@@ -20,6 +20,7 @@ public:
     int percent, finished;
     bool threadsRunning;
 private:
+    bool initial;
     static void Progress(MainWindow *wnd);
     void UpdateValues(int axis);
     Ui::MainWindow *ui;

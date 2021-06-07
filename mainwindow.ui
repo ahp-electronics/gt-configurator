@@ -58,7 +58,7 @@
        <x>10</x>
        <y>30</y>
        <width>261</width>
-       <height>341</height>
+       <height>361</height>
       </rect>
      </property>
      <property name="title">
@@ -287,7 +287,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>275</y>
+        <y>300</y>
         <width>241</width>
         <height>21</height>
        </rect>
@@ -315,7 +315,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>309</y>
+        <y>330</y>
         <width>121</width>
         <height>21</height>
        </rect>
@@ -340,7 +340,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>250</y>
+        <y>280</y>
         <width>121</width>
         <height>17</height>
        </rect>
@@ -353,13 +353,26 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>310</y>
+        <y>330</y>
         <width>101</width>
         <height>17</height>
        </rect>
       </property>
       <property name="text">
        <string>Acceleration</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="Invert_0">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>250</y>
+        <width>201</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Invert direction</string>
       </property>
      </widget>
     </widget>
@@ -507,7 +520,7 @@
        <x>280</x>
        <y>30</y>
        <width>261</width>
-       <height>341</height>
+       <height>361</height>
       </rect>
      </property>
      <property name="title">
@@ -736,7 +749,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>275</y>
+        <y>300</y>
         <width>241</width>
         <height>21</height>
        </rect>
@@ -767,7 +780,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>309</y>
+        <y>330</y>
         <width>121</width>
         <height>21</height>
        </rect>
@@ -792,7 +805,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>250</y>
+        <y>280</y>
         <width>121</width>
         <height>17</height>
        </rect>
@@ -805,13 +818,26 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>310</y>
+        <y>330</y>
         <width>101</width>
         <height>17</height>
        </rect>
       </property>
       <property name="text">
        <string>Acceleration</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="Invert_1">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>250</y>
+        <width>211</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Invert direction</string>
       </property>
      </widget>
     </widget>
