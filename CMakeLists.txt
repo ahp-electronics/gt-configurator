@@ -33,6 +33,8 @@ find_package(Threads REQUIRED)
 
 include_directories(${AHPGT_INCLUDE_DIR})
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/files.gt-configurator.cmake ${CMAKE_CURRENT_BINARY_DIR}/files.gt-configurator )
+
 if(ANDROID)
   add_library(gt-configurator SHARED
     main.cpp
