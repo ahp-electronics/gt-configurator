@@ -20,6 +20,8 @@ public:
     int percent, finished;
     bool threadsRunning;
 private:
+    int axisstatus[2];
+    int motionmode[2];
     bool initial;
     static void Progress(MainWindow *wnd);
     void UpdateValues(int axis);

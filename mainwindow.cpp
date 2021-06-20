@@ -181,6 +181,45 @@ MainWindow::MainWindow(QWidget *parent)
                    [=](int value){
         UpdateValues(1);
     });
+    connect(ui->Ra_P, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
+                   [=](int value){
+       ahp_gt_start_motion(0, ui->Ra_Speed->value());
+    });
+    connect(ui->Ra_N, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
+                   [=](int value){
+       ahp_gt_start_motion(0, -ui->Ra_Speed->value());
+    });
+    connect(ui->Dec_P, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
+                   [=](int value){
+       ahp_gt_start_motion(1, ui->Dec_Speed->value());
+    });
+    connect(ui->Dec_N, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
+                   [=](int value){
+       ahp_gt_start_motion(1, -ui->Dec_Speed->value());
+    });
+    connect(ui->Ra_P, static_cast<void (QPushButton::*)()>(&QPushButton::released),
+                   [=](int value){
+        ahp_gt_stop_motion(0);
+    });
+    connect(ui->Ra_N, static_cast<void (QPushButton::*)()>(&QPushButton::released),
+                   [=](int value){
+        ahp_gt_stop_motion(0);
+    });
+    connect(ui->Dec_P, static_cast<void (QPushButton::*)()>(&QPushButton::released),
+                   [=](int value){
+        ahp_gt_stop_motion(1);
+    });
+    connect(ui->Dec_N, static_cast<void (QPushButton::*)()>(&QPushButton::released),
+                   [=](int value){
+        ahp_gt_stop_motion(1);
+    });
+    connect(ui->Tracking, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+                   [=](bool checked){
+        if(ui->Tracking->IsChecked())
+            ahp_gt_start_tracking(0);
+        else
+            ahp_gt_stop_motion(0);
+    });
     connect(ui->Write, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [=](bool checked=false){
         percent = 0;
