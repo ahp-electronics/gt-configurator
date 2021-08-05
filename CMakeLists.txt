@@ -54,3 +54,5 @@ endif()
 
 target_link_libraries(gt-configurator PRIVATE ${AHPGT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} Qt5::Widgets Qt5::SerialPort)
 install(TARGETS gt-configurator RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install(FILES gt-configurator.png DESTINATION /usr/share/icons)
+install(FILES gt-configurator.desktop DESTINATION /usr/share/applications)

@@ -1,9 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Name=GT Configurator
-Comment=Configure your AHP GT Mount controller
-Exec=gt-configurator
-Icon=gt-configurator
-Terminal=false
-Type=Application
-Categories=Education

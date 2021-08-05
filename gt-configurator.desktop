@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=XC Gui
+GenericName=Gui test application for the AHP XC Cross-correlators
+Comment=Test GUI for XC Crosscorrelators
+Exec=xc-gui
+Icon=ahp
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=GNOME;GTK;Development;IDE;

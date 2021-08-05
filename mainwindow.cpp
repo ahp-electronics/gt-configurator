@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    this->setFixedSize(571, 600);
+    this->setFixedSize(890, 600);
     ui->setupUi(this);
     QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
     for (int i = 0; i < ports.length(); i++)
@@ -182,40 +182,40 @@ MainWindow::MainWindow(QWidget *parent)
         UpdateValues(1);
     });
     connect(ui->Ra_P, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
-                   [=](int value){
+                   [=](){
        ahp_gt_start_motion(0, ui->Ra_Speed->value());
     });
     connect(ui->Ra_N, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
-                   [=](int value){
+                   [=](){
        ahp_gt_start_motion(0, -ui->Ra_Speed->value());
     });
     connect(ui->Dec_P, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
-                   [=](int value){
+                   [=](){
        ahp_gt_start_motion(1, ui->Dec_Speed->value());
     });
     connect(ui->Dec_N, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
-                   [=](int value){
+                   [=](){
        ahp_gt_start_motion(1, -ui->Dec_Speed->value());
     });
     connect(ui->Ra_P, static_cast<void (QPushButton::*)()>(&QPushButton::released),
-                   [=](int value){
+                   [=](){
         ahp_gt_stop_motion(0);
     });
     connect(ui->Ra_N, static_cast<void (QPushButton::*)()>(&QPushButton::released),
-                   [=](int value){
+                   [=](){
         ahp_gt_stop_motion(0);
     });
     connect(ui->Dec_P, static_cast<void (QPushButton::*)()>(&QPushButton::released),
-                   [=](int value){
+                   [=](){
         ahp_gt_stop_motion(1);
     });
     connect(ui->Dec_N, static_cast<void (QPushButton::*)()>(&QPushButton::released),
-                   [=](int value){
+                   [=](){
         ahp_gt_stop_motion(1);
     });
     connect(ui->Tracking, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
                    [=](bool checked){
-        if(ui->Tracking->IsChecked())
+        if(ui->Tracking->isChecked())
             ahp_gt_start_tracking(0);
         else
             ahp_gt_stop_motion(0);
@@ -241,16 +241,33 @@ MainWindow::MainWindow(QWidget *parent)
         if(ahp_gt_connect(port)) {
             ahp_gt_read_values(0);
             ahp_gt_read_values(1);
-            int i = 0;
-            for (i = 0; i < 12; i++)
-                if(ahp_gt_get_mount_type()==mounttype[i])
-                    break;
-            ui->MountType->setCurrentIndex(i);
-            ui->MountType->activated(i);
             ui->WriteArea->setEnabled(true);
             ui->WorkArea->setEnabled(true);
-            UpdateValues(0);
-            UpdateValues(1);
+            ui->Control->setEnabled(true);
+            int axis = 0;
+            ui->Microsteps_0->setValue(ahp_gt_get_microsteps(axis));
+            ui->MotorSteps_0->setValue(ahp_gt_get_motor_steps(axis));
+            ui->Worm_0->setValue(ahp_gt_get_worm_teeth(axis));
+            ui->Motor_0->setValue(ahp_gt_get_motor_teeth(axis));
+            ui->Crown_0->setValue(ahp_gt_get_crown_teeth(axis));
+            ui->Acceleration_0->setValue(ahp_gt_get_acceleration(axis));
+            ui->MaxSpeed_0->setMaximum(ahp_gt_get_speed_limit(axis));
+            ui->MaxSpeed_0->setValue(ahp_gt_get_max_speed(axis));
+            ui->Coil_0->setCurrentIndex(ahp_gt_get_stepping_conf(axis));
+            ui->Invert_0->setChecked(ahp_gt_get_direction_invert(axis));
+            ui->GPIO_0->setCurrentIndex(ahp_gt_get_feature(axis));
+            axis++;
+            ui->Microsteps_1->setValue(ahp_gt_get_microsteps(axis));
+            ui->MotorSteps_1->setValue(ahp_gt_get_motor_steps(axis));
+            ui->Worm_1->setValue(ahp_gt_get_worm_teeth(axis));
+            ui->Motor_1->setValue(ahp_gt_get_motor_teeth(axis));
+            ui->Crown_1->setValue(ahp_gt_get_crown_teeth(axis));
+            ui->Acceleration_1->setValue(ahp_gt_get_acceleration(axis));
+            ui->MaxSpeed_1->setMaximum(ahp_gt_get_speed_limit(axis));
+            ui->MaxSpeed_1->setValue(ahp_gt_get_max_speed(axis));
+            ui->Coil_1->setCurrentIndex(ahp_gt_get_stepping_conf(axis));
+            ui->Invert_1->setChecked(ahp_gt_get_direction_invert(axis));
+            ui->GPIO_1->setCurrentIndex(ahp_gt_get_feature(axis));
         }
     });
     std::thread(MainWindow::Progress, this).detach();

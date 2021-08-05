@@ -1,1 +1,0 @@
-gt-configurator,/usr/bin/

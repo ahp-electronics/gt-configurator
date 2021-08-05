@@ -1,9 +1,0 @@
-Package: gt-configurator
-Version: VERSION
-Architecture: ARCH
-Maintainer: Ilia Platone <info@iliaplatone.com>
-Installed-Size: XXX		
-Depends: libahp-gt, qt5-default, libqt5serialport5
-Section: utils
-Priority: extra
-Description: Configuration application for AHP GT controllers
