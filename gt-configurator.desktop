@@ -1,11 +1,11 @@
 [Desktop Entry]
 Version=1.0
 Encoding=UTF-8
-Name=XC Gui
-GenericName=Gui test application for the AHP XC Cross-correlators
-Comment=Test GUI for XC Crosscorrelators
-Exec=xc-gui
-Icon=ahp
+Name=GT Configurator
+GenericName=Configuration utility for the AHP GT mount controllers
+Comment=Configuration utility for the GT Controllers
+Exec=gt-configurator
+Icon=gt-configurator
 StartupNotify=true
 Terminal=false
 Type=Application
