@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(gt-configurator LANGUAGES CXX)
+project(gt-configurator LANGUAGES C CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -23,17 +23,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #            ${CMAKE_CURRENT_SOURCE_DIR}/path/to/libssl.so)
 #    endif()
 #endif()
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
+LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
 
 find_package(Qt5 COMPONENTS Widgets SerialPort REQUIRED)
-find_package(M REQUIRED)
 find_package(AHPGT REQUIRED)
 find_package(Threads REQUIRED)
 
 include_directories(${AHPGT_INCLUDE_DIR})
-
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/files.gt-configurator.cmake ${CMAKE_CURRENT_BINARY_DIR}/files.gt-configurator )
 
 if(ANDROID)
   add_library(gt-configurator SHARED
@@ -42,7 +38,7 @@ if(ANDROID)
     mainwindow.h
     mainwindow.ui
   )
-else()
+else(ANDROID)
   add_executable(gt-configurator
     main.cpp
     mainwindow.cpp
@@ -50,7 +46,11 @@ else()
     mainwindow.ui
     resource.qrc
   )
-endif()
+  if(WIN32)
+    add_definitions(-D _win32_IE=0x0500 -D WINVER=0x0500)
+    set_target_properties(gt-configurator PROPERTIES WIN32_EXECUTABLE TRUE)
+  endif(WIN32)
+endif(ANDROID)
 
 target_link_libraries(gt-configurator PRIVATE ${AHPGT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} Qt5::Widgets Qt5::SerialPort)
 install(TARGETS gt-configurator RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
