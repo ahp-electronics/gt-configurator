@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>770</width>
-    <height>560</height>
+    <width>896</width>
+    <height>647</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -780,6 +780,9 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksBelow</enum>
+      </property>
      </widget>
      <widget class="QLabel" name="label_21">
       <property name="geometry">
@@ -818,6 +821,9 @@
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksBelow</enum>
       </property>
      </widget>
      <widget class="QCheckBox" name="Tracking">
@@ -979,7 +985,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>770</width>
+     <width>896</width>
      <height>21</height>
     </rect>
    </property>

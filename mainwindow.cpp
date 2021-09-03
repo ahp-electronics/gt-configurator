@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    this->setFixedSize(890, 600);
+    this->setFixedSize(770, 540);
     ui->setupUi(this);
     QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
     for (int i = 0; i < ports.length(); i++)
