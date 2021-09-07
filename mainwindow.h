@@ -17,14 +17,23 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    int percent, finished;
-    bool threadsRunning;
+
+    int flashFirmware();
 private:
+    QString firmwareFilename;
+    int percent { 0 };
+    int finished { 1 };
+    bool threadsRunning;
+    bool isConnected;
     int axisstatus[2];
     int motionmode[2];
     bool initial;
-    static void Progress(MainWindow *wnd);
     void UpdateValues(int axis);
     Ui::MainWindow *ui;
+    bool oldTracking;
+    static void Progress(MainWindow *wnd);
+    static void WriteValues(MainWindow *wnd);
+signals:
+    void onUpdateProgress();
 };
 #endif // MAINWINDOW_H

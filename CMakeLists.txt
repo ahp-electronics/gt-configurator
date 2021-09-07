@@ -28,23 +28,38 @@ LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
 find_package(Qt5 COMPONENTS Widgets SerialPort REQUIRED)
 find_package(AHPGT REQUIRED)
 find_package(Threads REQUIRED)
+find_package(M REQUIRED)
+find_package(USB REQUIRED)
 
-include_directories(${AHPGT_INCLUDE_DIR})
+include_directories(${AHPGT_INCLUDE_DIR} ${DFU_INCLUDE_DIR})
+
+add_definitions(-DHAVE_NANOSLEEP)
+
+set(DFU_SOURCES
+    ${CMAKE_SOURCE_DIR}/dfu/dfu.c
+    ${CMAKE_SOURCE_DIR}/dfu/dfu_load.c
+    ${CMAKE_SOURCE_DIR}/dfu/dfuse.c
+    ${CMAKE_SOURCE_DIR}/dfu/quirks.c
+    ${CMAKE_SOURCE_DIR}/dfu/dfu_file.c
+    ${CMAKE_SOURCE_DIR}/dfu/dfu_util.c
+    ${CMAKE_SOURCE_DIR}/dfu/dfuse_mem.c
+   )
 
 if(ANDROID)
-  add_library(gt-configurator SHARED
+  add_library(gt-configurator SHARED ${DFU_SOURCES}
     main.cpp
     mainwindow.cpp
     mainwindow.h
-    mainwindow.ui
+    ${CMAKE_SOURCE_DIR}/mainwindow.ui
   )
 else(ANDROID)
-  add_executable(gt-configurator
-    main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
-    resource.qrc
+  add_executable(gt-configurator ${DFU_SOURCES}
+    ${CMAKE_SOURCE_DIR}/main.cpp
+    ${CMAKE_SOURCE_DIR}/mainwindow.cpp
+    ${CMAKE_SOURCE_DIR}/mainwindow.h
+    ${CMAKE_SOURCE_DIR}/mainwindow.ui
+    ${CMAKE_SOURCE_DIR}/resource.qrc
+    ${CMAKE_SOURCE_DIR}/app.rc
   )
   if(WIN32)
     add_definitions(-D _win32_IE=0x0500 -D WINVER=0x0500)
@@ -52,7 +67,9 @@ else(ANDROID)
   endif(WIN32)
 endif(ANDROID)
 
-target_link_libraries(gt-configurator PRIVATE ${AHPGT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} Qt5::Widgets Qt5::SerialPort)
+link_directories(${CMAKE_LIBRARY_PATH} ${CMAKE_BINARY_DIR})
+
+target_link_libraries(gt-configurator PRIVATE ${AHPGT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIB} ${USB_LIBRARIES} Qt5::Widgets Qt5::SerialPort)
 install(TARGETS gt-configurator RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install(FILES gt-configurator.png DESTINATION /usr/share/icons)
 install(FILES gt-configurator.desktop DESTINATION /usr/share/applications)

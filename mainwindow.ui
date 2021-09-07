@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>896</width>
-    <height>647</height>
+    <width>772</width>
+    <height>656</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
       <x>10</x>
       <y>10</y>
       <width>751</width>
-      <height>501</height>
+      <height>611</height>
      </rect>
     </property>
     <property name="title">
@@ -240,7 +240,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Motor theeth</string>
+       <string>Motor teeth</string>
       </property>
      </widget>
      <widget class="QSlider" name="MaxSpeed_0">
@@ -281,10 +281,13 @@
        </rect>
       </property>
       <property name="maximum">
-       <number>63</number>
+       <number>20</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
       </property>
       <property name="value">
-       <number>32</number>
+       <number>10</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -296,7 +299,7 @@
        <number>8</number>
       </property>
      </widget>
-     <widget class="QLabel" name="label_9">
+     <widget class="QLabel" name="MaxSpeed_label_0">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -309,7 +312,7 @@
        <string>Maximum speed</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_10">
+     <widget class="QLabel" name="Acceleration_label_0">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -338,12 +341,12 @@
     </widget>
     <widget class="QGroupBox" name="WriteArea">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>440</y>
+       <y>550</y>
        <width>731</width>
        <height>51</height>
       </rect>
@@ -352,6 +355,9 @@
       <string/>
      </property>
      <widget class="QPushButton" name="Write">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -367,9 +373,9 @@
      <widget class="QProgressBar" name="progress">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>200</x>
         <y>10</y>
-        <width>611</width>
+        <width>521</width>
         <height>23</height>
        </rect>
       </property>
@@ -377,8 +383,21 @@
        <number>0</number>
       </property>
      </widget>
+     <widget class="QPushButton" name="LoadFW">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>10</y>
+        <width>89</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Load FW..</string>
+      </property>
+     </widget>
     </widget>
-    <widget class="QGroupBox" name="RA_2">
+    <widget class="QGroupBox" name="DEC">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -589,7 +608,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Motor theeth</string>
+       <string>Motor teeth</string>
       </property>
      </widget>
      <widget class="QSlider" name="MaxSpeed_1">
@@ -633,10 +652,10 @@
        </rect>
       </property>
       <property name="maximum">
-       <number>63</number>
+       <number>20</number>
       </property>
       <property name="value">
-       <number>32</number>
+       <number>10</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -648,7 +667,7 @@
        <number>8</number>
       </property>
      </widget>
-     <widget class="QLabel" name="label_19">
+     <widget class="QLabel" name="MaxSpeed_label_1">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -661,7 +680,7 @@
        <string>Maximum speed</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_20">
+     <widget class="QLabel" name="Acceleration_label_1">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -777,14 +796,26 @@
         <height>16</height>
        </rect>
       </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+      <property name="value">
+       <number>200</number>
+      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
       <property name="tickPosition">
        <enum>QSlider::TicksBelow</enum>
       </property>
+      <property name="tickInterval">
+       <number>50</number>
+      </property>
      </widget>
-     <widget class="QLabel" name="label_21">
+     <widget class="QLabel" name="Ra_Speed_label">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -797,7 +828,7 @@
        <string>Ra Speed</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_22">
+     <widget class="QLabel" name="Dec_Speed_label">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -819,11 +850,23 @@
         <height>16</height>
        </rect>
       </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+      <property name="value">
+       <number>200</number>
+      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
       <property name="tickPosition">
        <enum>QSlider::TicksBelow</enum>
+      </property>
+      <property name="tickInterval">
+       <number>50</number>
       </property>
      </widget>
      <widget class="QCheckBox" name="Tracking">
@@ -869,9 +912,6 @@
       </property>
      </widget>
      <widget class="QComboBox" name="MountType">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
       <property name="geometry">
        <rect>
         <x>80</x>
@@ -954,6 +994,44 @@
        <string>AZEQ?</string>
       </property>
      </widget>
+     <widget class="QLabel" name="PWMFreq_label">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>10</y>
+        <width>131</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>PWM Frequency</string>
+      </property>
+     </widget>
+     <widget class="QSlider" name="PWMFreq">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>30</y>
+        <width>201</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>0</number>
+      </property>
+      <property name="maximum">
+       <number>11</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::TicksBelow</enum>
+      </property>
+     </widget>
     </widget>
     <widget class="QComboBox" name="ComPort">
      <property name="geometry">
@@ -978,6 +1056,246 @@
       <string>COM Port:</string>
      </property>
     </widget>
+    <widget class="QGroupBox" name="RaInfo">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>440</y>
+       <width>731</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Informations RA</string>
+     </property>
+     <widget class="QLineEdit" name="TotalSteps0">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>20</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>20</y>
+        <width>61</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Total Steps</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_10">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>20</y>
+        <width>51</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Mutiplier</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="Divider0">
+      <property name="geometry">
+       <rect>
+        <x>620</x>
+        <y>20</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_9">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>20</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Worm Steps</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="WormSteps0">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>20</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_12">
+      <property name="geometry">
+       <rect>
+        <x>560</x>
+        <y>20</y>
+        <width>51</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Divider</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="Multiplier0">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>20</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="DecInfo">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>490</y>
+       <width>731</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Informations Dec</string>
+     </property>
+     <widget class="QLineEdit" name="TotalSteps1">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>20</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_27">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>20</y>
+        <width>61</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Total Steps</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_28">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>20</y>
+        <width>51</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Mutiplier</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="Divider1">
+      <property name="geometry">
+       <rect>
+        <x>620</x>
+        <y>20</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_29">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>20</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Worm Steps</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="WormSteps1">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>20</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_30">
+      <property name="geometry">
+       <rect>
+        <x>560</x>
+        <y>20</y>
+        <width>51</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Divider</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="Multiplier1">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>20</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -985,12 +1303,17 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>896</width>
+     <width>772</width>
      <height>21</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpen_FW">
+   <property name="text">
+    <string>Open FW...</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
