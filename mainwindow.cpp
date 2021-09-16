@@ -522,8 +522,9 @@ void MainWindow::UpdateValues(int axis)
         ahp_gt_set_crown_teeth(axis, ui->Crown_0->value());
         ahp_gt_set_acceleration_angle(axis, (ui->Acceleration_0->maximum()-ui->Acceleration_0->value())*M_PI/1800.0);
         ahp_gt_set_max_speed(axis, ui->MaxSpeed_0->value());
-        ahp_gt_set_stepping_conf(axis, (GT1Stepping)ui->Coil_0->currentIndex());
+        ahp_gt_set_stepping_conf(axis, (GT1SteppingConfiguration)ui->Coil_0->currentIndex());
         ahp_gt_set_direction_invert(axis, ui->Invert_0->isChecked());
+        ahp_gt_set_feature(axis, (GT1Feature)(ui->GPIO_0->currentIndex()));
         ahp_gt_set_features(axis, (SkywatcherFeature)((ui->isAZEQ->isChecked() ? isAZEQ : 0)|hasPPEC));
 
         ui->MotorSteps_0->setValue(ahp_gt_get_motor_steps(axis));
@@ -548,8 +549,9 @@ void MainWindow::UpdateValues(int axis)
         ahp_gt_set_crown_teeth(axis, ui->Crown_1->value());
         ahp_gt_set_acceleration_angle(axis,  (ui->Acceleration_1->maximum()-ui->Acceleration_1->value())*M_PI/1800.0);
         ahp_gt_set_max_speed(axis, ui->MaxSpeed_1->value());
-        ahp_gt_set_stepping_conf(axis, (GT1Stepping)ui->Coil_1->currentIndex());
+        ahp_gt_set_stepping_conf(axis, (GT1SteppingConfiguration)ui->Coil_1->currentIndex());
         ahp_gt_set_direction_invert(axis, ui->Invert_1->isChecked());
+        ahp_gt_set_feature(axis, (GT1Feature)(ui->GPIO_1->currentIndex()));
         ahp_gt_set_features(axis, (SkywatcherFeature)((ui->isAZEQ->isChecked() ? isAZEQ : 0)|hasPPEC));
 
         ui->MotorSteps_1->setValue(ahp_gt_get_motor_steps(axis));
