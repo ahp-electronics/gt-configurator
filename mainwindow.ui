@@ -330,7 +330,7 @@
        <rect>
         <x>20</x>
         <y>220</y>
-        <width>201</width>
+        <width>111</width>
         <height>23</height>
        </rect>
       </property>
@@ -698,7 +698,7 @@
        <rect>
         <x>10</x>
         <y>220</y>
-        <width>211</width>
+        <width>121</width>
         <height>23</height>
        </rect>
       </property>
@@ -1056,7 +1056,7 @@
       <string>COM Port:</string>
      </property>
     </widget>
-    <widget class="QGroupBox" name="RaInfo">
+    <widget class="QGroupBox" name="AdvancedRA">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -1069,21 +1069,8 @@
       </rect>
      </property>
      <property name="title">
-      <string>Informations RA</string>
+      <string>Advanced RA</string>
      </property>
-     <widget class="QLineEdit" name="TotalSteps0">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>20</y>
-        <width>91</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_3">
       <property name="geometry">
        <rect>
@@ -1110,19 +1097,6 @@
        <string>Mutiplier</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="Divider0">
-      <property name="geometry">
-       <rect>
-        <x>620</x>
-        <y>20</y>
-        <width>91</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_9">
       <property name="geometry">
        <rect>
@@ -1134,19 +1108,6 @@
       </property>
       <property name="text">
        <string>Worm Steps</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="WormSteps0">
-      <property name="geometry">
-       <rect>
-        <x>290</x>
-        <y>20</y>
-        <width>91</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_12">
@@ -1162,21 +1123,84 @@
        <string>Divider</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="Multiplier0">
+     <widget class="QSpinBox" name="TotalSteps0">
       <property name="geometry">
        <rect>
-        <x>460</x>
-        <y>20</y>
+        <x>110</x>
+        <y>10</y>
         <width>91</width>
-        <height>21</height>
+        <height>26</height>
        </rect>
       </property>
-      <property name="readOnly">
-       <bool>true</bool>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>16777215</number>
+      </property>
+      <property name="value">
+       <number>360</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="WormSteps0">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>10</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>16777215</number>
+      </property>
+      <property name="value">
+       <number>360</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Multiplier0">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>10</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>127</number>
+      </property>
+      <property name="value">
+       <number>127</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Divider0">
+      <property name="geometry">
+       <rect>
+        <x>600</x>
+        <y>10</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>14</number>
+      </property>
+      <property name="value">
+       <number>14</number>
       </property>
      </widget>
     </widget>
-    <widget class="QGroupBox" name="DecInfo">
+    <widget class="QGroupBox" name="AdvancedDec">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -1189,21 +1213,8 @@
       </rect>
      </property>
      <property name="title">
-      <string>Informations Dec</string>
+      <string>Advanced Dec</string>
      </property>
-     <widget class="QLineEdit" name="TotalSteps1">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>20</y>
-        <width>91</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_27">
       <property name="geometry">
        <rect>
@@ -1230,19 +1241,6 @@
        <string>Mutiplier</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="Divider1">
-      <property name="geometry">
-       <rect>
-        <x>620</x>
-        <y>20</y>
-        <width>91</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_29">
       <property name="geometry">
        <rect>
@@ -1254,19 +1252,6 @@
       </property>
       <property name="text">
        <string>Worm Steps</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="WormSteps1">
-      <property name="geometry">
-       <rect>
-        <x>290</x>
-        <y>20</y>
-        <width>91</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_30">
@@ -1282,17 +1267,80 @@
        <string>Divider</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="Multiplier1">
+     <widget class="QSpinBox" name="TotalSteps1">
       <property name="geometry">
        <rect>
-        <x>460</x>
-        <y>20</y>
+        <x>110</x>
+        <y>10</y>
         <width>91</width>
-        <height>21</height>
+        <height>26</height>
        </rect>
       </property>
-      <property name="readOnly">
-       <bool>true</bool>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>16777215</number>
+      </property>
+      <property name="value">
+       <number>360</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="WormSteps1">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>10</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>16777215</number>
+      </property>
+      <property name="value">
+       <number>360</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Multiplier1">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>10</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>127</number>
+      </property>
+      <property name="value">
+       <number>127</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Divider1">
+      <property name="geometry">
+       <rect>
+        <x>600</x>
+        <y>10</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>14</number>
+      </property>
+      <property name="value">
+       <number>14</number>
       </property>
      </widget>
     </widget>
