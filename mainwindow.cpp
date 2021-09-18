@@ -209,7 +209,7 @@ MainWindow::MainWindow(QWidget *parent)
             ui->AdvancedDec->setEnabled(false);
         }
     });
-    connect(ui->MountType, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+    connect(ui->MountType, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
             [=](int index) {
         switch(mounttype[index]) {
         case isEQ6:
@@ -325,92 +325,97 @@ MainWindow::MainWindow(QWidget *parent)
             [=](bool checked){
         ahp_gt_set_direction_invert(1, ui->Invert_1->isChecked());
     });
-    /*
-    connect(ui->SteppingMode_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=](int index) {
-        if(ui->SteppingMode_0->currentIndex() == 0)
-            ui->Multiplier0->setMaximum(127);
-        else
+    connect(ui->SteppingMode_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [=](int index) {
+        if(ui->SteppingMode_0->currentIndex() == HalfStep)
             ui->Multiplier0->setMaximum(1);
+        else
+            ui->Multiplier0->setMaximum(127);
         ahp_gt_set_stepping_mode(0, (GT1SteppingMode)ui->SteppingMode_0->currentIndex());
-    });*/
-    connect(ui->TotalSteps0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                   [=](int value){
-        ahp_gt_set_totalsteps(0, ui->TotalSteps0->value());
+        UpdateValues(0);
     });
-    connect(ui->WormSteps0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                   [=](int value){
-        ahp_gt_set_wormsteps(0, ui->WormSteps0->value());
-    });
-        connect(ui->Multiplier0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                   [=](int value){
+    connect(ui->Multiplier0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+               [=](int value){
         ahp_gt_set_multiplier(0, ui->Multiplier0->value());
+        UpdateValues(0);
     });
     connect(ui->Divider0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
         ahp_gt_set_divider(0, ui->Divider0->value());
-    });/*
-    connect(ui->SteppingMode_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=](int index) {
-        if(ui->SteppingMode_1->currentIndex() == 0)
-            ui->Multiplier1->setMaximum(127);
-        else
-            ui->Multiplier1->setMaximum(1);
-        ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_1->currentIndex());
-    });*/
-    connect(ui->TotalSteps1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                   [=](int value){
-        ahp_gt_set_totalsteps(1, ui->TotalSteps0->value());
-    });
-    connect(ui->WormSteps1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                   [=](int value){
-        ahp_gt_set_wormsteps(1, ui->WormSteps0->value());
-    });
-        connect(ui->Multiplier1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                   [=](int value){
-        ahp_gt_set_multiplier(1, ui->Multiplier1->value());
-    });
-    connect(ui->Divider1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                   [=](int value){
-        ahp_gt_set_divider(1, ui->Divider1->value());
+        UpdateValues(0);
     });
     connect(ui->MotorSteps_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
         ahp_gt_set_motor_steps(0, ui->MotorSteps_0->value());
         UpdateValues(0);
+        ui->Divider0->setValue(ahp_gt_get_divider(0));
+        ui->Multiplier0->setValue(ahp_gt_get_multiplier(0));
     });
     connect(ui->Worm_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
         ahp_gt_set_worm_teeth(0, ui->Worm_0->value());
         UpdateValues(0);
+        ui->Divider0->setValue(ahp_gt_get_divider(0));
+        ui->Multiplier0->setValue(ahp_gt_get_multiplier(0));
     });
     connect(ui->Motor_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
         ahp_gt_set_motor_teeth(0, ui->Motor_0->value());
         UpdateValues(0);
+        ui->Divider0->setValue(ahp_gt_get_divider(0));
+        ui->Multiplier0->setValue(ahp_gt_get_multiplier(0));
     });
     connect(ui->Crown_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
         ahp_gt_set_crown_teeth(0, ui->Crown_0->value());
         UpdateValues(0);
+        ui->Divider0->setValue(ahp_gt_get_divider(0));
+        ui->Multiplier0->setValue(ahp_gt_get_multiplier(0));
+    });
+    connect(ui->SteppingMode_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [=](int index) {
+        if(ui->SteppingMode_1->currentIndex() == HalfStep)
+            ui->Multiplier1->setMaximum(1);
+        else
+            ui->Multiplier1->setMaximum(127);
+        ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_1->currentIndex());
+        UpdateValues(1);
+    });
+    connect(ui->Multiplier1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+               [=](int value){
+        ahp_gt_set_multiplier(1, ui->Multiplier1->value());
+        UpdateValues(1);
+    });
+    connect(ui->Divider1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                   [=](int value){
+        ahp_gt_set_divider(1, ui->Divider1->value());
+        UpdateValues(1);
     });
     connect(ui->MotorSteps_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
         ahp_gt_set_motor_steps(1, ui->MotorSteps_1->value());
         UpdateValues(1);
+        ui->Divider1->setValue(ahp_gt_get_divider(1));
+        ui->Multiplier1->setValue(ahp_gt_get_multiplier(1));
     });
     connect(ui->Worm_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
         ahp_gt_set_worm_teeth(1, ui->Worm_1->value());
         UpdateValues(1);
+        ui->Divider1->setValue(ahp_gt_get_divider(1));
+        ui->Multiplier1->setValue(ahp_gt_get_multiplier(1));
     });
     connect(ui->Motor_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
         ahp_gt_set_motor_teeth(1, ui->Motor_1->value());
         UpdateValues(1);
+        ui->Divider1->setValue(ahp_gt_get_divider(1));
+        ui->Multiplier1->setValue(ahp_gt_get_multiplier(1));
     });
     connect(ui->Crown_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
         ahp_gt_set_crown_teeth(1, ui->Crown_1->value());
         UpdateValues(1);
+        ui->Divider1->setValue(ahp_gt_get_divider(1));
+        ui->Multiplier1->setValue(ahp_gt_get_multiplier(1));
     });
     connect(ui->Ra_P, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
                    [=](){
@@ -512,19 +517,19 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_set_features(0, (SkywatcherFeature)((ui->isAZEQ->isChecked() ? isAZEQ : 0)|hasPPEC));
         ahp_gt_set_features(1, (SkywatcherFeature)((ui->isAZEQ->isChecked() ? isAZEQ : 0)|hasPPEC));
     });
-    connect(ui->Coil_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+    connect(ui->Coil_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
                    [=](int index){
         ahp_gt_set_stepping_conf(0, (GT1SteppingConfiguration)ui->Coil_0->currentIndex());
     });
-    connect(ui->Coil_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+    connect(ui->Coil_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
                    [=](int index){
         ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)ui->Coil_1->currentIndex());
     });
-    connect(ui->GPIO_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+    connect(ui->GPIO_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
                    [=](int index){
         ahp_gt_set_feature(0, (GT1Feature)(ui->GPIO_0->currentIndex()));
     });
-    connect(ui->GPIO_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+    connect(ui->GPIO_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
                    [=](int index){
         ahp_gt_set_feature(1, (GT1Feature)(ui->GPIO_1->currentIndex()));
     });
@@ -601,36 +606,20 @@ MainWindow::~MainWindow()
 void MainWindow::UpdateValues(int axis)
 {
     if(axis == 0) {
-
-        ui->MotorSteps_0->setValue(ahp_gt_get_motor_steps(axis));
-        ui->Worm_0->setValue(ahp_gt_get_worm_teeth(axis));
-        ui->Motor_0->setValue(ahp_gt_get_motor_teeth(axis));
-        ui->Crown_0->setValue(ahp_gt_get_crown_teeth(axis));
-        ui->Acceleration_0->setValue(ui->Acceleration_0->maximum()-ahp_gt_get_acceleration_angle(axis)*1800.0/M_PI);
-        ui->MaxSpeed_0->setValue(ahp_gt_get_max_speed(axis));
-        ui->Coil_0->setCurrentIndex(ahp_gt_get_stepping_conf(axis));
-        ui->Invert_0->setChecked(ahp_gt_get_direction_invert(axis));
-        ui->GPIO_0->setCurrentIndex(ahp_gt_get_feature(axis));
-        ui->TotalSteps0->setValue(ahp_gt_get_totalsteps(axis));
-        ui->WormSteps0->setValue(ahp_gt_get_wormsteps(axis));
-        ui->Multiplier0->setValue(ahp_gt_get_multiplier(axis));
-        ui->Divider0->setValue(ahp_gt_get_divider(axis));
-        //ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(axis));
+        ahp_gt_set_wormsteps(0, fmin(pow(2,24)-1, ahp_gt_get_motor_steps(0)*ahp_gt_get_multiplier(0)*ahp_gt_get_worm_teeth(0)/ahp_gt_get_motor_teeth(0)/ahp_gt_get_divider(0)));
+        ahp_gt_set_totalsteps(0, fmin(pow(2,24)-1, ahp_gt_get_wormsteps(0)*ahp_gt_get_crown_teeth(0)));
+        ui->Divider0->setValue(ahp_gt_get_divider(0));
+        ui->Multiplier0->setValue(ahp_gt_get_multiplier(0));
+        ui->WormSteps0->setText(QString::number(ahp_gt_get_wormsteps(0)));
+        ui->TotalSteps0->setText(QString::number(ahp_gt_get_totalsteps(0)));
+        //ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(0));
     } else if (axis == 1) {
-
-        ui->MotorSteps_1->setValue(ahp_gt_get_motor_steps(axis));
-        ui->Worm_1->setValue(ahp_gt_get_worm_teeth(axis));
-        ui->Motor_1->setValue(ahp_gt_get_motor_teeth(axis));
-        ui->Crown_1->setValue(ahp_gt_get_crown_teeth(axis));
-        ui->Acceleration_1->setValue(ui->Acceleration_1->maximum()-ahp_gt_get_acceleration_angle(axis)*1800.0/M_PI);
-        ui->MaxSpeed_1->setValue(ahp_gt_get_max_speed(axis));
-        ui->Coil_1->setCurrentIndex(ahp_gt_get_stepping_conf(axis));
-        ui->Invert_1->setChecked(ahp_gt_get_direction_invert(axis));
-        ui->GPIO_1->setCurrentIndex(ahp_gt_get_feature(axis));
-        ui->TotalSteps1->setValue(ahp_gt_get_totalsteps(axis));
-        ui->WormSteps1->setValue(ahp_gt_get_wormsteps(axis));
-        ui->Multiplier1->setValue(ahp_gt_get_multiplier(axis));
-        ui->Divider1->setValue(ahp_gt_get_divider(axis));
-        //ui->SteppingMode_1->setCurrentIndex(ahp_gt_get_stepping_mode(axis));
+        ahp_gt_set_wormsteps(1, fmin(pow(2,24)-1, ahp_gt_get_motor_steps(1)*ahp_gt_get_multiplier(1)*ahp_gt_get_worm_teeth(1)/ahp_gt_get_motor_teeth(1)/ahp_gt_get_divider(1)));
+        ahp_gt_set_totalsteps(1, fmin(pow(2,24)-1, ahp_gt_get_wormsteps(1)*ahp_gt_get_crown_teeth(1)));
+        ui->Divider1->setValue(ahp_gt_get_divider(1));
+        ui->Multiplier1->setValue(ahp_gt_get_multiplier(1));
+        ui->WormSteps1->setText(QString::number(ahp_gt_get_wormsteps(1)));
+        ui->TotalSteps1->setText(QString::number(ahp_gt_get_totalsteps(1)));
+        //ui->SteppingMode_1->setCurrentIndex(ahp_gt_get_stepping_mode(1));
     }
 }

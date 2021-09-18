@@ -338,6 +338,31 @@
        <string>Invert direction</string>
       </property>
      </widget>
+     <widget class="QComboBox" name="SteppingMode_0">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>210</y>
+        <width>91</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>Mixed</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Microstep</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Half-step</string>
+       </property>
+      </item>
+     </widget>
     </widget>
     <widget class="QGroupBox" name="WriteArea">
      <property name="enabled">
@@ -705,6 +730,31 @@
       <property name="text">
        <string>Invert direction</string>
       </property>
+     </widget>
+     <widget class="QComboBox" name="SteppingMode_1">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>210</y>
+        <width>91</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>Mixed</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Microstep</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Half-step</string>
+       </property>
+      </item>
      </widget>
     </widget>
     <widget class="QGroupBox" name="Control">
@@ -1123,44 +1173,6 @@
        <string>Divider</string>
       </property>
      </widget>
-     <widget class="QSpinBox" name="TotalSteps0">
-      <property name="geometry">
-       <rect>
-        <x>110</x>
-        <y>10</y>
-        <width>91</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>16777215</number>
-      </property>
-      <property name="value">
-       <number>360</number>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="WormSteps0">
-      <property name="geometry">
-       <rect>
-        <x>290</x>
-        <y>10</y>
-        <width>91</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>16777215</number>
-      </property>
-      <property name="value">
-       <number>360</number>
-      </property>
-     </widget>
      <widget class="QSpinBox" name="Multiplier0">
       <property name="geometry">
        <rect>
@@ -1197,6 +1209,32 @@
       </property>
       <property name="value">
        <number>14</number>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TotalSteps0">
+      <property name="geometry">
+       <rect>
+        <x>112</x>
+        <y>20</y>
+        <width>101</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="WormSteps0">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>20</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
       </property>
      </widget>
     </widget>
@@ -1267,44 +1305,6 @@
        <string>Divider</string>
       </property>
      </widget>
-     <widget class="QSpinBox" name="TotalSteps1">
-      <property name="geometry">
-       <rect>
-        <x>110</x>
-        <y>10</y>
-        <width>91</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>16777215</number>
-      </property>
-      <property name="value">
-       <number>360</number>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="WormSteps1">
-      <property name="geometry">
-       <rect>
-        <x>290</x>
-        <y>10</y>
-        <width>91</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>16777215</number>
-      </property>
-      <property name="value">
-       <number>360</number>
-      </property>
-     </widget>
      <widget class="QSpinBox" name="Multiplier1">
       <property name="geometry">
        <rect>
@@ -1341,6 +1341,32 @@
       </property>
       <property name="value">
        <number>14</number>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="TotalSteps1">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>20</y>
+        <width>101</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="WormSteps1">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>20</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
       </property>
      </widget>
     </widget>
