@@ -31,7 +31,7 @@ find_package(Threads REQUIRED)
 find_package(M REQUIRED)
 find_package(USB REQUIRED)
 
-include_directories(${AHPGT_INCLUDE_DIR} ${DFU_INCLUDE_DIR})
+include_directories(${AHPGT_INCLUDE_DIR} ${DFU_INCLUDE_DIR} ${USB_INCLUDE_DIR})
 
 add_definitions(-DHAVE_NANOSLEEP)
 
