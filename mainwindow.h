@@ -3,6 +3,7 @@
 
 #include <thread>
 #include <QThread>
+#include <QSettings>
 #include <QMainWindow>
 #include <ahp_gt.h>
 
@@ -20,6 +21,7 @@ public:
 
     int flashFirmware();
 private:
+    QSettings *settings;
     QString firmwareFilename;
     int percent { 0 };
     int finished { 1 };

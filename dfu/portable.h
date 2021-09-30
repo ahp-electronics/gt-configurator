@@ -9,7 +9,11 @@
 # define PACKAGE_VERSION "0.10-msvc"
 # define PACKAGE_STRING "dfu-util 0.10-msvc"
 # define PACKAGE_BUGREPORT "http://sourceforge.net/p/dfu-util/tickets/"
+#ifdef _WIN32
+# include <io.h>
+#else
 # include <sys/io.h>
+#endif
 /* FIXME if off_t is a typedef it is not a define */
 # ifndef off_t
 #  define off_t long int

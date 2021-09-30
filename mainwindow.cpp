@@ -1,14 +1,16 @@
 #include "mainwindow.h"
 #include <ctime>
+#include <cmath>
 #include <cstring>
 #include <QSerialPort>
+#include <QStandardPaths>
 #include <QSerialPortInfo>
 #include <QFileDialog>
 #include <errno.h>
 #include <libusb.h>
 #include "dfu/dfu.h"
 #include "./ui_mainwindow.h"
-
+static const double SIDEREAL_DAY = 86164.0916000;
 static MountType mounttype[] = {
     isEQ6,
     isHEQ5,
@@ -186,8 +188,21 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    setAccessibleName("GT Configurator");
+    QString homedir = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).at(0);
+    QString ini = homedir+"/settings.ini";
+    if(!QDir(homedir).exists()){
+        QDir().mkdir(homedir);
+    }
+    if(!QFile(ini).exists()){
+        QFile *f = new QFile(ini);
+        f->open(QIODevice::WriteOnly);
+        f->close();
+        f->~QFile();
+    }
+    settings = new QSettings(ini, QSettings::Format::IniFormat);
     isConnected = false;
-    this->setFixedSize(770, 645);
+    this->setFixedSize(770, 745);
     ui->setupUi(this);
     QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
     for (int i = 0; i < ports.length(); i++)
@@ -312,110 +327,101 @@ MainWindow::MainWindow(QWidget *parent)
             ui->isAZEQ->setCheckState(Qt::CheckState::Checked);
             break;
         default:
+            ui->MotorSteps_0->setValue(settings->value("MotorSteps_0", 200).toInt());
+            ui->Motor_0->setValue(settings->value("Motor_0", 1).toInt());
+            ui->Worm_0->setValue(settings->value("Worm_0", 5).toInt());
+            ui->Crown_0->setValue(settings->value("Crown_0", 180).toInt());
+            ui->MaxSpeed_0->setValue(settings->value("MaxSpeed_0", 800).toInt());
+            ui->Acceleration_0->setValue(settings->value("Acceleration_0", 10).toInt());
+            ui->GPIO_0->setCurrentIndex(settings->value("GPIO_0", 0).toInt());
+            ui->SteppingMode_0->setCurrentIndex(settings->value("SteppingMode_0", 0).toInt());
+            ui->Coil_0->setCurrentIndex(settings->value("Coil_0", 0).toInt());
+            ui->Invert_0->setChecked(settings->value("Invert_0", false).toBool());
+            ui->MotorSteps_1->setValue(settings->value("MotorSteps_1", 200).toInt());
+            ui->Motor_1->setValue(settings->value("Motor_1", 1).toInt());
+            ui->Worm_1->setValue(settings->value("Worm_1", 5).toInt());
+            ui->Crown_1->setValue(settings->value("Crown_1", 180).toInt());
+            ui->MaxSpeed_1->setValue(settings->value("MaxSpeed_1", 800).toInt());
+            ui->Acceleration_1->setValue(settings->value("Acceleration_1", 10).toInt());
+            ui->GPIO_1->setCurrentIndex(settings->value("GPIO_1", 0).toInt());
+            ui->SteppingMode_1->setCurrentIndex(settings->value("SteppingMode_1", 0).toInt());
+            ui->Coil_1->setCurrentIndex(settings->value("Coil_1", 0).toInt());
+            ui->Invert_1->setChecked(settings->value("Invert_1", false).toBool());
+            ui->PWMFreq->setValue(settings->value("PWMFreq", 0).toInt());
+            ui->isAZEQ->setChecked(settings->value("isAZEQ", false).toBool());
             break;
         }
         UpdateValues(0);
         UpdateValues(1);
+        settings->setValue("MountType", index);
     });
     connect(ui->Invert_0, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
-            [=](bool checked){
+            [=](int state){
+        settings->setValue("Invert_0", ui->Invert_0->isChecked());
         ahp_gt_set_direction_invert(0, ui->Invert_0->isChecked());
     });
     connect(ui->Invert_1, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
-            [=](bool checked){
+            [=](int state){
+        settings->setValue("Invert_1", ui->Invert_1->isChecked());
         ahp_gt_set_direction_invert(1, ui->Invert_1->isChecked());
     });
     connect(ui->SteppingMode_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [=](int index) {
-        if(ui->SteppingMode_0->currentIndex() == HalfStep)
-            ui->Multiplier0->setMaximum(1);
-        else
-            ui->Multiplier0->setMaximum(127);
+        settings->setValue("SteppingMode_0", index);
         ahp_gt_set_stepping_mode(0, (GT1SteppingMode)ui->SteppingMode_0->currentIndex());
-        UpdateValues(0);
-    });
-    connect(ui->Multiplier0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-               [=](int value){
-        ahp_gt_set_multiplier(0, ui->Multiplier0->value());
-        UpdateValues(0);
-    });
-    connect(ui->Divider0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                   [=](int value){
-        ahp_gt_set_divider(0, ui->Divider0->value());
         UpdateValues(0);
     });
     connect(ui->MotorSteps_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
+        settings->setValue("MotorSteps_0", value);
         ahp_gt_set_motor_steps(0, ui->MotorSteps_0->value());
         UpdateValues(0);
-        ui->Divider0->setValue(ahp_gt_get_divider(0));
-        ui->Multiplier0->setValue(ahp_gt_get_multiplier(0));
     });
     connect(ui->Worm_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
+        settings->setValue("Worm_0", value);
         ahp_gt_set_worm_teeth(0, ui->Worm_0->value());
         UpdateValues(0);
-        ui->Divider0->setValue(ahp_gt_get_divider(0));
-        ui->Multiplier0->setValue(ahp_gt_get_multiplier(0));
     });
     connect(ui->Motor_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
+        settings->setValue("Motor_0", value);
         ahp_gt_set_motor_teeth(0, ui->Motor_0->value());
         UpdateValues(0);
-        ui->Divider0->setValue(ahp_gt_get_divider(0));
-        ui->Multiplier0->setValue(ahp_gt_get_multiplier(0));
     });
     connect(ui->Crown_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
+        settings->setValue("Crown_0", value);
         ahp_gt_set_crown_teeth(0, ui->Crown_0->value());
         UpdateValues(0);
-        ui->Divider0->setValue(ahp_gt_get_divider(0));
-        ui->Multiplier0->setValue(ahp_gt_get_multiplier(0));
     });
     connect(ui->SteppingMode_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [=](int index) {
-        if(ui->SteppingMode_1->currentIndex() == HalfStep)
-            ui->Multiplier1->setMaximum(1);
-        else
-            ui->Multiplier1->setMaximum(127);
+        settings->setValue("SteppingMode_1", index);
         ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_1->currentIndex());
-        UpdateValues(1);
-    });
-    connect(ui->Multiplier1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-               [=](int value){
-        ahp_gt_set_multiplier(1, ui->Multiplier1->value());
-        UpdateValues(1);
-    });
-    connect(ui->Divider1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                   [=](int value){
-        ahp_gt_set_divider(1, ui->Divider1->value());
         UpdateValues(1);
     });
     connect(ui->MotorSteps_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
+        settings->setValue("MotorSteps_1", value);
         ahp_gt_set_motor_steps(1, ui->MotorSteps_1->value());
         UpdateValues(1);
-        ui->Divider1->setValue(ahp_gt_get_divider(1));
-        ui->Multiplier1->setValue(ahp_gt_get_multiplier(1));
     });
     connect(ui->Worm_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
+        settings->setValue("Worm_1", value);
         ahp_gt_set_worm_teeth(1, ui->Worm_1->value());
         UpdateValues(1);
-        ui->Divider1->setValue(ahp_gt_get_divider(1));
-        ui->Multiplier1->setValue(ahp_gt_get_multiplier(1));
     });
     connect(ui->Motor_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
+        settings->setValue("Motor_1", value);
         ahp_gt_set_motor_teeth(1, ui->Motor_1->value());
         UpdateValues(1);
-        ui->Divider1->setValue(ahp_gt_get_divider(1));
-        ui->Multiplier1->setValue(ahp_gt_get_multiplier(1));
     });
     connect(ui->Crown_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
+        settings->setValue("Crown_1", value);
         ahp_gt_set_crown_teeth(1, ui->Crown_1->value());
         UpdateValues(1);
-        ui->Divider1->setValue(ahp_gt_get_divider(1));
-        ui->Multiplier1->setValue(ahp_gt_get_multiplier(1));
     });
     connect(ui->Ra_P, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
                    [=](){
@@ -480,21 +486,25 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ui->Acceleration_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                    [=](int value){
+        settings->setValue("Acceleration_0", value);
         ahp_gt_set_acceleration_angle(0, (ui->Acceleration_0->maximum()-ui->Acceleration_0->value())*M_PI/1800.0);
         ui->Acceleration_label_0->setText("Acceleration: "+QString::number(2.0-(double)value/10.0)+"°");
     });
     connect(ui->Acceleration_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                    [=](int value){
+        settings->setValue("Acceleration_1", value);
         ahp_gt_set_acceleration_angle(1,  (ui->Acceleration_1->maximum()-ui->Acceleration_1->value())*M_PI/1800.0);
         ui->Acceleration_label_1->setText("Acceleration: "+QString::number(2.0-(double)value/10.0)+"°");
     });
     connect(ui->MaxSpeed_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                    [=](int value){
+        settings->setValue("MaxSpeed_0", value);
         ahp_gt_set_max_speed(0, ui->MaxSpeed_0->value());
         ui->MaxSpeed_label_0->setText("Maximum speed: "+QString::number(value)+"x");
     });
     connect(ui->MaxSpeed_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                    [=](int value){
+        settings->setValue("MaxSpeed_1", value);
         ahp_gt_set_max_speed(1, ui->MaxSpeed_1->value());
         ui->MaxSpeed_label_1->setText("Maximum speed: "+QString::number(value)+"x");
     });
@@ -508,30 +518,58 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ui->PWMFreq, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                    [=](int value){
+        settings->setValue("PWMFreq", value);
         ahp_gt_set_pwm_frequency(ui->PWMFreq->value());
         ahp_gt_set_mount_type(mounttype[ui->MountType->currentIndex()]);
         ui->PWMFreq_label->setText("PWM Frequency: "+QString::number(1500+700*value)+" Hz");
     });
     connect(ui->isAZEQ, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
                    [=](int state){
+        settings->setValue("isAZEQ", ui->isAZEQ->isChecked());
         ahp_gt_set_features(0, (SkywatcherFeature)((ui->isAZEQ->isChecked() ? isAZEQ : 0)|hasPPEC));
         ahp_gt_set_features(1, (SkywatcherFeature)((ui->isAZEQ->isChecked() ? isAZEQ : 0)|hasPPEC));
     });
     connect(ui->Coil_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
                    [=](int index){
+        settings->setValue("Coil_0", index);
         ahp_gt_set_stepping_conf(0, (GT1SteppingConfiguration)ui->Coil_0->currentIndex());
     });
     connect(ui->Coil_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
                    [=](int index){
+        settings->setValue("Coil_1", index);
         ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)ui->Coil_1->currentIndex());
     });
     connect(ui->GPIO_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
                    [=](int index){
-        ahp_gt_set_feature(0, (GT1Feature)(ui->GPIO_0->currentIndex()));
+        settings->setValue("GPIO_0", index);
+        switch(ui->GPIO_0->currentIndex()) {
+        case 0:
+            ahp_gt_set_feature(0, GpioUnused);
+            break;
+        case 1:
+            ahp_gt_set_feature(0, GpioAsST4);
+            break;
+        case 2:
+            ahp_gt_set_feature(0, GpioAsPulseDrive);
+            break;
+        default: break;
+        }
     });
     connect(ui->GPIO_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
                    [=](int index){
-        ahp_gt_set_feature(1, (GT1Feature)(ui->GPIO_1->currentIndex()));
+        settings->setValue("GPIO_1", index);
+        switch(ui->GPIO_1->currentIndex()) {
+        case 0:
+            ahp_gt_set_feature(1, GpioUnused);
+            break;
+        case 1:
+            ahp_gt_set_feature(1, GpioAsST4);
+            break;
+        case 2:
+            ahp_gt_set_feature(1, GpioAsPulseDrive);
+            break;
+        default: break;
+        }
     });
     connect(ui->Write, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [=](bool checked=false){
@@ -594,7 +632,57 @@ MainWindow::MainWindow(QWidget *parent)
         ui->WorkArea->setEnabled(finished);
         ui->progress->setValue(percent);
     });
+    connect(ui->Inductance_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                   [=](int value){
+        settings->setValue("Inductance_0", value);
+        UpdateValues(0);
+    });
+    connect(ui->Resistance_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                   [=](int value){
+        settings->setValue("Resistance_0", value);
+        UpdateValues(0);
+    });
+    connect(ui->Current_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                   [=](int value){
+        settings->setValue("Current_0", value);
+        UpdateValues(0);
+    });
+    connect(ui->Voltage_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                   [=](int value){
+        settings->setValue("Voltage_0", value);
+        UpdateValues(0);
+    });
+    connect(ui->Inductance_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                   [=](int value){
+        settings->setValue("Inductance_1", value);
+        UpdateValues(1);
+    });
+    connect(ui->Resistance_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                   [=](int value){
+        settings->setValue("Resistance_1", value);
+        UpdateValues(1);
+    });
+    connect(ui->Current_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                   [=](int value){
+        settings->setValue("Current_1", value);
+        UpdateValues(1);
+    });
+    connect(ui->Voltage_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                   [=](int value){
+        settings->setValue("Voltage_1", value);
+        UpdateValues(1);
+    });
     std::thread(MainWindow::Progress, this).detach();
+    ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
+
+    ui->Inductance_0->setValue(settings->value("Inductance_0", 10).toInt());
+    ui->Resistance_0->setValue(settings->value("Resistance_0", 20000).toInt());
+    ui->Current_0->setValue(settings->value("Current_0", 1000).toInt());
+    ui->Voltage_0->setValue(settings->value("Voltage_0", 12).toInt());
+    ui->Inductance_1->setValue(settings->value("Inductance_1", 10).toInt());
+    ui->Resistance_1->setValue(settings->value("Resistance_1", 20000).toInt());
+    ui->Current_1->setValue(settings->value("Current_1", 1000).toInt());
+    ui->Voltage_1->setValue(settings->value("Voltage_1", 12).toInt());
 }
 
 MainWindow::~MainWindow()
@@ -608,18 +696,32 @@ void MainWindow::UpdateValues(int axis)
     if(axis == 0) {
         ahp_gt_set_wormsteps(0, fmin(pow(2,24)-1, ahp_gt_get_motor_steps(0)*ahp_gt_get_multiplier(0)*ahp_gt_get_worm_teeth(0)/ahp_gt_get_motor_teeth(0)/ahp_gt_get_divider(0)));
         ahp_gt_set_totalsteps(0, fmin(pow(2,24)-1, ahp_gt_get_wormsteps(0)*ahp_gt_get_crown_teeth(0)));
-        ui->Divider0->setValue(ahp_gt_get_divider(0));
-        ui->Multiplier0->setValue(ahp_gt_get_multiplier(0));
+        ui->Divider0->setText(QString::number(ahp_gt_get_divider(0)));
+        ui->Multiplier0->setText(QString::number(ahp_gt_get_multiplier(0)));
         ui->WormSteps0->setText(QString::number(ahp_gt_get_wormsteps(0)));
         ui->TotalSteps0->setText(QString::number(ahp_gt_get_totalsteps(0)));
-        //ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(0));
+        ui->TrackingFrequency_0->setText("Step freq (Steps/s): " + QString::number(ahp_gt_get_totalsteps(0)/SIDEREAL_DAY));
+        double L = (double)ui->Inductance_0->value()/1000.0;
+        double R = (double)ui->Resistance_0->value()/1000.0;
+        double mI = (double)ui->Current_0->value()/1000.0;
+        double mV = (double)ui->Voltage_0->value();
+        double Z = sqrt(fmax(0, pow(mV/mI, 2.0)-pow(R, 2.0)));
+        double f = (2.0*M_PI*Z/L);
+        ui->MinFrequency_0->setText("PWM (Hz): " + QString::number(f));
     } else if (axis == 1) {
         ahp_gt_set_wormsteps(1, fmin(pow(2,24)-1, ahp_gt_get_motor_steps(1)*ahp_gt_get_multiplier(1)*ahp_gt_get_worm_teeth(1)/ahp_gt_get_motor_teeth(1)/ahp_gt_get_divider(1)));
         ahp_gt_set_totalsteps(1, fmin(pow(2,24)-1, ahp_gt_get_wormsteps(1)*ahp_gt_get_crown_teeth(1)));
-        ui->Divider1->setValue(ahp_gt_get_divider(1));
-        ui->Multiplier1->setValue(ahp_gt_get_multiplier(1));
+        ui->Divider1->setText(QString::number(ahp_gt_get_divider(1)));
+        ui->Multiplier1->setText(QString::number(ahp_gt_get_multiplier(1)));
         ui->WormSteps1->setText(QString::number(ahp_gt_get_wormsteps(1)));
         ui->TotalSteps1->setText(QString::number(ahp_gt_get_totalsteps(1)));
-        //ui->SteppingMode_1->setCurrentIndex(ahp_gt_get_stepping_mode(1));
+        ui->TrackingFrequency_1->setText("Step freq (Steps/s): " + QString::number(ahp_gt_get_totalsteps(1)/SIDEREAL_DAY));
+        double L = (double)ui->Inductance_1->value()/1000.0;
+        double R = (double)ui->Resistance_1->value()/1000.0;
+        double mI = (double)ui->Current_1->value()/1000.0;
+        double mV = (double)ui->Voltage_1->value();
+        double Z = sqrt(fmax(0, pow(mV/mI, 2.0)-pow(R, 2.0)));
+        double f = (2.0*M_PI*Z/L);
+        ui->MinFrequency_1->setText("PWM (Hz): " + QString::number(f));
     }
 }
