@@ -327,28 +327,6 @@ MainWindow::MainWindow(QWidget *parent)
             ui->isAZEQ->setCheckState(Qt::CheckState::Checked);
             break;
         default:
-            ui->MotorSteps_0->setValue(settings->value("MotorSteps_0", 200).toInt());
-            ui->Motor_0->setValue(settings->value("Motor_0", 1).toInt());
-            ui->Worm_0->setValue(settings->value("Worm_0", 5).toInt());
-            ui->Crown_0->setValue(settings->value("Crown_0", 180).toInt());
-            ui->MaxSpeed_0->setValue(settings->value("MaxSpeed_0", 800).toInt());
-            ui->Acceleration_0->setValue(settings->value("Acceleration_0", 10).toInt());
-            ui->GPIO_0->setCurrentIndex(settings->value("GPIO_0", 0).toInt());
-            ui->SteppingMode_0->setCurrentIndex(settings->value("SteppingMode_0", 0).toInt());
-            ui->Coil_0->setCurrentIndex(settings->value("Coil_0", 0).toInt());
-            ui->Invert_0->setChecked(settings->value("Invert_0", false).toBool());
-            ui->MotorSteps_1->setValue(settings->value("MotorSteps_1", 200).toInt());
-            ui->Motor_1->setValue(settings->value("Motor_1", 1).toInt());
-            ui->Worm_1->setValue(settings->value("Worm_1", 5).toInt());
-            ui->Crown_1->setValue(settings->value("Crown_1", 180).toInt());
-            ui->MaxSpeed_1->setValue(settings->value("MaxSpeed_1", 800).toInt());
-            ui->Acceleration_1->setValue(settings->value("Acceleration_1", 10).toInt());
-            ui->GPIO_1->setCurrentIndex(settings->value("GPIO_1", 0).toInt());
-            ui->SteppingMode_1->setCurrentIndex(settings->value("SteppingMode_1", 0).toInt());
-            ui->Coil_1->setCurrentIndex(settings->value("Coil_1", 0).toInt());
-            ui->Invert_1->setChecked(settings->value("Invert_1", false).toBool());
-            ui->PWMFreq->setValue(settings->value("PWMFreq", 0).toInt());
-            ui->isAZEQ->setChecked(settings->value("isAZEQ", false).toBool());
             break;
         }
         UpdateValues(0);
@@ -605,27 +583,40 @@ MainWindow::MainWindow(QWidget *parent)
             ui->commonSettings->setEnabled(true);
             ui->AdvancedRA->setEnabled(true);
             ui->AdvancedDec->setEnabled(true);
-            int axis = 0;
-            ui->MotorSteps_0->setValue(ahp_gt_get_motor_steps(axis));
-            ui->Worm_0->setValue(ahp_gt_get_worm_teeth(axis));
-            ui->Motor_0->setValue(ahp_gt_get_motor_teeth(axis));
-            ui->Crown_0->setValue(ahp_gt_get_crown_teeth(axis));
-            ui->Acceleration_0->setValue(ui->Acceleration_0->maximum()-ahp_gt_get_acceleration_angle(axis)*3600.0/M_PI);
-            ui->MaxSpeed_0->setValue(ahp_gt_get_max_speed(axis));
-            ui->Coil_0->setCurrentIndex(ahp_gt_get_stepping_conf(axis));
-            ui->Invert_0->setChecked(ahp_gt_get_direction_invert(axis));
-            ui->GPIO_0->setCurrentIndex(ahp_gt_get_feature(axis));
-            axis++;
-            ui->MotorSteps_1->setValue(ahp_gt_get_motor_steps(axis));
-            ui->Worm_1->setValue(ahp_gt_get_worm_teeth(axis));
-            ui->Motor_1->setValue(ahp_gt_get_motor_teeth(axis));
-            ui->Crown_1->setValue(ahp_gt_get_crown_teeth(axis));
-            ui->Acceleration_1->setValue(ui->Acceleration_1->maximum()-ahp_gt_get_acceleration_angle(axis)*3600.0/M_PI);
-            ui->MaxSpeed_1->setValue(ahp_gt_get_max_speed(axis));
-            ui->Coil_1->setCurrentIndex(ahp_gt_get_stepping_conf(axis));
-            ui->Invert_1->setChecked(ahp_gt_get_direction_invert(axis));
-            ui->GPIO_1->setCurrentIndex(ahp_gt_get_feature(axis));
-            ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency());
+            ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
+
+            ui->MotorSteps_0->setValue(settings->value("MotorSteps_0", ahp_gt_get_motor_steps(0)).toInt());
+            ui->Motor_0->setValue(settings->value("Motor_0", ahp_gt_get_motor_teeth(0)).toInt());
+            ui->Worm_0->setValue(settings->value("Worm_0", ahp_gt_get_worm_teeth(0)).toInt());
+            ui->Crown_0->setValue(settings->value("Crown_0", ahp_gt_get_crown_teeth(0)).toInt());
+            ui->MaxSpeed_0->setValue(settings->value("MaxSpeed_0", ahp_gt_get_max_speed(0)).toInt());
+            ui->Acceleration_0->setValue(settings->value("Acceleration_0", ui->Acceleration_0->maximum()-ahp_gt_get_acceleration_angle(0)*3600.0/M_PI).toInt());
+            ui->GPIO_0->setCurrentIndex(settings->value("GPIO_0", ahp_gt_get_feature(0)).toInt());
+            ui->Coil_0->setCurrentIndex(settings->value("Coil_0", ahp_gt_get_stepping_conf(0)).toInt());
+            ui->Invert_0->setChecked(settings->value("Invert_0", ahp_gt_get_direction_invert(0) == 1).toBool());
+            ui->SteppingMode_0->setCurrentIndex(settings->value("SteppingMode_0", ahp_gt_get_stepping_mode(0)).toInt());
+            ui->Inductance_0->setValue(settings->value("Inductance_0", 10).toInt());
+            ui->Resistance_0->setValue(settings->value("Resistance_0", 20000).toInt());
+            ui->Current_0->setValue(settings->value("Current_0", 1000).toInt());
+            ui->Voltage_0->setValue(settings->value("Voltage_0", 12).toInt());
+
+            ui->MotorSteps_1->setValue(settings->value("MotorSteps_1", ahp_gt_get_motor_steps(1)).toInt());
+            ui->Motor_1->setValue(settings->value("Motor_1", ahp_gt_get_motor_teeth(1)).toInt());
+            ui->Worm_1->setValue(settings->value("Worm_1", ahp_gt_get_worm_teeth(1)).toInt());
+            ui->Crown_1->setValue(settings->value("Crown_1", ahp_gt_get_crown_teeth(1)).toInt());
+            ui->MaxSpeed_1->setValue(settings->value("MaxSpeed_1", ahp_gt_get_max_speed(1)).toInt());
+            ui->Acceleration_1->setValue(settings->value("Acceleration_1", ui->Acceleration_1->maximum()-ahp_gt_get_acceleration_angle(1)*3600.0/M_PI).toInt());
+            ui->GPIO_1->setCurrentIndex(settings->value("GPIO_1", ahp_gt_get_feature(1)).toInt());
+            ui->Coil_1->setCurrentIndex(settings->value("Coil_1", ahp_gt_get_stepping_conf(1)).toInt());
+            ui->Invert_1->setChecked(settings->value("Invert_1", ahp_gt_get_direction_invert(1) == 1).toBool());
+            ui->SteppingMode_1->setCurrentIndex(settings->value("SteppingMode_1", ahp_gt_get_stepping_mode(1)).toInt());
+            ui->Inductance_1->setValue(settings->value("Inductance_1", 10).toInt());
+            ui->Resistance_1->setValue(settings->value("Resistance_1", 20000).toInt());
+            ui->Current_1->setValue(settings->value("Current_1", 1000).toInt());
+            ui->Voltage_1->setValue(settings->value("Voltage_1", 12).toInt());
+
+            ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency()).toInt());
+            ui->isAZEQ->setChecked(settings->value("isAZEQ", false).toBool());
         }
     });
     connect(this, static_cast<void (MainWindow::*)()>(&MainWindow::onUpdateProgress), this, [=]() {
@@ -673,16 +664,6 @@ MainWindow::MainWindow(QWidget *parent)
         UpdateValues(1);
     });
     std::thread(MainWindow::Progress, this).detach();
-    ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
-
-    ui->Inductance_0->setValue(settings->value("Inductance_0", 10).toInt());
-    ui->Resistance_0->setValue(settings->value("Resistance_0", 20000).toInt());
-    ui->Current_0->setValue(settings->value("Current_0", 1000).toInt());
-    ui->Voltage_0->setValue(settings->value("Voltage_0", 12).toInt());
-    ui->Inductance_1->setValue(settings->value("Inductance_1", 10).toInt());
-    ui->Resistance_1->setValue(settings->value("Resistance_1", 20000).toInt());
-    ui->Current_1->setValue(settings->value("Current_1", 1000).toInt());
-    ui->Voltage_1->setValue(settings->value("Voltage_1", 12).toInt());
 }
 
 MainWindow::~MainWindow()
