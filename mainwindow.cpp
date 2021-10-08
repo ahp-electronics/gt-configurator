@@ -183,7 +183,13 @@ void MainWindow::WriteValues(MainWindow *wnd)
     wnd->percent = 0;
     wnd->finished = 0;
     if(wnd->ui->Write->text() == "Flash") {
-        wnd->flashFirmware();
+        if(!wnd->flashFirmware()) {
+            QFile *f = new QFile(wnd->firmwareFilename);
+            f->open(QIODevice::ReadOnly);
+            wnd->settings->setValue("firmware", f->readAll().toBase64());
+            f->close();
+            f->~QFile();
+        }
         wnd->finished = 1;
     } else {
         ahp_gt_write_values(0, &wnd->percent, &wnd->finished);
@@ -327,7 +333,7 @@ MainWindow::MainWindow(QWidget *parent)
         ui->ComPort->addItem(settings->value("LastPort", ports[0].portName()).toString());
         for (int i = 1; i < ports.length(); i++)
             ui->ComPort->addItem(ports[i].portName());
-        ui->MountType->activated(0);
+        ui->MountType->setCurrentIndex(0);
     }
     connect(ui->LoadFW, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [=](bool checked) {
@@ -343,8 +349,7 @@ MainWindow::MainWindow(QWidget *parent)
             QJsonObject obj = doc.object();
             QString base64 = obj["data"].toString();
             if(base64 == settings->value("firmware", "").toString()) return;
-            settings->setValue("firmware", base64);
-            QByteArray data = QByteArray::fromBase64(obj["data"].toString().toUtf8(), QByteArray::Base64Encoding);
+            QByteArray data = QByteArray::fromBase64(base64.toUtf8());
             QFile *f = new QFile(firmwareFilename);
             f->open(QIODevice::WriteOnly);
             f->write(data.data(), data.length());
