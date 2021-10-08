@@ -1,10 +1,11 @@
 #include "mainwindow.h"
-#include <config.h>
+#include <unistd.h>
 #include <ctime>
 #include <cmath>
 #include <cstring>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QIODevice>
 #include <functional>
 #include <QTemporaryFile>
 #include <QSerialPort>
@@ -213,7 +214,7 @@ void MainWindow::readIni(QString ini)
     QSettings *oldsettings = settings;
     QSettings *s = new QSettings(ini, QSettings::Format::IniFormat);
     settings = s;
-    ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
+    emit ui->MountType->currentIndexChanged(settings->value("MountType", 0).toInt());
 
     ui->MotorSteps_0->setValue(settings->value("MotorSteps_0", ahp_gt_get_motor_steps(0)).toInt());
     ui->Motor_0->setValue(settings->value("Motor_0", ahp_gt_get_motor_teeth(0)).toInt());
@@ -221,10 +222,10 @@ void MainWindow::readIni(QString ini)
     ui->Crown_0->setValue(settings->value("Crown_0", ahp_gt_get_crown_teeth(0)).toInt());
     ui->MaxSpeed_0->setValue(settings->value("MaxSpeed_0", ahp_gt_get_max_speed(0)).toInt());
     ui->Acceleration_0->setValue(settings->value("Acceleration_0", ui->Acceleration_0->maximum()-ahp_gt_get_acceleration_angle(0)*3600.0/M_PI).toInt());
-    ui->GPIO_0->setCurrentIndex(settings->value("GPIO_0", ahp_gt_get_feature(0)).toInt());
-    ui->Coil_0->setCurrentIndex(settings->value("Coil_0", ahp_gt_get_stepping_conf(0)).toInt());
+    emit ui->GPIO_0->currentIndexChanged(settings->value("GPIO_0", ahp_gt_get_feature(0)).toInt());
+    emit ui->Coil_0->currentIndexChanged(settings->value("Coil_0", ahp_gt_get_stepping_conf(0)).toInt());
     ui->Invert_0->setChecked(settings->value("Invert_0", ahp_gt_get_direction_invert(0) == 1).toBool());
-    ui->SteppingMode_0->setCurrentIndex(settings->value("SteppingMode_0", ahp_gt_get_stepping_mode(0)).toInt());
+    emit ui->SteppingMode_0->currentIndexChanged(settings->value("SteppingMode_0", ahp_gt_get_stepping_mode(0)).toInt());
     ui->Inductance_0->setValue(settings->value("Inductance_0", 10).toInt());
     ui->Resistance_0->setValue(settings->value("Resistance_0", 20000).toInt());
     ui->Current_0->setValue(settings->value("Current_0", 1000).toInt());
@@ -236,10 +237,10 @@ void MainWindow::readIni(QString ini)
     ui->Crown_1->setValue(settings->value("Crown_1", ahp_gt_get_crown_teeth(1)).toInt());
     ui->MaxSpeed_1->setValue(settings->value("MaxSpeed_1", ahp_gt_get_max_speed(1)).toInt());
     ui->Acceleration_1->setValue(settings->value("Acceleration_1", ui->Acceleration_1->maximum()-ahp_gt_get_acceleration_angle(1)*3600.0/M_PI).toInt());
-    ui->GPIO_1->setCurrentIndex(settings->value("GPIO_1", ahp_gt_get_feature(1)).toInt());
-    ui->Coil_1->setCurrentIndex(settings->value("Coil_1", ahp_gt_get_stepping_conf(1)).toInt());
+    emit ui->GPIO_1->currentIndexChanged(settings->value("GPIO_1", ahp_gt_get_feature(1)).toInt());
+    emit ui->Coil_1->currentIndexChanged(settings->value("Coil_1", ahp_gt_get_stepping_conf(1)).toInt());
     ui->Invert_1->setChecked(settings->value("Invert_1", ahp_gt_get_direction_invert(1) == 1).toBool());
-    ui->SteppingMode_1->setCurrentIndex(settings->value("SteppingMode_1", ahp_gt_get_stepping_mode(1)).toInt());
+    emit ui->SteppingMode_1->currentIndexChanged(settings->value("SteppingMode_1", ahp_gt_get_stepping_mode(1)).toInt());
     ui->Inductance_1->setValue(settings->value("Inductance_1", 10).toInt());
     ui->Resistance_1->setValue(settings->value("Resistance_1", 20000).toInt());
     ui->Current_1->setValue(settings->value("Current_1", 1000).toInt());
@@ -309,12 +310,11 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     setAccessibleName("GT Configurator");
-    setWindowTitle("GT Configurator - Version " GT_CONFIGURATOR_VERSION " Engine " + QString::number(ahp_gt_get_version(), 16));
+    firmwareFilename = QStandardPaths::standardLocations(QStandardPaths::TempLocation).at(0)+tmpnam(NULL);
     QString homedir = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).at(0);
     ini = homedir+"/settings.ini";
-    QString dir = QDir(ini).dirName();
-    if(!QDir(dir).exists()){
-        QDir().mkdir(dir);
+    if(!QDir(homedir).exists()){
+        QDir().mkdir(homedir);
     }
     if(!QFile(ini).exists()){
         QFile *f = new QFile(ini);
@@ -338,32 +338,34 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->LoadFW, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [=](bool checked) {
         QString url = "https://www.iliaplatone.com/firmware.php?product=gt1";
-        QScopedPointer<QNetworkAccessManager> manager(new QNetworkAccessManager);
-        QNetworkReply *response = manager->get(QNetworkRequest(QUrl(url)));
-        QObject::connect(response, static_cast<void (QNetworkReply::*)()>(&QNetworkReply::finished), [=]() {
-            response->deleteLater();
-            response->manager()->deleteLater();
-            if (response->error() != QNetworkReply::NoError) return;
-            QString json = QString::fromUtf8(response->readAll());
-            QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8());
-            QJsonObject obj = doc.object();
-            QString base64 = obj["data"].toString();
-            if(base64 == settings->value("firmware", "").toString()) return;
-            QByteArray data = QByteArray::fromBase64(base64.toUtf8());
-            QFile *f = new QFile(firmwareFilename);
-            f->open(QIODevice::WriteOnly);
-            f->write(data.data(), data.length());
-            f->close();
-            f->~QFile();
-            ui->Write->setText("Flash");
-            ui->Write->setEnabled(true);
-            ui->RA->setEnabled(false);
-            ui->DEC->setEnabled(false);
-            ui->Control->setEnabled(false);
-            ui->commonSettings->setEnabled(false);
-            ui->AdvancedRA->setEnabled(false);
-            ui->AdvancedDec->setEnabled(false);
-        }) && manager.take();
+        QNetworkAccessManager* manager = new QNetworkAccessManager();
+        QNetworkReply* response = manager->get(QNetworkRequest(QUrl(url)));
+
+        QEventLoop loop;
+        connect(response, SIGNAL(finished()), &loop, SLOT(quit()));
+        connect(response, SIGNAL(error(QNetworkReply::NetworkError)), &loop, SLOT(quit()));
+        loop.exec();
+
+        QJsonDocument doc = QJsonDocument::fromJson(response->readAll());
+        QJsonObject obj = doc.object();
+        QString base64 = obj["data"].toString();
+        if(base64 == settings->value("firmware", "").toString()) return;
+        QByteArray data = QByteArray::fromBase64(base64.toUtf8());
+        QFile *f = new QFile(firmwareFilename);
+        f->open(QIODevice::WriteOnly|QIODevice::NewOnly);
+        f->write(data.data(), data.length());
+        f->close();
+        f->~QFile();
+        response->deleteLater();
+        response->manager()->deleteLater();
+        ui->Write->setText("Flash");
+        ui->Write->setEnabled(true);
+        ui->RA->setEnabled(false);
+        ui->DEC->setEnabled(false);
+        ui->Control->setEnabled(false);
+        ui->commonSettings->setEnabled(false);
+        ui->AdvancedRA->setEnabled(false);
+        ui->AdvancedDec->setEnabled(false);
     });
     connect(ui->Connect, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [=](bool checked) {
@@ -376,7 +378,6 @@ MainWindow::MainWindow(QWidget *parent)
         strcat(port, ports[ui->ComPort->currentIndex()].portName().toStdString().c_str());
         if(!ahp_gt_connect(port)) {
             settings->setValue("LastPort", port);
-            firmwareFilename = "";
             ui->Write->setText("Write");
             ui->Write->setEnabled(true);
             isConnected = true;
@@ -394,14 +395,14 @@ MainWindow::MainWindow(QWidget *parent)
             readIni(ini);
         }
     });
-    connect(ui->ReadCFG, static_cast<void (QAction::*)(bool)>(&QAction::triggered),
+    connect(ui->loadConfig, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [=](bool triggered) {
         QString ini = QFileDialog::getOpenFileName(this, "Open configuration file", ".", "Configuration files (*.ini)");
         if(ini.endsWith(".ini")) {
             readIni(ini);
         }
     });
-    connect(ui->SaveCFG, static_cast<void (QAction::*)(bool)>(&QAction::triggered),
+    connect(ui->saveConfig, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [=](bool triggered) {
         QString ini = QFileDialog::getSaveFileName(this, "Save configuration file", ".", "Configuration files (*.ini)");
         if(ini.endsWith(".ini")) {
@@ -787,13 +788,13 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(ini);
         UpdateValues(1);
     });
-    QTemporaryFile file(QDir::tempPath()+"/gt1_firmware");
-    firmwareFilename = file.fileName();
     std::thread(MainWindow::Progress, this).detach();
 }
 
 MainWindow::~MainWindow()
 {
+    if(QFile(firmwareFilename).exists())
+        unlink(firmwareFilename.toUtf8());
     threadsRunning = false;
     delete ui;
 }
@@ -822,7 +823,7 @@ void MainWindow::UpdateValues(int axis)
         ui->Multiplier1->setText(QString::number(ahp_gt_get_multiplier(1)));
         ui->WormSteps1->setText(QString::number(ahp_gt_get_wormsteps(1)));
         ui->TotalSteps1->setText(QString::number(ahp_gt_get_totalsteps(1)));
-        ui->TrackingFrequency_1->setText("Step freq (Steps/s): " + QString::number(ahp_gt_get_totalsteps(1)/SIDEREAL_DAY));
+        ui->TrackingFrequency_1->setText("RPM: " + QString::number(ahp_gt_get_totalsteps(1)/SIDEREAL_DAY));
         double L = (double)ui->Inductance_1->value()/1000.0;
         double R = (double)ui->Resistance_1->value()/1000.0;
         double mI = (double)ui->Current_1->value()/1000.0;
