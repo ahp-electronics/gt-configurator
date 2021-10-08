@@ -423,7 +423,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Load FW..</string>
+       <string>Check FW..</string>
       </property>
      </widget>
     </widget>

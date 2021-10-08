@@ -3,7 +3,13 @@
 #include <ctime>
 #include <cmath>
 #include <cstring>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <functional>
+#include <QTemporaryFile>
 #include <QSerialPort>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QStandardPaths>
 #include <QSerialPortInfo>
 #include <QFileDialog>
@@ -325,8 +331,25 @@ MainWindow::MainWindow(QWidget *parent)
     }
     connect(ui->LoadFW, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [=](bool checked) {
-        firmwareFilename = QFileDialog::getOpenFileName(this, "Select firmware file", ".", "Firmware files (*.bin)");
-        if(firmwareFilename.endsWith(".bin")) {
+        QString url = "https://www.iliaplatone.com/firmware.php?product=gt1";
+        QScopedPointer<QNetworkAccessManager> manager(new QNetworkAccessManager);
+        QNetworkReply *response = manager->get(QNetworkRequest(QUrl(url)));
+        QObject::connect(response, static_cast<void (QNetworkReply::*)()>(&QNetworkReply::finished), [=]() {
+            response->deleteLater();
+            response->manager()->deleteLater();
+            if (response->error() != QNetworkReply::NoError) return;
+            QString json = QString::fromUtf8(response->readAll());
+            QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8());
+            QJsonObject obj = doc.object();
+            QString base64 = obj["data"].toString();
+            if(base64 == settings->value("firmware", "").toString()) return;
+            settings->setValue("firmware", base64);
+            QByteArray data = QByteArray::fromBase64(obj["data"].toString().toUtf8(), QByteArray::Base64Encoding);
+            QFile *f = new QFile(firmwareFilename);
+            f->open(QIODevice::WriteOnly);
+            f->write(data.data(), data.length());
+            f->close();
+            f->~QFile();
             ui->Write->setText("Flash");
             ui->Write->setEnabled(true);
             ui->RA->setEnabled(false);
@@ -335,7 +358,7 @@ MainWindow::MainWindow(QWidget *parent)
             ui->commonSettings->setEnabled(false);
             ui->AdvancedRA->setEnabled(false);
             ui->AdvancedDec->setEnabled(false);
-        }
+        }) && manager.take();
     });
     connect(ui->Connect, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [=](bool checked) {
@@ -759,6 +782,8 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(ini);
         UpdateValues(1);
     });
+    QTemporaryFile file(QDir::tempPath()+"/gt1_firmware");
+    firmwareFilename = file.fileName();
     std::thread(MainWindow::Progress, this).detach();
 }
 
