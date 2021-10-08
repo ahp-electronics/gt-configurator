@@ -21,7 +21,11 @@ public:
 
     int flashFirmware();
 private:
-    QSettings *settings;
+    void saveIni(QString ini);
+    void readIni(QString ini);
+
+    QSettings * settings;
+    QString ini;
     QString firmwareFilename;
     int percent { 0 };
     int finished { 1 };

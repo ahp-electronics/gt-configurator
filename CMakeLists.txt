@@ -11,6 +11,11 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(GT_CONFIGURATOR_VERSION_MAJOR 0)
+set(GT_CONFIGURATOR_VERSION_MINOR 8)
+set(GT_CONFIGURATOR_VERSION_RELEASE 5)
+set(GT_CONFIGURATOR_VERSION "${GT_CONFIGURATOR_VERSION_MAJOR}.${GT_CONFIGURATOR_VERSION_MINOR}.${GT_CONFIGURATOR_VERSION_RELEASE}")
+
 # QtCreator supports the following variables for Android, which are identical to qmake Android variables.
 # Check http://doc.qt.io/qt-5/deployment-android.html for more information.
 # They need to be set before the find_package(Qt5 ...) call.
@@ -32,6 +37,8 @@ find_package(M REQUIRED)
 find_package(USB REQUIRED)
 
 include_directories(${AHPGT_INCLUDE_DIR} ${DFU_INCLUDE_DIR} ${USB_INCLUDE_DIR})
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
 
 add_definitions(-DHAVE_NANOSLEEP)
 

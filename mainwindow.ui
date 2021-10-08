@@ -942,19 +942,6 @@
        <string>Tracking Test</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_22">
-      <property name="geometry">
-       <rect>
-        <x>110</x>
-        <y>350</y>
-        <width>131</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Step frequency:</string>
-      </property>
-     </widget>
     </widget>
     <widget class="QGroupBox" name="commonSettings">
      <property name="enabled">
@@ -1677,6 +1664,19 @@
       </property>
      </widget>
     </widget>
+    <widget class="QPushButton" name="Connect">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>10</y>
+       <width>89</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Connect</string>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -1688,11 +1688,39 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="ReadCFG"/>
+    <addaction name="SaveCFG"/>
+   </widget>
+   <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen_FW">
    <property name="text">
     <string>Open FW...</string>
+   </property>
+  </action>
+  <action name="actionOpen_configuration">
+   <property name="text">
+    <string>Open configuration</string>
+   </property>
+  </action>
+  <action name="actionSave_configuration">
+   <property name="text">
+    <string>Save configuration</string>
+   </property>
+  </action>
+  <action name="ReadCFG">
+   <property name="text">
+    <string>Open Configuration</string>
+   </property>
+  </action>
+  <action name="SaveCFG">
+   <property name="text">
+    <string>Save Configuration</string>
    </property>
   </action>
  </widget>
