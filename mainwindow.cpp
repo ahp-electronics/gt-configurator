@@ -211,10 +211,8 @@ void MainWindow::readIni(QString ini)
         f->close();
         f->~QFile();
     }
-    QSettings *oldsettings = settings;
-    QSettings *s = new QSettings(ini, QSettings::Format::IniFormat);
-    settings = s;
-    emit ui->MountType->currentIndexChanged(settings->value("MountType", 0).toInt());
+    QSettings *settings = new QSettings(ini, QSettings::Format::IniFormat);
+    ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
 
     ui->MotorSteps_0->setValue(settings->value("MotorSteps_0", ahp_gt_get_motor_steps(0)).toInt());
     ui->Motor_0->setValue(settings->value("Motor_0", ahp_gt_get_motor_teeth(0)).toInt());
@@ -222,14 +220,14 @@ void MainWindow::readIni(QString ini)
     ui->Crown_0->setValue(settings->value("Crown_0", ahp_gt_get_crown_teeth(0)).toInt());
     ui->MaxSpeed_0->setValue(settings->value("MaxSpeed_0", ahp_gt_get_max_speed(0)).toInt());
     ui->Acceleration_0->setValue(settings->value("Acceleration_0", ui->Acceleration_0->maximum()-ahp_gt_get_acceleration_angle(0)*3600.0/M_PI).toInt());
-    emit ui->GPIO_0->currentIndexChanged(settings->value("GPIO_0", ahp_gt_get_feature(0)).toInt());
-    emit ui->Coil_0->currentIndexChanged(settings->value("Coil_0", ahp_gt_get_stepping_conf(0)).toInt());
     ui->Invert_0->setChecked(settings->value("Invert_0", ahp_gt_get_direction_invert(0) == 1).toBool());
-    emit ui->SteppingMode_0->currentIndexChanged(settings->value("SteppingMode_0", ahp_gt_get_stepping_mode(0)).toInt());
     ui->Inductance_0->setValue(settings->value("Inductance_0", 10).toInt());
     ui->Resistance_0->setValue(settings->value("Resistance_0", 20000).toInt());
     ui->Current_0->setValue(settings->value("Current_0", 1000).toInt());
     ui->Voltage_0->setValue(settings->value("Voltage_0", 12).toInt());
+    ui->GPIO_0->setCurrentIndex(settings->value("GPIO_0", ahp_gt_get_feature(0)).toInt());
+    ui->Coil_0->setCurrentIndex(settings->value("Coil_0", ahp_gt_get_stepping_conf(0)).toInt());
+    ui->SteppingMode_0->setCurrentIndex(settings->value("SteppingMode_0", ahp_gt_get_stepping_mode(0)).toInt());
 
     ui->MotorSteps_1->setValue(settings->value("MotorSteps_1", ahp_gt_get_motor_steps(1)).toInt());
     ui->Motor_1->setValue(settings->value("Motor_1", ahp_gt_get_motor_teeth(1)).toInt());
@@ -237,19 +235,24 @@ void MainWindow::readIni(QString ini)
     ui->Crown_1->setValue(settings->value("Crown_1", ahp_gt_get_crown_teeth(1)).toInt());
     ui->MaxSpeed_1->setValue(settings->value("MaxSpeed_1", ahp_gt_get_max_speed(1)).toInt());
     ui->Acceleration_1->setValue(settings->value("Acceleration_1", ui->Acceleration_1->maximum()-ahp_gt_get_acceleration_angle(1)*3600.0/M_PI).toInt());
-    emit ui->GPIO_1->currentIndexChanged(settings->value("GPIO_1", ahp_gt_get_feature(1)).toInt());
-    emit ui->Coil_1->currentIndexChanged(settings->value("Coil_1", ahp_gt_get_stepping_conf(1)).toInt());
     ui->Invert_1->setChecked(settings->value("Invert_1", ahp_gt_get_direction_invert(1) == 1).toBool());
-    emit ui->SteppingMode_1->currentIndexChanged(settings->value("SteppingMode_1", ahp_gt_get_stepping_mode(1)).toInt());
     ui->Inductance_1->setValue(settings->value("Inductance_1", 10).toInt());
     ui->Resistance_1->setValue(settings->value("Resistance_1", 20000).toInt());
     ui->Current_1->setValue(settings->value("Current_1", 1000).toInt());
     ui->Voltage_1->setValue(settings->value("Voltage_1", 12).toInt());
+    ui->GPIO_1->setCurrentIndex(settings->value("GPIO_1", ahp_gt_get_feature(1)).toInt());
+    ui->Coil_1->setCurrentIndex(settings->value("Coil_1", ahp_gt_get_stepping_conf(1)).toInt());
+    ui->SteppingMode_1->setCurrentIndex(settings->value("SteppingMode_1", ahp_gt_get_stepping_mode(1)).toInt());
+
+    onSteppingMode_0IndexChanged(ui->SteppingMode_0->currentIndex());
+    onSteppingMode_1IndexChanged(ui->SteppingMode_1->currentIndex());
+    onCoil_0IndexChanged(ui->Coil_0->currentIndex());
+    onCoil_1IndexChanged(ui->Coil_1->currentIndex());
+    onGPIO_0IndexChanged(ui->GPIO_0->currentIndex());
+    onGPIO_1IndexChanged(ui->GPIO_1->currentIndex());
 
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency()).toInt());
     ui->isAZEQ->setChecked(settings->value("isAZEQ", false).toBool());
-    s->~QSettings();
-    settings = oldsettings;
 }
 
 void MainWindow::saveIni(QString ini)
@@ -392,6 +395,8 @@ MainWindow::MainWindow(QWidget *parent)
             ui->commonSettings->setEnabled(true);
             ui->AdvancedRA->setEnabled(true);
             ui->AdvancedDec->setEnabled(true);
+            ui->loadConfig->setEnabled(true);
+            ui->saveConfig->setEnabled(true);
             readIni(ini);
         }
     });
@@ -528,11 +533,6 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(ini);
         ahp_gt_set_direction_invert(1, ui->Invert_1->isChecked());
     });
-    connect(ui->SteppingMode_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=](int index) {
-        saveIni(ini);
-        ahp_gt_set_stepping_mode(0, (GT1SteppingMode)ui->SteppingMode_0->currentIndex());
-        UpdateValues(0);
-    });
     connect(ui->MotorSteps_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
         saveIni(ini);
@@ -556,11 +556,6 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(ini);
         ahp_gt_set_crown_teeth(0, ui->Crown_0->value());
         UpdateValues(0);
-    });
-    connect(ui->SteppingMode_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=](int index) {
-        saveIni(ini);
-        ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_1->currentIndex());
-        UpdateValues(1);
     });
     connect(ui->MotorSteps_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
                    [=](int value){
@@ -692,48 +687,6 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_set_features(0, (SkywatcherFeature)((ui->isAZEQ->isChecked() ? isAZEQ : 0)|hasPPEC));
         ahp_gt_set_features(1, (SkywatcherFeature)((ui->isAZEQ->isChecked() ? isAZEQ : 0)|hasPPEC));
     });
-    connect(ui->Coil_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-                   [=](int index){
-        saveIni(ini);
-        ahp_gt_set_stepping_conf(0, (GT1SteppingConfiguration)ui->Coil_0->currentIndex());
-    });
-    connect(ui->Coil_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-                   [=](int index){
-        saveIni(ini);
-        ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)ui->Coil_1->currentIndex());
-    });
-    connect(ui->GPIO_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-                   [=](int index){
-        saveIni(ini);
-        switch(ui->GPIO_0->currentIndex()) {
-        case 0:
-            ahp_gt_set_feature(0, GpioUnused);
-            break;
-        case 1:
-            ahp_gt_set_feature(0, GpioAsST4);
-            break;
-        case 2:
-            ahp_gt_set_feature(0, GpioAsPulseDrive);
-            break;
-        default: break;
-        }
-    });
-    connect(ui->GPIO_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-                   [=](int index){
-        saveIni(ini);
-        switch(ui->GPIO_1->currentIndex()) {
-        case 0:
-            ahp_gt_set_feature(1, GpioUnused);
-            break;
-        case 1:
-            ahp_gt_set_feature(1, GpioAsST4);
-            break;
-        case 2:
-            ahp_gt_set_feature(1, GpioAsPulseDrive);
-            break;
-        default: break;
-        }
-    });
     connect(ui->Write, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [=](bool checked=false){
         if(ui->Write->text() == "Write") {
@@ -788,6 +741,12 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(ini);
         UpdateValues(1);
     });
+    connect(ui->SteppingMode_0, SIGNAL(&QComboBox::currentIndexChanged), SLOT(&MainWindow::onSteppingMode_0IndexChanged));
+    connect(ui->SteppingMode_1, SIGNAL(&QComboBox::currentIndexChanged), SLOT(&MainWindow::onSteppingMode_1IndexChanged));
+    connect(ui->Coil_0, SIGNAL(&QComboBox::currentIndexChanged), SLOT(&MainWindow::onCoil_0IndexChanged));
+    connect(ui->Coil_1, SIGNAL(&QComboBox::currentIndexChanged), SLOT(&MainWindow::onCoil_1IndexChanged));
+    connect(ui->GPIO_0, SIGNAL(&QComboBox::currentIndexChanged), SLOT(&MainWindow::onGPIO_0IndexChanged));
+    connect(ui->GPIO_1, SIGNAL(&QComboBox::currentIndexChanged), SLOT(&MainWindow::onGPIO_1IndexChanged));
     std::thread(MainWindow::Progress, this).detach();
 }
 
@@ -809,13 +768,14 @@ void MainWindow::UpdateValues(int axis)
         ui->WormSteps0->setText(QString::number(ahp_gt_get_wormsteps(0)));
         ui->TotalSteps0->setText(QString::number(ahp_gt_get_totalsteps(0)));
         ui->TrackingFrequency_0->setText("Step freq (Steps/s): " + QString::number(ahp_gt_get_totalsteps(0)/SIDEREAL_DAY));
-        double L = (double)ui->Inductance_0->value()/1000.0;
+        ui->RPM_0->setText("RPM: " + QString::number(SIDEREAL_DAY/(60*ahp_gt_get_crown_teeth(0)*ahp_gt_get_worm_teeth(0)/ahp_gt_get_motor_teeth(0))));
+        double L = (double)ui->Inductance_0->value()/1000000.0;
         double R = (double)ui->Resistance_0->value()/1000.0;
         double mI = (double)ui->Current_0->value()/1000.0;
         double mV = (double)ui->Voltage_0->value();
         double Z = sqrt(fmax(0, pow(mV/mI, 2.0)-pow(R, 2.0)));
         double f = (2.0*M_PI*Z/L);
-        ui->MinFrequency_0->setText("PWM (Hz): " + QString::number(f));
+        ui->MinFrequency_0->setText("Min freq (Hz): " + QString::number(f));
     } else if (axis == 1) {
         ahp_gt_set_wormsteps(1, fmin(pow(2,24)-1, ahp_gt_get_motor_steps(1)*ahp_gt_get_multiplier(1)*ahp_gt_get_worm_teeth(1)/ahp_gt_get_motor_teeth(1)/ahp_gt_get_divider(1)));
         ahp_gt_set_totalsteps(1, fmin(pow(2,24)-1, ahp_gt_get_wormsteps(1)*ahp_gt_get_crown_teeth(1)));
@@ -823,13 +783,68 @@ void MainWindow::UpdateValues(int axis)
         ui->Multiplier1->setText(QString::number(ahp_gt_get_multiplier(1)));
         ui->WormSteps1->setText(QString::number(ahp_gt_get_wormsteps(1)));
         ui->TotalSteps1->setText(QString::number(ahp_gt_get_totalsteps(1)));
-        ui->TrackingFrequency_1->setText("RPM: " + QString::number(ahp_gt_get_totalsteps(1)/SIDEREAL_DAY));
-        double L = (double)ui->Inductance_1->value()/1000.0;
+        ui->TrackingFrequency_1->setText("Step freq (Steps/s): " + QString::number(ahp_gt_get_totalsteps(1)/SIDEREAL_DAY));
+        ui->RPM_1->setText("RPM: " + QString::number(SIDEREAL_DAY/(60*ahp_gt_get_crown_teeth(1)*ahp_gt_get_worm_teeth(1)/ahp_gt_get_motor_teeth(1))));
+        double L = (double)ui->Inductance_1->value()/1000000.0;
         double R = (double)ui->Resistance_1->value()/1000.0;
         double mI = (double)ui->Current_1->value()/1000.0;
         double mV = (double)ui->Voltage_1->value();
         double Z = sqrt(fmax(0, pow(mV/mI, 2.0)-pow(R, 2.0)));
         double f = (2.0*M_PI*Z/L);
-        ui->MinFrequency_1->setText("PWM (Hz): " + QString::number(f));
+        ui->MinFrequency_1->setText("Min freq (Hz): " + QString::number(f));
     }
+}
+
+void MainWindow::onGPIO_0IndexChanged (int index) {
+    saveIni(ini);
+    switch(ui->GPIO_0->currentIndex()) {
+    case 0:
+    ahp_gt_set_feature(0, GpioUnused);
+    break;
+    case 1:
+    ahp_gt_set_feature(0, GpioAsST4);
+    break;
+    case 2:
+    ahp_gt_set_feature(0, GpioAsPulseDrive);
+    break;
+    default: break;
+    }
+}
+
+void MainWindow::onGPIO_1IndexChanged (int index) {
+    saveIni(ini);
+    switch(ui->GPIO_1->currentIndex()) {
+    case 0:
+    ahp_gt_set_feature(1, GpioUnused);
+    break;
+    case 1:
+    ahp_gt_set_feature(1, GpioAsST4);
+    break;
+    case 2:
+    ahp_gt_set_feature(1, GpioAsPulseDrive);
+    break;
+    default: break;
+    }
+}
+
+void MainWindow::onCoil_0IndexChanged (int index) {
+    saveIni(ini);
+    ahp_gt_set_stepping_conf(0, (GT1SteppingConfiguration)ui->Coil_0->currentIndex());
+}
+
+void MainWindow::onCoil_1IndexChanged (int index) {
+    saveIni(ini);
+    ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)ui->Coil_1->currentIndex());
+}
+
+void MainWindow::onSteppingMode_0IndexChanged (int index) {
+    saveIni(ini);
+    ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_0->currentIndex());
+    UpdateValues(0);
+}
+
+void MainWindow::onSteppingMode_1IndexChanged (int index) {
+    saveIni(ini);
+    ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_1->currentIndex());
+    UpdateValues(1);
 }

@@ -23,6 +23,12 @@ public:
 private:
     void saveIni(QString ini);
     void readIni(QString ini);
+    void onGPIO_0IndexChanged (int index);
+    void onCoil_0IndexChanged (int index);
+    void onSteppingMode_0IndexChanged (int index);
+    void onGPIO_1IndexChanged (int index);
+    void onCoil_1IndexChanged (int index);
+    void onSteppingMode_1IndexChanged (int index);
 
     QSettings * settings;
     QString ini;

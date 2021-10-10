@@ -1219,7 +1219,7 @@
        <number>1</number>
       </property>
       <property name="maximum">
-       <number>100000</number>
+       <number>1000000</number>
       </property>
       <property name="value">
        <number>20000</number>
@@ -1248,7 +1248,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Coil inductance (mH)</string>
+       <string>Coil inductance (µH)</string>
       </property>
      </widget>
      <widget class="QSpinBox" name="Inductance_0">
@@ -1264,7 +1264,7 @@
        <number>1</number>
       </property>
       <property name="maximum">
-       <number>10000</number>
+       <number>1000000</number>
       </property>
       <property name="value">
        <number>1000</number>
@@ -1283,7 +1283,7 @@
        <number>1</number>
       </property>
       <property name="maximum">
-       <number>10000</number>
+       <number>100000</number>
       </property>
       <property name="value">
        <number>700</number>
@@ -1305,14 +1305,14 @@
      <widget class="QLabel" name="MinFrequency_0">
       <property name="geometry">
        <rect>
-        <x>600</x>
-        <y>50</y>
-        <width>121</width>
+        <x>550</x>
+        <y>30</y>
+        <width>171</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>PWM (Hz):</string>
+       <string>Min freq (Hz):</string>
       </property>
      </widget>
      <widget class="QLineEdit" name="Multiplier0">
@@ -1367,7 +1367,7 @@
        <number>3</number>
       </property>
       <property name="maximum">
-       <number>24</number>
+       <number>240</number>
       </property>
       <property name="value">
        <number>12</number>
@@ -1377,13 +1377,26 @@
       <property name="geometry">
        <rect>
         <x>550</x>
-        <y>20</y>
+        <y>10</y>
         <width>171</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
        <string>Step freq (Steps/s):</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="RPM_0">
+      <property name="geometry">
+       <rect>
+        <x>600</x>
+        <y>50</y>
+        <width>121</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>RPM:</string>
       </property>
      </widget>
     </widget>
@@ -1493,7 +1506,7 @@
        <number>1</number>
       </property>
       <property name="maximum">
-       <number>100000</number>
+       <number>1000000</number>
       </property>
       <property name="value">
        <number>20000</number>
@@ -1522,7 +1535,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Coil inductance (mH)</string>
+       <string>Coil inductance (µH)</string>
       </property>
      </widget>
      <widget class="QSpinBox" name="Inductance_1">
@@ -1538,7 +1551,7 @@
        <number>1</number>
       </property>
       <property name="maximum">
-       <number>10000</number>
+       <number>1000000</number>
       </property>
       <property name="value">
        <number>1000</number>
@@ -1557,7 +1570,7 @@
        <number>1</number>
       </property>
       <property name="maximum">
-       <number>10000</number>
+       <number>100000</number>
       </property>
       <property name="value">
        <number>700</number>
@@ -1574,19 +1587,6 @@
       </property>
       <property name="text">
        <string>Current (mA)</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="MinFrequency_1">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>50</y>
-        <width>121</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>PWM (Hz):</string>
       </property>
      </widget>
      <widget class="QLineEdit" name="Multiplier1">
@@ -1641,23 +1641,49 @@
        <number>3</number>
       </property>
       <property name="maximum">
-       <number>24</number>
+       <number>240</number>
       </property>
       <property name="value">
        <number>12</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="MinFrequency_1">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>30</y>
+        <width>171</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Min freq (Hz):</string>
       </property>
      </widget>
      <widget class="QLabel" name="TrackingFrequency_1">
       <property name="geometry">
        <rect>
         <x>550</x>
-        <y>20</y>
+        <y>10</y>
         <width>171</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
        <string>Step freq (Steps/s):</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="RPM_1">
+      <property name="geometry">
+       <rect>
+        <x>600</x>
+        <y>50</y>
+        <width>121</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>RPM:</string>
       </property>
      </widget>
     </widget>
@@ -1675,6 +1701,9 @@
      </property>
     </widget>
     <widget class="QPushButton" name="loadConfig">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>330</x>
@@ -1688,6 +1717,9 @@
      </property>
     </widget>
     <widget class="QPushButton" name="saveConfig">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>420</x>
