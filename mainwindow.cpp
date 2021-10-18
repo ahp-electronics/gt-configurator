@@ -35,6 +35,15 @@ static MountType mounttype[] = {
     isCustom,
 };
 
+char *strrand(int len)
+{
+    int i;
+    char* ret = (char*)malloc(len);
+    for(i = 0; i < len; i++)
+        ret[i] = 'a'+(rand()%21);
+    return ret;
+}
+
 void MainWindow::Progress(MainWindow *wnd)
 {
     wnd->threadsRunning = true;
@@ -181,6 +190,7 @@ out:
 
 void MainWindow::WriteValues(MainWindow *wnd)
 {
+    wnd->saveIni(wnd->getDefaultIni());
     wnd->percent = 0;
     wnd->finished = 0;
     if(wnd->ui->Write->text() == "Flash") {
@@ -244,12 +254,51 @@ void MainWindow::readIni(QString ini)
     ui->Coil_1->setCurrentIndex(settings->value("Coil_1", ahp_gt_get_stepping_conf(1)).toInt());
     ui->SteppingMode_1->setCurrentIndex(settings->value("SteppingMode_1", ahp_gt_get_stepping_mode(1)).toInt());
 
-    onSteppingMode_0IndexChanged(ui->SteppingMode_0->currentIndex());
-    onSteppingMode_1IndexChanged(ui->SteppingMode_1->currentIndex());
-    onCoil_0IndexChanged(ui->Coil_0->currentIndex());
-    onCoil_1IndexChanged(ui->Coil_1->currentIndex());
-    onGPIO_0IndexChanged(ui->GPIO_0->currentIndex());
-    onGPIO_1IndexChanged(ui->GPIO_1->currentIndex());
+    ahp_gt_set_mount_type((MountType)ui->MountType->currentIndex());
+
+    ahp_gt_set_motor_steps(0, ui->MotorSteps_0->value());
+    ahp_gt_set_motor_teeth(0, ui->Motor_0->value());
+    ahp_gt_set_worm_teeth(0, ui->Worm_0->value());
+    ahp_gt_set_crown_teeth(0, ui->Crown_0->value());
+    ahp_gt_set_max_speed(0, ui->MaxSpeed_0->value());
+    ahp_gt_set_acceleration_angle(0, (ui->Acceleration_0->maximum()-ui->Acceleration_0->value())*M_PI/1800.0);
+    ahp_gt_set_direction_invert(0, ui->Invert_0->isChecked());
+    ahp_gt_set_stepping_conf(0, (GT1SteppingConfiguration)ui->Coil_0->currentIndex());
+    ahp_gt_set_stepping_mode(0, (GT1SteppingMode)ui->SteppingMode_0->currentIndex());
+    switch(ui->GPIO_0->currentIndex()) {
+    case 0:
+    ahp_gt_set_feature(0, GpioUnused);
+    break;
+    case 1:
+    ahp_gt_set_feature(0, GpioAsST4);
+    break;
+    case 2:
+    ahp_gt_set_feature(0, GpioAsPulseDrive);
+    break;
+    default: break;
+    }
+
+    ahp_gt_set_motor_steps(1, ui->MotorSteps_1->value());
+    ahp_gt_set_motor_teeth(1, ui->Motor_1->value());
+    ahp_gt_set_worm_teeth(1, ui->Worm_1->value());
+    ahp_gt_set_crown_teeth(1, ui->Crown_1->value());
+    ahp_gt_set_max_speed(1, ui->MaxSpeed_1->value());
+    ahp_gt_set_acceleration_angle(1, (ui->Acceleration_1->maximum()-ui->Acceleration_1->value())*M_PI/1800.0);
+    ahp_gt_set_direction_invert(1, ui->Invert_1->isChecked());
+    ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)ui->Coil_1->currentIndex());
+    ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_1->currentIndex());
+    switch(ui->GPIO_1->currentIndex()) {
+    case 0:
+    ahp_gt_set_feature(1, GpioUnused);
+    break;
+    case 1:
+    ahp_gt_set_feature(1, GpioAsST4);
+    break;
+    case 2:
+    ahp_gt_set_feature(1, GpioAsPulseDrive);
+    break;
+    default: break;
+    }
 
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency()).toInt());
     ui->isAZEQ->setChecked(settings->value("isAZEQ", false).toBool());
@@ -313,7 +362,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     setAccessibleName("GT Configurator");
-    firmwareFilename = QStandardPaths::standardLocations(QStandardPaths::TempLocation).at(0)+tmpnam(NULL);
+    firmwareFilename = QStandardPaths::standardLocations(QStandardPaths::TempLocation).at(0)+"/"+strrand(32);
     QString homedir = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).at(0);
     ini = homedir+"/settings.ini";
     if(!QDir(homedir).exists()){
@@ -402,14 +451,14 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ui->loadConfig, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [=](bool triggered) {
-        QString ini = QFileDialog::getOpenFileName(this, "Open configuration file", ".", "Configuration files (*.ini)");
+        QString ini = QFileDialog::getOpenFileName(this, "Open configuration file", QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).at(0), "Configuration files (*.ini)");
         if(ini.endsWith(".ini")) {
             readIni(ini);
         }
     });
     connect(ui->saveConfig, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [=](bool triggered) {
-        QString ini = QFileDialog::getSaveFileName(this, "Save configuration file", ".", "Configuration files (*.ini)");
+        QString ini = QFileDialog::getSaveFileName(this, "Save configuration file", QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).at(0), "Configuration files (*.ini)");
         if(ini.endsWith(".ini")) {
             saveIni(ini);
         }
@@ -741,12 +790,54 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(ini);
         UpdateValues(1);
     });
-    connect(ui->SteppingMode_0, SIGNAL(&QComboBox::currentIndexChanged), SLOT(&MainWindow::onSteppingMode_0IndexChanged));
-    connect(ui->SteppingMode_1, SIGNAL(&QComboBox::currentIndexChanged), SLOT(&MainWindow::onSteppingMode_1IndexChanged));
-    connect(ui->Coil_0, SIGNAL(&QComboBox::currentIndexChanged), SLOT(&MainWindow::onCoil_0IndexChanged));
-    connect(ui->Coil_1, SIGNAL(&QComboBox::currentIndexChanged), SLOT(&MainWindow::onCoil_1IndexChanged));
-    connect(ui->GPIO_0, SIGNAL(&QComboBox::currentIndexChanged), SLOT(&MainWindow::onGPIO_0IndexChanged));
-    connect(ui->GPIO_1, SIGNAL(&QComboBox::currentIndexChanged), SLOT(&MainWindow::onGPIO_1IndexChanged));
+    connect(ui->SteppingMode_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=] (int index) {
+        saveIni(ini);
+        ahp_gt_set_stepping_mode(0, (GT1SteppingMode)ui->SteppingMode_0->currentIndex());
+        UpdateValues(0);
+    });
+    connect(ui->SteppingMode_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=] (int index) {
+        saveIni(ini);
+        ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_1->currentIndex());
+        UpdateValues(1);
+    });
+    connect(ui->Coil_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=] (int index) {
+        saveIni(ini);
+        ahp_gt_set_stepping_conf(0, (GT1SteppingConfiguration)ui->Coil_0->currentIndex());
+    });
+    connect(ui->Coil_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=] (int index) {
+        saveIni(ini);
+        ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)ui->Coil_1->currentIndex());
+    });
+    connect(ui->GPIO_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=] (int index) {
+        saveIni(ini);
+        switch(ui->GPIO_0->currentIndex()) {
+        case 0:
+        ahp_gt_set_feature(0, GpioUnused);
+        break;
+        case 1:
+        ahp_gt_set_feature(0, GpioAsST4);
+        break;
+        case 2:
+        ahp_gt_set_feature(0, GpioAsPulseDrive);
+        break;
+        default: break;
+        }
+    });
+    connect(ui->GPIO_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [=]  (int index) {
+        saveIni(ini);
+        switch(ui->GPIO_1->currentIndex()) {
+        case 0:
+        ahp_gt_set_feature(1, GpioUnused);
+        break;
+        case 1:
+        ahp_gt_set_feature(1, GpioAsST4);
+        break;
+        case 2:
+        ahp_gt_set_feature(1, GpioAsPulseDrive);
+        break;
+        default: break;
+        }
+    });
     std::thread(MainWindow::Progress, this).detach();
 }
 
@@ -793,58 +884,4 @@ void MainWindow::UpdateValues(int axis)
         double f = (2.0*M_PI*Z/L);
         ui->MinFrequency_1->setText("Min freq (Hz): " + QString::number(f));
     }
-}
-
-void MainWindow::onGPIO_0IndexChanged (int index) {
-    saveIni(ini);
-    switch(ui->GPIO_0->currentIndex()) {
-    case 0:
-    ahp_gt_set_feature(0, GpioUnused);
-    break;
-    case 1:
-    ahp_gt_set_feature(0, GpioAsST4);
-    break;
-    case 2:
-    ahp_gt_set_feature(0, GpioAsPulseDrive);
-    break;
-    default: break;
-    }
-}
-
-void MainWindow::onGPIO_1IndexChanged (int index) {
-    saveIni(ini);
-    switch(ui->GPIO_1->currentIndex()) {
-    case 0:
-    ahp_gt_set_feature(1, GpioUnused);
-    break;
-    case 1:
-    ahp_gt_set_feature(1, GpioAsST4);
-    break;
-    case 2:
-    ahp_gt_set_feature(1, GpioAsPulseDrive);
-    break;
-    default: break;
-    }
-}
-
-void MainWindow::onCoil_0IndexChanged (int index) {
-    saveIni(ini);
-    ahp_gt_set_stepping_conf(0, (GT1SteppingConfiguration)ui->Coil_0->currentIndex());
-}
-
-void MainWindow::onCoil_1IndexChanged (int index) {
-    saveIni(ini);
-    ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)ui->Coil_1->currentIndex());
-}
-
-void MainWindow::onSteppingMode_0IndexChanged (int index) {
-    saveIni(ini);
-    ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_0->currentIndex());
-    UpdateValues(0);
-}
-
-void MainWindow::onSteppingMode_1IndexChanged (int index) {
-    saveIni(ini);
-    ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_1->currentIndex());
-    UpdateValues(1);
 }
