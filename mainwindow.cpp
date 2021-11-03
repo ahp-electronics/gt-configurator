@@ -459,9 +459,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->saveConfig, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [=](bool triggered) {
         QString ini = QFileDialog::getSaveFileName(this, "Save configuration file", QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).at(0), "Configuration files (*.ini)");
-        if(ini.endsWith(".ini")) {
-            saveIni(ini);
-        }
+        if(!ini.endsWith(".ini"))
+            ini = ini.append(".ini");
+        saveIni(ini);
     });
     connect(ui->MountType, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             [=](int index) {
@@ -852,13 +852,11 @@ MainWindow::~MainWindow()
 void MainWindow::UpdateValues(int axis)
 {
     if(axis == 0) {
-        ahp_gt_set_wormsteps(0, fmin(pow(2,24)-1, ahp_gt_get_motor_steps(0)*ahp_gt_get_multiplier(0)*ahp_gt_get_worm_teeth(0)/ahp_gt_get_motor_teeth(0)/ahp_gt_get_divider(0)));
-        ahp_gt_set_totalsteps(0, fmin(pow(2,24)-1, ahp_gt_get_wormsteps(0)*ahp_gt_get_crown_teeth(0)));
         ui->Divider0->setText(QString::number(ahp_gt_get_divider(0)));
         ui->Multiplier0->setText(QString::number(ahp_gt_get_multiplier(0)));
         ui->WormSteps0->setText(QString::number(ahp_gt_get_wormsteps(0)));
         ui->TotalSteps0->setText(QString::number(ahp_gt_get_totalsteps(0)));
-        ui->TrackingFrequency_0->setText("Step freq (Steps/s): " + QString::number(ahp_gt_get_totalsteps(0)/SIDEREAL_DAY));
+        ui->TrackingFrequency_0->setText("Steps/s: " + QString::number(ahp_gt_get_totalsteps(0)/SIDEREAL_DAY));
         ui->RPM_0->setText("RPM: " + QString::number(SIDEREAL_DAY/(60*ahp_gt_get_crown_teeth(0)*ahp_gt_get_worm_teeth(0)/ahp_gt_get_motor_teeth(0))));
         double L = (double)ui->Inductance_0->value()/1000000.0;
         double R = (double)ui->Resistance_0->value()/1000.0;
@@ -866,15 +864,13 @@ void MainWindow::UpdateValues(int axis)
         double mV = (double)ui->Voltage_0->value();
         double Z = sqrt(fmax(0, pow(mV/mI, 2.0)-pow(R, 2.0)));
         double f = (2.0*M_PI*Z/L);
-        ui->MinFrequency_0->setText("Min freq (Hz): " + QString::number(f));
+        ui->MinFrequency_0->setText("Hz: " + QString::number(f));
     } else if (axis == 1) {
-        ahp_gt_set_wormsteps(1, fmin(pow(2,24)-1, ahp_gt_get_motor_steps(1)*ahp_gt_get_multiplier(1)*ahp_gt_get_worm_teeth(1)/ahp_gt_get_motor_teeth(1)/ahp_gt_get_divider(1)));
-        ahp_gt_set_totalsteps(1, fmin(pow(2,24)-1, ahp_gt_get_wormsteps(1)*ahp_gt_get_crown_teeth(1)));
         ui->Divider1->setText(QString::number(ahp_gt_get_divider(1)));
         ui->Multiplier1->setText(QString::number(ahp_gt_get_multiplier(1)));
         ui->WormSteps1->setText(QString::number(ahp_gt_get_wormsteps(1)));
         ui->TotalSteps1->setText(QString::number(ahp_gt_get_totalsteps(1)));
-        ui->TrackingFrequency_1->setText("Step freq (Steps/s): " + QString::number(ahp_gt_get_totalsteps(1)/SIDEREAL_DAY));
+        ui->TrackingFrequency_1->setText("Steps/s: " + QString::number(ahp_gt_get_totalsteps(1)/SIDEREAL_DAY));
         ui->RPM_1->setText("RPM: " + QString::number(SIDEREAL_DAY/(60*ahp_gt_get_crown_teeth(1)*ahp_gt_get_worm_teeth(1)/ahp_gt_get_motor_teeth(1))));
         double L = (double)ui->Inductance_1->value()/1000000.0;
         double R = (double)ui->Resistance_1->value()/1000.0;
@@ -882,6 +878,6 @@ void MainWindow::UpdateValues(int axis)
         double mV = (double)ui->Voltage_1->value();
         double Z = sqrt(fmax(0, pow(mV/mI, 2.0)-pow(R, 2.0)));
         double f = (2.0*M_PI*Z/L);
-        ui->MinFrequency_1->setText("Min freq (Hz): " + QString::number(f));
+        ui->MinFrequency_1->setText("Hz: " + QString::number(f));
     }
 }
