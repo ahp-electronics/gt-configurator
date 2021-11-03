@@ -857,7 +857,7 @@ void MainWindow::UpdateValues(int axis)
         ui->WormSteps0->setText(QString::number(ahp_gt_get_wormsteps(0)));
         ui->TotalSteps0->setText(QString::number(ahp_gt_get_totalsteps(0)));
         ui->TrackingFrequency_0->setText("Steps/s: " + QString::number(ahp_gt_get_totalsteps(0)/SIDEREAL_DAY));
-        ui->RPM_0->setText("RPM: " + QString::number(SIDEREAL_DAY/(60*ahp_gt_get_crown_teeth(0)*ahp_gt_get_worm_teeth(0)/ahp_gt_get_motor_teeth(0))));
+        ui->SPT_0->setText("s/turn: " + QString::number(SIDEREAL_DAY/(ahp_gt_get_crown_teeth(0)*ahp_gt_get_worm_teeth(0)/ahp_gt_get_motor_teeth(0))));
         double L = (double)ui->Inductance_0->value()/1000000.0;
         double R = (double)ui->Resistance_0->value()/1000.0;
         double mI = (double)ui->Current_0->value()/1000.0;
@@ -871,7 +871,7 @@ void MainWindow::UpdateValues(int axis)
         ui->WormSteps1->setText(QString::number(ahp_gt_get_wormsteps(1)));
         ui->TotalSteps1->setText(QString::number(ahp_gt_get_totalsteps(1)));
         ui->TrackingFrequency_1->setText("Steps/s: " + QString::number(ahp_gt_get_totalsteps(1)/SIDEREAL_DAY));
-        ui->RPM_1->setText("RPM: " + QString::number(SIDEREAL_DAY/(60*ahp_gt_get_crown_teeth(1)*ahp_gt_get_worm_teeth(1)/ahp_gt_get_motor_teeth(1))));
+        ui->SPT_1->setText("s/turn: " + QString::number(SIDEREAL_DAY/(ahp_gt_get_crown_teeth(1)*ahp_gt_get_worm_teeth(1)/ahp_gt_get_motor_teeth(1))));
         double L = (double)ui->Inductance_1->value()/1000000.0;
         double R = (double)ui->Resistance_1->value()/1000.0;
         double mI = (double)ui->Current_1->value()/1000.0;

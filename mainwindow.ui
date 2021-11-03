@@ -1308,7 +1308,7 @@
        <string>Steps/s:</string>
       </property>
      </widget>
-     <widget class="QLabel" name="RPM_0">
+     <widget class="QLabel" name="SPT_0">
       <property name="geometry">
        <rect>
         <x>600</x>
@@ -1318,7 +1318,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>RPM:</string>
+       <string>s/turn:</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_32">
@@ -1673,7 +1673,7 @@
        <string>Steps/s:</string>
       </property>
      </widget>
-     <widget class="QLabel" name="RPM_1">
+     <widget class="QLabel" name="SPT_1">
       <property name="geometry">
        <rect>
         <x>610</x>
@@ -1683,7 +1683,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>RPM:</string>
+       <string>s/turn:</string>
       </property>
      </widget>
     </widget>
@@ -1740,7 +1740,7 @@
      <x>0</x>
      <y>0</y>
      <width>772</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
