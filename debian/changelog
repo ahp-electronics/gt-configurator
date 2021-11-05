@@ -1,3 +1,9 @@
+gt-configurator (0.8.8) focal; urgency=low
+
+  * New release
+
+ -- Ilia Platone <info@iliaplatone.com>  Mon, 05 Nov 2021 00:00:00 +0200
+
 gt-configurator (1.0.0) focal; urgency=low
 
   * Initial release
