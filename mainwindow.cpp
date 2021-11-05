@@ -708,12 +708,14 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(ini);
         ahp_gt_set_max_speed(0, ui->MaxSpeed_0->value());
         ui->MaxSpeed_label_0->setText("Maximum speed: "+QString::number(value)+"x");
+        UpdateValues(0);
     });
     connect(ui->MaxSpeed_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                    [=](int value){
         saveIni(ini);
         ahp_gt_set_max_speed(1, ui->MaxSpeed_1->value());
         ui->MaxSpeed_label_1->setText("Maximum speed: "+QString::number(value)+"x");
+        UpdateValues(1);
     });
     connect(ui->Ra_Speed, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
                    [=](int value){
@@ -852,32 +854,36 @@ MainWindow::~MainWindow()
 void MainWindow::UpdateValues(int axis)
 {
     if(axis == 0) {
+        double totalsteps = ahp_gt_get_totalsteps(0)*ahp_gt_get_divider(0)/ahp_gt_get_multiplier(0);
         ui->Divider0->setText(QString::number(ahp_gt_get_divider(0)));
         ui->Multiplier0->setText(QString::number(ahp_gt_get_multiplier(0)));
         ui->WormSteps0->setText(QString::number(ahp_gt_get_wormsteps(0)));
         ui->TotalSteps0->setText(QString::number(ahp_gt_get_totalsteps(0)));
-        ui->TrackingFrequency_0->setText("Steps/s: " + QString::number(ahp_gt_get_totalsteps(0)/SIDEREAL_DAY));
-        ui->SPT_0->setText("s/turn: " + QString::number(SIDEREAL_DAY/(ahp_gt_get_crown_teeth(0)*ahp_gt_get_worm_teeth(0)/ahp_gt_get_motor_teeth(0))));
+        ui->TrackingFrequency_0->setText("Steps/s: " + QString::number(totalsteps/SIDEREAL_DAY));
+        ui->SPT_0->setText("sec/turn: " + QString::number(SIDEREAL_DAY/(ahp_gt_get_crown_teeth(0)*ahp_gt_get_worm_teeth(0)/ahp_gt_get_motor_teeth(0))));
         double L = (double)ui->Inductance_0->value()/1000000.0;
         double R = (double)ui->Resistance_0->value()/1000.0;
         double mI = (double)ui->Current_0->value()/1000.0;
         double mV = (double)ui->Voltage_0->value();
         double Z = sqrt(fmax(0, pow(mV/mI, 2.0)-pow(R, 2.0)));
         double f = (2.0*M_PI*Z/L);
-        ui->MinFrequency_0->setText("Hz: " + QString::number(f));
+        ui->MinFrequency_0->setText("PWM Hz: " + QString::number(f));
+        ui->MaxFrequency_0->setText("Goto Hz: " + QString::number(totalsteps*ahp_gt_get_max_speed(0)/SIDEREAL_DAY));
     } else if (axis == 1) {
+        double totalsteps = ahp_gt_get_totalsteps(1)*ahp_gt_get_divider(1)/ahp_gt_get_multiplier(1);
         ui->Divider1->setText(QString::number(ahp_gt_get_divider(1)));
         ui->Multiplier1->setText(QString::number(ahp_gt_get_multiplier(1)));
         ui->WormSteps1->setText(QString::number(ahp_gt_get_wormsteps(1)));
         ui->TotalSteps1->setText(QString::number(ahp_gt_get_totalsteps(1)));
-        ui->TrackingFrequency_1->setText("Steps/s: " + QString::number(ahp_gt_get_totalsteps(1)/SIDEREAL_DAY));
-        ui->SPT_1->setText("s/turn: " + QString::number(SIDEREAL_DAY/(ahp_gt_get_crown_teeth(1)*ahp_gt_get_worm_teeth(1)/ahp_gt_get_motor_teeth(1))));
+        ui->TrackingFrequency_1->setText("Steps/s: " + QString::number(totalsteps/SIDEREAL_DAY));
+        ui->SPT_1->setText("sec/turn: " + QString::number(SIDEREAL_DAY/(ahp_gt_get_crown_teeth(1)*ahp_gt_get_worm_teeth(1)/ahp_gt_get_motor_teeth(1))));
         double L = (double)ui->Inductance_1->value()/1000000.0;
         double R = (double)ui->Resistance_1->value()/1000.0;
         double mI = (double)ui->Current_1->value()/1000.0;
         double mV = (double)ui->Voltage_1->value();
         double Z = sqrt(fmax(0, pow(mV/mI, 2.0)-pow(R, 2.0)));
         double f = (2.0*M_PI*Z/L);
-        ui->MinFrequency_1->setText("Hz: " + QString::number(f));
+        ui->MinFrequency_1->setText("PWM Hz: " + QString::number(f));
+        ui->MaxFrequency_1->setText("Goto Hz: " + QString::number(totalsteps*ahp_gt_get_max_speed(1)/SIDEREAL_DAY));
     }
 }
