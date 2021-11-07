@@ -277,6 +277,7 @@ void MainWindow::readIni(QString ini)
     break;
     default: break;
     }
+    UpdateValues(0);
 
     ahp_gt_set_motor_steps(1, ui->MotorSteps_1->value());
     ahp_gt_set_motor_teeth(1, ui->Motor_1->value());
@@ -299,6 +300,7 @@ void MainWindow::readIni(QString ini)
     break;
     default: break;
     }
+    UpdateValues(1);
 
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency()).toInt());
     ui->isAZEQ->setChecked(settings->value("isAZEQ", false).toBool());
