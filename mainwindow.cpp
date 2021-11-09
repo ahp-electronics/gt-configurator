@@ -415,7 +415,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
     settings = new QSettings(ini, QSettings::Format::IniFormat);
     isConnected = false;
-    this->setFixedSize(770, 745);
+    this->setFixedSize(1100, 570);
     ui->setupUi(this);
     QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
     if(ports.length() == 0)
