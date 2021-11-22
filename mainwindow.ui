@@ -1132,7 +1132,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>340</x>
+       <x>440</x>
        <y>30</y>
        <width>89</width>
        <height>21</height>
@@ -1148,7 +1148,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>440</x>
+       <x>540</x>
        <y>30</y>
        <width>89</width>
        <height>21</height>
@@ -1757,6 +1757,48 @@
        <string>Goto Hz:</string>
       </property>
      </widget>
+    </widget>
+    <widget class="QPushButton" name="Disconnect">
+     <property name="geometry">
+      <rect>
+       <x>340</x>
+       <y>30</y>
+       <width>89</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Disconnect</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelNotes">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>660</x>
+       <y>30</y>
+       <width>67</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Notes:</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="Notes">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>710</x>
+       <y>30</y>
+       <width>361</width>
+       <height>21</height>
+      </rect>
+     </property>
     </widget>
    </widget>
   </widget>

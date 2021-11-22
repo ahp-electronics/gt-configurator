@@ -249,6 +249,8 @@ void MainWindow::readIni(QString ini)
         f->~QFile();
     }
     QSettings *settings = new QSettings(ini, QSettings::Format::IniFormat);
+    ui->Notes->setText(QByteArray::fromBase64(settings->value("Notes").toString().toUtf8()));
+
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
 
     ui->MotorSteps_0->setValue(settings->value("MotorSteps_0", ahp_gt_get_motor_steps(0)).toInt());
@@ -390,6 +392,7 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("MountType", ui->MountType->currentIndex());
     settings->setValue("PWMFreq", ui->PWMFreq->value());
     settings->setValue("isAZEQ", ui->isAZEQ->isChecked());
+    settings->setValue("Notes", QString(ui->Notes->text().toUtf8().toBase64()));
     s->~QSettings();
     settings = oldsettings;
 }
@@ -480,6 +483,9 @@ MainWindow::MainWindow(QWidget *parent)
             ahp_gt_read_values(1);
             ui->LoadFW->setEnabled(false);
             ui->Connect->setEnabled(false);
+            ui->Disconnect->setEnabled(true);
+            ui->labelNotes->setEnabled(true);
+            ui->Notes->setEnabled(true);
             ui->RA->setEnabled(true);
             ui->DEC->setEnabled(true);
             ui->WorkArea->setEnabled(true);
@@ -491,6 +497,28 @@ MainWindow::MainWindow(QWidget *parent)
             ui->saveConfig->setEnabled(true);
             readIni(ini);
         }
+    });
+    connect(ui->Disconnect, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            [ = ](bool checked)
+    {
+        ui->Write->setText("Write");
+        ui->Write->setEnabled(false);
+        isConnected = false;
+        ui->LoadFW->setEnabled(true);
+        ui->Connect->setEnabled(true);
+        ui->Disconnect->setEnabled(false);
+        ui->labelNotes->setEnabled(false);
+        ui->Notes->setEnabled(false);
+        ui->RA->setEnabled(false);
+        ui->DEC->setEnabled(false);
+        ui->WorkArea->setEnabled(false);
+        ui->Control->setEnabled(false);
+        ui->commonSettings->setEnabled(false);
+        ui->AdvancedRA->setEnabled(false);
+        ui->AdvancedDec->setEnabled(false);
+        ui->loadConfig->setEnabled(false);
+        ui->saveConfig->setEnabled(false);
+        ahp_gt_disconnect();
     });
     connect(ui->loadConfig, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool triggered)
