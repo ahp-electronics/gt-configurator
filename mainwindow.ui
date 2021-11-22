@@ -1759,6 +1759,9 @@
      </widget>
     </widget>
     <widget class="QPushButton" name="Disconnect">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>340</x>
