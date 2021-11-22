@@ -3,7 +3,7 @@
 
 [Setup]
 AppName={#MyAppName}
-AppVersion=0.8.8
+AppVersion=0.8.9
 DefaultDirName={autopf}\AHP\{#MyAppName}
 DefaultGroupName=AHP
 UninstallDisplayIcon={app}\{#TargetName}.exe
