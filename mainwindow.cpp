@@ -251,7 +251,16 @@ void MainWindow::readIni(QString ini)
     QSettings *settings = new QSettings(ini, QSettings::Format::IniFormat);
     ui->Notes->setText(QByteArray::fromBase64(settings->value("Notes").toString().toUtf8()));
 
+    ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency()).toInt());
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
+    ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
+    ui->PPEC->setChecked(settings->value("PPEC", false).toBool());
+    ahp_gt_set_mount_type((MountType)ui->MountType->currentIndex());
+    ahp_gt_set_mount_flags(ui->MountStyle->currentIndex() == 1);
+    ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
+    ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
+    ahp_gt_set_pwm_frequency(ui->PWMFreq->value());
+
 
     ui->MotorSteps_0->setValue(settings->value("MotorSteps_0", ahp_gt_get_motor_steps(0)).toInt());
     ui->Motor_0->setValue(settings->value("Motor_0", ahp_gt_get_motor_teeth(0)).toInt());
@@ -284,8 +293,6 @@ void MainWindow::readIni(QString ini)
     ui->GPIO_1->setCurrentIndex(settings->value("GPIO_1", ahp_gt_get_feature(1)).toInt());
     ui->Coil_1->setCurrentIndex(settings->value("Coil_1", ahp_gt_get_stepping_conf(1)).toInt());
     ui->SteppingMode_1->setCurrentIndex(settings->value("SteppingMode_1", ahp_gt_get_stepping_mode(1)).toInt());
-
-    ahp_gt_set_mount_type((MountType)ui->MountType->currentIndex());
 
     ahp_gt_set_motor_steps(0, ui->MotorSteps_0->value());
     ahp_gt_set_motor_teeth(0, ui->Motor_0->value());
@@ -336,9 +343,6 @@ void MainWindow::readIni(QString ini)
             break;
     }
     UpdateValues(1);
-
-    ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency()).toInt());
-    ui->isAZEQ->setChecked(settings->value("isAZEQ", false).toBool());
 }
 
 void MainWindow::saveIni(QString ini)
@@ -391,7 +395,8 @@ void MainWindow::saveIni(QString ini)
 
     settings->setValue("MountType", ui->MountType->currentIndex());
     settings->setValue("PWMFreq", ui->PWMFreq->value());
-    settings->setValue("isAZEQ", ui->isAZEQ->isChecked());
+    settings->setValue("MountStyle", ui->MountStyle->currentIndex());
+    settings->setValue("PPEC", ui->PPEC->isChecked());
     settings->setValue("Notes", QString(ui->Notes->text().toUtf8().toBase64()));
     s->~QSettings();
     settings = oldsettings;
@@ -551,7 +556,7 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->Motor_1->setValue(10);
                 ui->Worm_1->setValue(40);
                 ui->Crown_1->setValue(180);
-                ui->isAZEQ->setCheckState(Qt::CheckState::Unchecked);
+                ui->MountStyle->setCurrentIndex(0);
                 break;
             case isHEQ5:
                 ui->Motor_0->setValue(10);
@@ -560,7 +565,7 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->Motor_1->setValue(10);
                 ui->Worm_1->setValue(40);
                 ui->Crown_1->setValue(180);
-                ui->isAZEQ->setCheckState(Qt::CheckState::Unchecked);
+                ui->MountStyle->setCurrentIndex(0);
                 break;
             case isEQ5:
                 ui->Motor_0->setValue(10);
@@ -569,7 +574,7 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->Motor_1->setValue(10);
                 ui->Worm_1->setValue(40);
                 ui->Crown_1->setValue(144);
-                ui->isAZEQ->setCheckState(Qt::CheckState::Unchecked);
+                ui->MountStyle->setCurrentIndex(0);
                 break;
             case isEQ3:
                 ui->Motor_0->setValue(10);
@@ -578,7 +583,7 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->Motor_1->setValue(10);
                 ui->Worm_1->setValue(40);
                 ui->Crown_1->setValue(144);
-                ui->isAZEQ->setCheckState(Qt::CheckState::Unchecked);
+                ui->MountStyle->setCurrentIndex(0);
                 break;
             case isEQ8:
                 ui->Motor_0->setValue(10);
@@ -587,7 +592,7 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->Motor_1->setValue(10);
                 ui->Worm_1->setValue(40);
                 ui->Crown_1->setValue(360);
-                ui->isAZEQ->setCheckState(Qt::CheckState::Unchecked);
+                ui->MountStyle->setCurrentIndex(0);
                 break;
             case isAZEQ6:
                 ui->Motor_0->setValue(10);
@@ -596,7 +601,7 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->Motor_1->setValue(10);
                 ui->Worm_1->setValue(40);
                 ui->Crown_1->setValue(180);
-                ui->isAZEQ->setCheckState(Qt::CheckState::Checked);
+                ui->MountStyle->setCurrentIndex(2);
                 break;
             case isAZEQ5:
                 ui->Motor_0->setValue(10);
@@ -605,7 +610,7 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->Motor_1->setValue(10);
                 ui->Worm_1->setValue(40);
                 ui->Crown_1->setValue(144);
-                ui->isAZEQ->setCheckState(Qt::CheckState::Checked);
+                ui->MountStyle->setCurrentIndex(2);
                 break;
             case isGT:
                 ui->Motor_0->setValue(10);
@@ -614,7 +619,7 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->Motor_1->setValue(10);
                 ui->Worm_1->setValue(40);
                 ui->Crown_1->setValue(144);
-                ui->isAZEQ->setCheckState(Qt::CheckState::Unchecked);
+                ui->MountStyle->setCurrentIndex(0);
                 break;
             case isMF:
                 ui->Motor_0->setValue(10);
@@ -623,7 +628,7 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->Motor_1->setValue(10);
                 ui->Worm_1->setValue(40);
                 ui->Crown_1->setValue(144);
-                ui->isAZEQ->setCheckState(Qt::CheckState::Unchecked);
+                ui->MountStyle->setCurrentIndex(0);
                 break;
             case is114GT:
                 ui->Motor_0->setValue(10);
@@ -632,7 +637,7 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->Motor_1->setValue(10);
                 ui->Worm_1->setValue(40);
                 ui->Crown_1->setValue(144);
-                ui->isAZEQ->setCheckState(Qt::CheckState::Unchecked);
+                ui->MountStyle->setCurrentIndex(0);
                 break;
             case isDOB:
                 ui->Motor_0->setValue(10);
@@ -641,7 +646,7 @@ MainWindow::MainWindow(QWidget *parent)
                 ui->Motor_1->setValue(10);
                 ui->Worm_1->setValue(40);
                 ui->Crown_1->setValue(100);
-                ui->isAZEQ->setCheckState(Qt::CheckState::Checked);
+                ui->MountStyle->setCurrentIndex(1);
                 break;
             default:
                 break;
@@ -836,12 +841,19 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_set_mount_type(mounttype[ui->MountType->currentIndex()]);
         ui->PWMFreq_label->setText("PWM Frequency: " + QString::number(1500 + 700 * value) + " Hz");
     });
-    connect(ui->isAZEQ, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
-            [ = ](int state)
+    connect(ui->PPEC, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            [ = ](bool checked)
+    {
+        ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
+        ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
+    });
+    connect(ui->MountStyle, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            [ = ](int index)
     {
         saveIni(ini);
-        ahp_gt_set_features(0, (SkywatcherFeature)((ui->isAZEQ->isChecked() ? isAZEQ : 0) | hasPPEC));
-        ahp_gt_set_features(1, (SkywatcherFeature)((ui->isAZEQ->isChecked() ? isAZEQ : 0) | hasPPEC));
+        ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
+        ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
+        ahp_gt_set_mount_flags(ui->MountStyle->currentIndex() == 1);
     });
     connect(ui->Write, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked = false)
