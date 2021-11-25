@@ -507,7 +507,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
         if(!success)
         {
-            settings->setValue("LastPort", port);
+            settings->setValue("LastPort", ui->ComPort->currentText());
             ui->Write->setText("Write");
             ui->Write->setEnabled(true);
             isConnected = true;
