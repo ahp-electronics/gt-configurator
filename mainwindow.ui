@@ -1124,6 +1124,12 @@
        <height>21</height>
       </rect>
      </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+     <property name="currentText">
+      <string>localhost:9600</string>
+     </property>
     </widget>
     <widget class="QLabel" name="label">
      <property name="geometry">

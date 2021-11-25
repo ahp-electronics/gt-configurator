@@ -425,16 +425,22 @@ MainWindow::MainWindow(QWidget *parent)
     isConnected = false;
     this->setFixedSize(1100, 570);
     ui->setupUi(this);
+    QString lastPort = settings->value("LastPort", "").toString();
+    if(lastPort != "")
+        ui->ComPort->addItem(lastPort);
+    ui->ComPort->addItem("localhost:9600");
     QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
-    if(ports.length() == 0)
-        ui->ComPort->addItem("No ports available");
-    else
+    if(ports.length() > 0)
     {
-        ui->ComPort->addItem(settings->value("LastPort", ports[0].portName()).toString());
-        for (int i = 1; i < ports.length(); i++)
-            ui->ComPort->addItem(ports[i].portName());
-        ui->MountType->setCurrentIndex(0);
+        for (int i = 0; i < ports.length(); i++)
+        {
+            if(ports[i].portName() != lastPort)
+                ui->ComPort->addItem(ports[i].portName());
+        }
     }
+    else
+        ui->ComPort->addItem("No serial ports available");
+    ui->MountType->setCurrentIndex(0);
     connect(ui->LoadFW, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked)
     {
@@ -471,14 +477,35 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Connect, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked)
     {
-        if(ui->ComPort->currentText() == "No ports available")
-            return;
-        char port[150] = {0};
+        QString portname;
 #ifndef _WIN32
-        strcat(port, "/dev/");
+        portname.append("/dev/");
 #endif
-        strcat(port, ports[ui->ComPort->currentIndex()].portName().toStdString().c_str());
-        if(!ahp_gt_connect(port))
+        int fd = -1;
+        int port = 9600;
+        QString address = "localhost";
+        int success = 1;
+        if(ui->ComPort->currentText().contains(':'))
+        {
+            address = ui->ComPort->currentText().split(":")[0];
+            port = ui->ComPort->currentText().split(":")[1].toInt();
+            update();
+            socket.connectToHost(address, port);
+            socket.waitForConnected();
+            if(socket.isValid())
+            {
+                socket.setReadBufferSize(4096);
+                fd = socket.socketDescriptor();
+                if(fd > -1)
+                    success = ahp_gt_connect_fd(fd);
+            }
+        }
+        else
+        {
+            portname.append(ui->ComPort->currentText());
+            success = ahp_gt_connect(portname.toUtf8());
+        }
+        if(!success)
         {
             settings->setValue("LastPort", port);
             ui->Write->setText("Write");
