@@ -45,16 +45,6 @@ char *strrand(int len)
     return ret;
 }
 
-void MainWindow::Progress(MainWindow *wnd)
-{
-    wnd->threadsRunning = true;
-    while(wnd->threadsRunning)
-    {
-        emit wnd->onUpdateProgress();
-        QThread::msleep(100);
-    }
-}
-
 int MainWindow::flashFirmware()
 {
     dfu_status status;
@@ -406,6 +396,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    ProgressThread = new Thread();
     setAccessibleName("GT Configurator");
     firmwareFilename = QStandardPaths::standardLocations(QStandardPaths::TempLocation).at(0) + "/" + strrand(32);
     QString homedir = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).at(0);
@@ -896,11 +887,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
         std::thread(MainWindow::WriteValues, this).detach();
     });
-    connect(this, static_cast<void (MainWindow::*)()>(&MainWindow::onUpdateProgress), this, [ = ]()
-    {
-        ui->WorkArea->setEnabled(finished);
-        ui->progress->setValue(percent);
-    });
     connect(ui->Inductance_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
@@ -1007,7 +993,49 @@ MainWindow::MainWindow(QWidget *parent)
                 break;
         }
     });
-    std::thread(MainWindow::Progress, this).detach();
+    connect(ui->Goto, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), [ = ]  (bool checked)
+    {
+        ahp_gt_goto_absolute(0, ui->TargetSteps_0->value(), ahp_gt_get_max_speed(0));
+        ahp_gt_goto_absolute(1, ui->TargetSteps_1->value(), ahp_gt_get_max_speed(1));
+    });
+    connect(ProgressThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * parent)
+    {
+        QDateTime now = QDateTime::currentDateTimeUtc();
+        for(int a = 0; a < 2; a++)
+        {
+            SkywatcherAxisStatus status = ahp_gt_get_status(a);
+            if(status.Running)
+            {
+                double currentSteps = ahp_gt_get_position(a);
+                currentSteps *= 180.0 * 60.0 * 60.0 / M_PI;
+                double diffSteps = currentSteps - lastSteps[a];
+                double Speed = diffSteps / (double)lastPollTime.msecsTo(now);
+                lastPollTime = now;
+                lastSteps[a] = currentSteps;
+                if(a == 0)
+                {
+                    ui->CurrentSteps_0->setText(QString::number(currentSteps));
+                    ui->Rate_0->setText("as/sec: " + QString::number(Speed));
+                }
+                if(a == 1)
+                {
+                    ui->CurrentSteps_1->setText(QString::number(currentSteps));
+                    ui->Rate_1->setText("as/sec: " + QString::number(Speed));
+                }
+                if(status.Mode == MODE_GOTO)
+                {
+                    ui->Control->setEnabled(false);
+                }
+            }
+            else
+            {
+                ui->Control->setEnabled(true);
+            }
+        }
+        ui->WorkArea->setEnabled(finished);
+        ui->progress->setValue(percent);
+    });
+    ProgressThread->start();
 }
 
 MainWindow::~MainWindow()

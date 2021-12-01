@@ -6,7 +6,9 @@
 #include <QSettings>
 #include <QMainWindow>
 #include <QTcpSocket>
+#include <QDateTime>
 #include <ahp_gt.h>
+#include "threads.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -32,7 +34,9 @@ class MainWindow : public QMainWindow
         }
 
     private:
-
+        QDateTime lastPollTime;
+        double lastSteps[2];
+        Thread *ProgressThread;
         QSettings * settings;
         QString ini;
         QString firmwareFilename;
@@ -47,9 +51,6 @@ class MainWindow : public QMainWindow
         void UpdateValues(int axis);
         Ui::MainWindow *ui;
         bool oldTracking;
-        static void Progress(MainWindow *wnd);
         static void WriteValues(MainWindow *wnd);
-    signals:
-        void onUpdateProgress();
 };
 #endif // MAINWINDOW_H

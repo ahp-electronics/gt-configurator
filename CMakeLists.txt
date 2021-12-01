@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(GT_CONFIGURATOR_VERSION_MAJOR 0)
 set(GT_CONFIGURATOR_VERSION_MINOR 9)
-set(GT_CONFIGURATOR_VERSION_RELEASE 1)
+set(GT_CONFIGURATOR_VERSION_RELEASE 2)
 set(GT_CONFIGURATOR_VERSION "${GT_CONFIGURATOR_VERSION_MAJOR}.${GT_CONFIGURATOR_VERSION_MINOR}.${GT_CONFIGURATOR_VERSION_RELEASE}")
 
 # QtCreator supports the following variables for Android, which are identical to qmake Android variables.
@@ -54,9 +54,10 @@ set(DFU_SOURCES
 
 if(ANDROID)
   add_library(gt-configurator SHARED ${DFU_SOURCES}
-    main.cpp
-    mainwindow.cpp
-    mainwindow.h
+    ${CMAKE_SOURCE_DIR}/main.cpp
+    ${CMAKE_SOURCE_DIR}/mainwindow.cpp
+    ${CMAKE_SOURCE_DIR}/mainwindow.h
+    ${CMAKE_SOURCE_DIR}/threads.h
     ${CMAKE_SOURCE_DIR}/mainwindow.ui
   )
 else(ANDROID)
@@ -65,6 +66,7 @@ else(ANDROID)
     ${CMAKE_SOURCE_DIR}/mainwindow.cpp
     ${CMAKE_SOURCE_DIR}/mainwindow.h
     ${CMAKE_SOURCE_DIR}/mainwindow.ui
+    ${CMAKE_SOURCE_DIR}/threads.h
     ${CMAKE_SOURCE_DIR}/resource.qrc
     ${CMAKE_SOURCE_DIR}/app.rc
   )
