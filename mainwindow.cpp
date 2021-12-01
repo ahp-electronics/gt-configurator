@@ -214,13 +214,13 @@ void MainWindow::WriteValues(MainWindow *wnd)
             f->close();
             f->~QFile();
         }
-        wnd->finished = 1;
     }
     else
     {
         ahp_gt_write_values(0, &wnd->percent, &wnd->finished);
         ahp_gt_write_values(1, &wnd->percent, &wnd->finished);
     }
+    wnd->finished = 1;
     wnd->percent = 0;
 }
 
@@ -333,6 +333,8 @@ void MainWindow::readIni(QString ini)
             break;
     }
     UpdateValues(1);
+    ahp_gt_set_position(0, 0);
+    ahp_gt_set_position(1, 0);
 }
 
 void MainWindow::saveIni(QString ini)
@@ -396,7 +398,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    ProgressThread = new Thread();
+    ProgressThread = new Thread(500);
+    StatusThread = new Thread(500);
     setAccessibleName("GT Configurator");
     firmwareFilename = QStandardPaths::standardLocations(QStandardPaths::TempLocation).at(0) + "/" + strrand(32);
     QString homedir = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).at(0);
@@ -519,6 +522,9 @@ MainWindow::MainWindow(QWidget *parent)
             ui->loadConfig->setEnabled(true);
             ui->saveConfig->setEnabled(true);
             readIni(ini);
+            finished = true;
+            ahp_gt_set_position(0, 0);
+            ahp_gt_set_position(1, 0);
         }
     });
     connect(ui->Disconnect, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
@@ -746,8 +752,6 @@ MainWindow::MainWindow(QWidget *parent)
     {
         oldTracking = ui->Tracking->isChecked();
         ui->Tracking->setChecked(false);
-        while(ahp_gt_is_axis_moving(0))
-            QThread::msleep(100);
         ahp_gt_start_motion(0, ui->Ra_Speed->value());
     });
     connect(ui->Ra_N, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
@@ -755,53 +759,45 @@ MainWindow::MainWindow(QWidget *parent)
     {
         oldTracking = ui->Tracking->isChecked();
         ui->Tracking->setChecked(false);
-        while(ahp_gt_is_axis_moving(0))
-            QThread::msleep(100);
         ahp_gt_start_motion(0, -ui->Ra_Speed->value());
     });
     connect(ui->Dec_P, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
-        while(ahp_gt_is_axis_moving(1))
-            QThread::msleep(100);
         ahp_gt_start_motion(1, ui->Dec_Speed->value());
     });
     connect(ui->Dec_N, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
-        while(ahp_gt_is_axis_moving(1))
-            QThread::msleep(100);
         ahp_gt_start_motion(1, -ui->Dec_Speed->value());
+    });
+    connect(ui->Stop, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
+            [ = ]()
+    {
+        ahp_gt_stop_motion(0, 0);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->Ra_P, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(0);
-        while(ahp_gt_is_axis_moving(0))
-            QThread::msleep(100);
+        ahp_gt_stop_motion(0, 1);
         ui->Tracking->setChecked(oldTracking);
     });
     connect(ui->Ra_N, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(0);
-        while(ahp_gt_is_axis_moving(0))
-            QThread::msleep(100);
+        ahp_gt_stop_motion(0, 1);
         ui->Tracking->setChecked(oldTracking);
     });
     connect(ui->Dec_P, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(1);
-        while(ahp_gt_is_axis_moving(1))
-            QThread::msleep(100);
+        ahp_gt_stop_motion(1, 1);
     });
     connect(ui->Dec_N, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(1);
-        while(ahp_gt_is_axis_moving(1))
-            QThread::msleep(100);
+        ahp_gt_stop_motion(1, 1);
     });
     connect(ui->Tracking, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
             [ = ](int state)
@@ -809,7 +805,7 @@ MainWindow::MainWindow(QWidget *parent)
         if(ui->Tracking->isChecked())
             ahp_gt_start_tracking(0);
         else
-            ahp_gt_stop_motion(0);
+            ahp_gt_stop_motion(0, 1);
     });
     connect(ui->Acceleration_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
@@ -995,47 +991,56 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ui->Goto, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), [ = ]  (bool checked)
     {
-        ahp_gt_goto_absolute(0, ui->TargetSteps_0->value(), ahp_gt_get_max_speed(0));
-        ahp_gt_goto_absolute(1, ui->TargetSteps_1->value(), ahp_gt_get_max_speed(1));
+        ahp_gt_goto_absolute(0, (double)ui->TargetSteps_0->value()*M_PI*2.0/(double)ahp_gt_get_totalsteps(0), ahp_gt_get_max_speed(0));
+        ahp_gt_goto_absolute(1, (double)ui->TargetSteps_1->value()*M_PI*2.0/(double)ahp_gt_get_totalsteps(1), ahp_gt_get_max_speed(1));
     });
-    connect(ProgressThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * parent)
+    connect(ProgressThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * parent)
     {
         QDateTime now = QDateTime::currentDateTimeUtc();
-        for(int a = 0; a < 2; a++)
-        {
-            SkywatcherAxisStatus status = ahp_gt_get_status(a);
-            if(status.Running)
+        double diffTime = (double)lastPollTime.msecsTo(now);
+        lastPollTime = now;
+        if(ahp_gt_is_connected() && finished) {
+            for(int a = 0; a < 2; a++)
             {
-                double currentSteps = ahp_gt_get_position(a);
-                currentSteps *= 180.0 * 60.0 * 60.0 / M_PI;
-                double diffSteps = currentSteps - lastSteps[a];
-                double Speed = diffSteps / (double)lastPollTime.msecsTo(now);
-                lastPollTime = now;
-                lastSteps[a] = currentSteps;
-                if(a == 0)
+                if(status[a].Running)
                 {
-                    ui->CurrentSteps_0->setText(QString::number(currentSteps));
-                    ui->Rate_0->setText("as/sec: " + QString::number(Speed));
+                    int totalsteps = ahp_gt_get_totalsteps(a);
+                    double currentSteps = ahp_gt_get_position(a);
+                    double diffSteps = currentSteps - lastSteps[a];
+                    lastSteps[a] = currentSteps;
+                    currentSteps *= totalsteps / M_PI / 2.0;
+                    diffSteps *= 180.0 * 60.0 * 60.0 / M_PI;
+                    double Speed = diffSteps * 1000.0 / diffTime;
+                    if(a == 0)
+                    {
+                        ui->CurrentSteps_0->setText(QString::number((int)currentSteps));
+                        ui->Rate_0->setText("as/sec: " + QString::number(Speed));
+                    }
+                    if(a == 1)
+                    {
+                        ui->CurrentSteps_1->setText(QString::number(currentSteps));
+                        ui->Rate_1->setText("as/sec: " + QString::number(Speed));
+                    }
                 }
-                if(a == 1)
-                {
-                    ui->CurrentSteps_1->setText(QString::number(currentSteps));
-                    ui->Rate_1->setText("as/sec: " + QString::number(Speed));
-                }
-                if(status.Mode == MODE_GOTO)
-                {
-                    ui->Control->setEnabled(false);
-                }
-            }
-            else
-            {
-                ui->Control->setEnabled(true);
             }
         }
         ui->WorkArea->setEnabled(finished);
         ui->progress->setValue(percent);
+
+        parent->unlock();
+    });
+    connect(StatusThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * parent)
+    {
+        if(ahp_gt_is_connected() && finished) {
+            for(int a = 0; a < 2; a++)
+            {
+                status[a] = ahp_gt_get_status(a);
+            }
+        }
+        parent->unlock();
     });
     ProgressThread->start();
+    StatusThread->start();
 }
 
 MainWindow::~MainWindow()
@@ -1086,4 +1091,9 @@ void MainWindow::UpdateValues(int axis)
         ui->MinFrequency_1->setText("PWM Hz: " + QString::number(f));
         ui->MaxFrequency_1->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(1) / SIDEREAL_DAY));
     }
+    int timer = 0;
+    timer += pow(10000.0 * SIDEREAL_DAY / ahp_gt_get_totalsteps(0), 2);
+    timer += pow(10000.0 * SIDEREAL_DAY / ahp_gt_get_totalsteps(1), 2);
+    timer = sqrt(timer);
+    ProgressThread->setTimer(timer);
 }

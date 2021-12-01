@@ -34,9 +34,11 @@ class MainWindow : public QMainWindow
         }
 
     private:
+        SkywatcherAxisStatus status[2];
         QDateTime lastPollTime;
         double lastSteps[2];
         Thread *ProgressThread;
+        Thread *StatusThread;
         QSettings * settings;
         QString ini;
         QString firmwareFilename;

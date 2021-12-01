@@ -795,7 +795,7 @@
      <widget class="QPushButton" name="Ra_P">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>20</x>
         <y>100</y>
         <width>61</width>
         <height>61</height>
@@ -808,7 +808,7 @@
      <widget class="QPushButton" name="Ra_N">
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>160</x>
         <y>100</y>
         <width>61</width>
         <height>61</height>
@@ -1997,7 +1997,7 @@
      <x>0</x>
      <y>0</y>
      <width>1100</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
