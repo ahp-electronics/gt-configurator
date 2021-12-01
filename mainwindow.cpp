@@ -398,8 +398,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    ProgressThread = new Thread(500);
-    StatusThread = new Thread(500);
+    ProgressThread = new Thread(1000);
+    StatusThread = new Thread(1000);
     setAccessibleName("GT Configurator");
     firmwareFilename = QStandardPaths::standardLocations(QStandardPaths::TempLocation).at(0) + "/" + strrand(32);
     QString homedir = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).at(0);
@@ -991,18 +991,21 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ui->Goto, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), [ = ]  (bool checked)
     {
-        ahp_gt_goto_absolute(0, (double)ui->TargetSteps_0->value()*M_PI*2.0/(double)ahp_gt_get_totalsteps(0), ahp_gt_get_max_speed(0));
-        ahp_gt_goto_absolute(1, (double)ui->TargetSteps_1->value()*M_PI*2.0/(double)ahp_gt_get_totalsteps(1), ahp_gt_get_max_speed(1));
+        ahp_gt_goto_absolute(0, (double)ui->TargetSteps_0->value()*M_PI * 2.0 / (double)ahp_gt_get_totalsteps(0),
+                             ui->Ra_Speed->value());
+        ahp_gt_goto_absolute(1, (double)ui->TargetSteps_1->value()*M_PI * 2.0 / (double)ahp_gt_get_totalsteps(1),
+                             ui->Dec_Speed->value());
     });
     connect(ProgressThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * parent)
     {
         QDateTime now = QDateTime::currentDateTimeUtc();
         double diffTime = (double)lastPollTime.msecsTo(now);
         lastPollTime = now;
-        if(ahp_gt_is_connected() && finished) {
+        if(ahp_gt_is_connected() && finished)
+        {
             for(int a = 0; a < 2; a++)
             {
-                if(status[a].Running)
+                if(status[a].Initialized)
                 {
                     int totalsteps = ahp_gt_get_totalsteps(a);
                     double currentSteps = ahp_gt_get_position(a);
@@ -1010,7 +1013,16 @@ MainWindow::MainWindow(QWidget *parent)
                     lastSteps[a] = currentSteps;
                     currentSteps *= totalsteps / M_PI / 2.0;
                     diffSteps *= 180.0 * 60.0 * 60.0 / M_PI;
-                    double Speed = diffSteps * 1000.0 / diffTime;
+                    double Speed = 0.0;
+                    for(int s = 0; s < _n_speeds; s++)
+                    {
+                        if(s < _n_speeds - 1)
+                            lastSpeeds[a][s] = lastSpeeds[a][s + 1];
+                        else
+                            lastSpeeds[a][s] = diffSteps * 1000.0 / diffTime;
+                        Speed += lastSpeeds[a][s];
+                    }
+                    Speed /= _n_speeds;
                     if(a == 0)
                     {
                         ui->CurrentSteps_0->setText(QString::number((int)currentSteps));
@@ -1031,7 +1043,8 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(StatusThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * parent)
     {
-        if(ahp_gt_is_connected() && finished) {
+        if(ahp_gt_is_connected() && finished)
+        {
             for(int a = 0; a < 2; a++)
             {
                 status[a] = ahp_gt_get_status(a);
@@ -1095,5 +1108,4 @@ void MainWindow::UpdateValues(int axis)
     timer += pow(10000.0 * SIDEREAL_DAY / ahp_gt_get_totalsteps(0), 2);
     timer += pow(10000.0 * SIDEREAL_DAY / ahp_gt_get_totalsteps(1), 2);
     timer = sqrt(timer);
-    ProgressThread->setTimer(timer);
 }
