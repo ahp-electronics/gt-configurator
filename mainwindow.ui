@@ -962,13 +962,13 @@
        </rect>
       </property>
       <property name="minimum">
-       <number>1</number>
+       <number>-16777216</number>
       </property>
       <property name="maximum">
-       <number>1000000</number>
+       <number>16777216</number>
       </property>
       <property name="value">
-       <number>1000</number>
+       <number>0</number>
       </property>
      </widget>
      <widget class="QSpinBox" name="TargetSteps_1">
@@ -981,13 +981,13 @@
        </rect>
       </property>
       <property name="minimum">
-       <number>1</number>
+       <number>-16777216</number>
       </property>
       <property name="maximum">
-       <number>1000000</number>
+       <number>16777216</number>
       </property>
       <property name="value">
-       <number>1000</number>
+       <number>0</number>
       </property>
      </widget>
      <widget class="QLabel" name="Ra_Speed_label_2">
@@ -1997,7 +1997,7 @@
      <x>0</x>
      <y>0</y>
      <width>1100</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
