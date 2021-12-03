@@ -10,7 +10,7 @@
 #include <ahp_gt.h>
 #include "threads.h"
 
-#define _n_speeds 7
+#define _n_speeds 1
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -37,7 +37,7 @@ class MainWindow : public QMainWindow
 
     private:
         SkywatcherAxisStatus status[2];
-        QDateTime lastPollTime;
+        QDateTime lastPollTime[2];
         double lastSteps[2];
         double lastSpeeds[2][_n_speeds];
         Thread *ProgressThread;

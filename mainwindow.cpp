@@ -998,9 +998,6 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ProgressThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * parent)
     {
-        QDateTime now = QDateTime::currentDateTimeUtc();
-        double diffTime = (double)lastPollTime.msecsTo(now);
-        lastPollTime = now;
         if(ahp_gt_is_connected() && finished)
         {
             for(int a = 0; a < 2; a++)
@@ -1009,6 +1006,9 @@ MainWindow::MainWindow(QWidget *parent)
                 {
                     int totalsteps = ahp_gt_get_totalsteps(a);
                     double currentSteps = ahp_gt_get_position(a);
+                    QDateTime now = QDateTime::currentDateTimeUtc();
+                    double diffTime = (double)lastPollTime[a].msecsTo(now);
+                    lastPollTime[a] = now;
                     double diffSteps = currentSteps - lastSteps[a];
                     lastSteps[a] = currentSteps;
                     currentSteps *= totalsteps / M_PI / 2.0;
