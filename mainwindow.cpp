@@ -246,7 +246,7 @@ void MainWindow::readIni(QString ini)
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
     ui->PPEC->setChecked(settings->value("PPEC", false).toBool());
     ahp_gt_set_mount_type((MountType)ui->MountType->currentIndex());
-    ahp_gt_set_mount_flags(ui->MountStyle->currentIndex() == 1);
+    ahp_gt_set_mount_flags((GT1Flags)(ui->MountStyle->currentIndex() == 1));
     ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
     ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
     ahp_gt_set_pwm_frequency(ui->PWMFreq->value());
@@ -867,7 +867,7 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(ini);
         ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
         ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
-        ahp_gt_set_mount_flags(ui->MountStyle->currentIndex() == 1);
+        ahp_gt_set_mount_flags((GT1Flags)(ui->MountStyle->currentIndex() == 1));
     });
     connect(ui->Write, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked = false)
