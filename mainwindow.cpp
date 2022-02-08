@@ -398,8 +398,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    ProgressThread = new Thread(1000);
-    StatusThread = new Thread(1000);
+    ProgressThread = new Thread(1000, 1000);
+    StatusThread = new Thread(1000, 1000);
     setAccessibleName("GT Configurator");
     firmwareFilename = QStandardPaths::standardLocations(QStandardPaths::TempLocation).at(0) + "/" + strrand(32);
     QString homedir = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).at(0);
@@ -1041,7 +1041,7 @@ MainWindow::MainWindow(QWidget *parent)
 
         parent->unlock();
     });
-    connect(StatusThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * parent)
+    connect(StatusThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), nullptr, [ = ] (Thread * parent)
     {
         if(ahp_gt_is_connected() && finished)
         {

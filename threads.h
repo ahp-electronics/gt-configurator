@@ -21,15 +21,16 @@ class Thread : public QThread
         }
         void run()
         {
+            lastPollTime = QDateTime::currentDateTimeUtc();
             while(!isInterruptionRequested())
             {
-                lastPollTime = QDateTime::currentDateTimeUtc();
-                if(lock())
+                if(lock() && timer_ms > fabs(lastPollTime.msecsTo(QDateTime::currentDateTimeUtc())))
                 {
+                    lastPollTime = QDateTime::currentDateTimeUtc();
                     emit threadLoop(this);
                 }
-                QThread::msleep(fmax(1, timer_ms - fabs(lastPollTime.msecsTo(QDateTime::currentDateTimeUtc()))));
-                QThread::msleep(loop_ms);
+                timer_ms = loop_ms;
+                QThread::msleep(1);
             }
             disconnect(this, 0, 0, 0);
         }
