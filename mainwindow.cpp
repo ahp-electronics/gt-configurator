@@ -398,6 +398,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    IndicationThread = new Thread(this, 10, 10);
     ProgressThread = new Thread(this, 10, 10);
     StatusThread = new Thread(this, 10, 10);
     setAccessibleName("GT Configurator");
@@ -998,6 +999,12 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ProgressThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * parent)
     {
+        ui->WorkArea->setEnabled(finished);
+        ui->progress->setValue(percent);
+        parent->unlock();
+    });
+    connect(IndicationThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * parent)
+    {
         if(ahp_gt_is_connected() && finished)
         {
             for(int a = 0; a < 2; a++)
@@ -1052,6 +1059,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
         parent->unlock();
     });
+    IndicationThread->start();
     ProgressThread->start();
     StatusThread->start();
 }
@@ -1104,8 +1112,8 @@ void MainWindow::UpdateValues(int axis)
         ui->MinFrequency_1->setText("PWM Hz: " + QString::number(f));
         ui->MaxFrequency_1->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(1) / SIDEREAL_DAY));
     }
-    int timer = 0;
     timer += pow(10000.0 * SIDEREAL_DAY / ahp_gt_get_totalsteps(0), 2);
     timer += pow(10000.0 * SIDEREAL_DAY / ahp_gt_get_totalsteps(1), 2);
     timer = sqrt(timer);
+    IndicationThread->setLoop(timer);
 }

@@ -40,6 +40,7 @@ class MainWindow : public QMainWindow
         QDateTime lastPollTime[2];
         double lastSteps[2];
         double lastSpeeds[2][_n_speeds];
+        Thread *IndicationThread;
         Thread *ProgressThread;
         Thread *StatusThread;
         Thread *WriteThread;
@@ -54,6 +55,7 @@ class MainWindow : public QMainWindow
         int axisstatus[2];
         int motionmode[2];
         bool initial;
+        int timer { 1000 };
         void UpdateValues(int axis);
         Ui::MainWindow *ui;
         bool oldTracking;
