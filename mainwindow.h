@@ -42,6 +42,7 @@ class MainWindow : public QMainWindow
         double lastSpeeds[2][_n_speeds];
         Thread *ProgressThread;
         Thread *StatusThread;
+        Thread *WriteThread;
         QSettings * settings;
         QString ini;
         QString firmwareFilename;

@@ -398,8 +398,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    ProgressThread = new Thread(1000, 1000);
-    StatusThread = new Thread(1000, 1000);
+    ProgressThread = new Thread(this, 10, 10);
+    StatusThread = new Thread(this, 10, 10);
     setAccessibleName("GT Configurator");
     firmwareFilename = QStandardPaths::standardLocations(QStandardPaths::TempLocation).at(0) + "/" + strrand(32);
     QString homedir = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).at(0);
@@ -881,7 +881,7 @@ MainWindow::MainWindow(QWidget *parent)
         {
             ui->ComPort->setEnabled(false);
         }
-        std::thread(MainWindow::WriteValues, this).detach();
+        std::thread(WriteValues, this).detach();
     });
     connect(ui->Inductance_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
