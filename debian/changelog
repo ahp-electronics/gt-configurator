@@ -1,58 +1,64 @@
-gt-configurator (0.9.6) focal; urgency=low
+gt-configurator (0.9.8) stable; urgency=low
+
+  * New release
+
+ -- Ilia Platone <info@iliaplatone.com>  Wed, 9 Mar 2022 00:00:00 +0200
+
+gt-configurator (0.9.6) stable; urgency=low
 
   * New release
 
  -- Ilia Platone <info@iliaplatone.com>  Tue, 9 Feb 2022 00:00:00 +0200
 
-gt-configurator (0.9.5) focal; urgency=low
+gt-configurator (0.9.5) stable; urgency=low
 
   * New release
 
  -- Ilia Platone <info@iliaplatone.com>  Tue, 8 Feb 2022 00:00:00 +0200
 
-gt-configurator (0.9.4) focal; urgency=low
+gt-configurator (0.9.4) stable; urgency=low
 
   * New release
 
  -- Ilia Platone <info@iliaplatone.com>  Thu, 17 Jan 2022 00:00:00 +0200
 
-gt-configurator (0.9.3) focal; urgency=low
+gt-configurator (0.9.3) stable; urgency=low
 
   * New release
 
  -- Ilia Platone <info@iliaplatone.com>  Thu, 25 Nov 2021 00:00:00 +0200
 
-gt-configurator (0.9.2) focal; urgency=low
+gt-configurator (0.9.2) stable; urgency=low
 
   * New release
 
  -- Ilia Platone <info@iliaplatone.com>  Thu, 25 Nov 2021 00:00:00 +0200
 
-gt-configurator (0.9.1) focal; urgency=low
+gt-configurator (0.9.1) stable; urgency=low
 
   * New release
 
  -- Ilia Platone <info@iliaplatone.com>  Thu, 25 Nov 2021 00:00:00 +0200
 
-gt-configurator (0.9.0) focal; urgency=low
+gt-configurator (0.9.0) stable; urgency=low
 
   * New release
 
  -- Ilia Platone <info@iliaplatone.com>  Tue, 23 Nov 2021 00:00:00 +0200
 
-gt-configurator (0.8.9) focal; urgency=low
+gt-configurator (0.8.9) stable; urgency=low
 
   * New release
 
  -- Ilia Platone <info@iliaplatone.com>  Mon, 05 Nov 2021 00:00:00 +0200
 
-gt-configurator (0.8.8) focal; urgency=low
+gt-configurator (0.8.8) stable; urgency=low
 
    * New release
 
   -- Ilia Platone <info@iliaplatone.com>  Mon, 05 Nov 2021 00:00:00 +0200
 
-gt-configurator (1.0.0) focal; urgency=low
+gt-configurator (1.0.0) stable; urgency=low
 
   * Initial release
 
