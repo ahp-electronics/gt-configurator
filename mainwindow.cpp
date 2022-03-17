@@ -219,6 +219,8 @@ void MainWindow::WriteValues(MainWindow *wnd)
     {
         ahp_gt_write_values(0, &wnd->percent, &wnd->finished);
         ahp_gt_write_values(1, &wnd->percent, &wnd->finished);
+        ahp_gt_set_position(0, 0);
+        ahp_gt_set_position(1, 0);
     }
     wnd->finished = 1;
     wnd->percent = 0;
@@ -524,8 +526,6 @@ MainWindow::MainWindow(QWidget *parent)
             ui->saveConfig->setEnabled(true);
             readIni(ini);
             finished = true;
-            ahp_gt_set_position(0, 0);
-            ahp_gt_set_position(1, 0);
         }
     });
     connect(ui->Disconnect, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
