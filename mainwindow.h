@@ -34,8 +34,17 @@ class MainWindow : public QMainWindow
         {
             return ini;
         }
+        void lockRA()
+        {
+            while(!RAmutex.tryLock());
+        }
+        void unlockRA()
+        {
+            RAmutex.unlock();
+        }
 
     private:
+        double currentSteps[2];
         SkywatcherAxisStatus status[2];
         QDateTime lastPollTime[2];
         double lastSteps[2];
@@ -60,5 +69,6 @@ class MainWindow : public QMainWindow
         Ui::MainWindow *ui;
         bool oldTracking;
         static void WriteValues(MainWindow *wnd);
+        QMutex RAmutex, DEmutex;
 };
 #endif // MAINWINDOW_H
