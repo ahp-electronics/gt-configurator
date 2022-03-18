@@ -260,7 +260,7 @@ void MainWindow::readIni(QString ini)
     ui->Crown_0->setValue(settings->value("Crown_0", ahp_gt_get_crown_teeth(0)).toInt());
     ui->MaxSpeed_0->setValue(settings->value("MaxSpeed_0", ahp_gt_get_max_speed(0)).toInt());
     ui->Acceleration_0->setValue(settings->value("Acceleration_0",
-                                 ui->Acceleration_0->maximum() - ahp_gt_get_acceleration_angle(0) * 3600.0 / M_PI).toInt());
+                                 ui->Acceleration_0->maximum() - ahp_gt_get_acceleration_angle(0) * 1800.0 / M_PI).toInt());
     ui->Invert_0->setChecked(settings->value("Invert_0", ahp_gt_get_direction_invert(0) == 1).toBool());
     ui->Inductance_0->setValue(settings->value("Inductance_0", 10).toInt());
     ui->Resistance_0->setValue(settings->value("Resistance_0", 20000).toInt());
@@ -276,7 +276,7 @@ void MainWindow::readIni(QString ini)
     ui->Crown_1->setValue(settings->value("Crown_1", ahp_gt_get_crown_teeth(1)).toInt());
     ui->MaxSpeed_1->setValue(settings->value("MaxSpeed_1", ahp_gt_get_max_speed(1)).toInt());
     ui->Acceleration_1->setValue(settings->value("Acceleration_1",
-                                 ui->Acceleration_1->maximum() - ahp_gt_get_acceleration_angle(1) * 3600.0 / M_PI).toInt());
+                                 ui->Acceleration_1->maximum() - ahp_gt_get_acceleration_angle(1) * 1800.0 / M_PI).toInt());
     ui->Invert_1->setChecked(settings->value("Invert_1", ahp_gt_get_direction_invert(1) == 1).toBool());
     ui->Inductance_1->setValue(settings->value("Inductance_1", 10).toInt());
     ui->Resistance_1->setValue(settings->value("Resistance_1", 20000).toInt());
@@ -291,7 +291,7 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_worm_teeth(0, ui->Worm_0->value());
     ahp_gt_set_crown_teeth(0, ui->Crown_0->value());
     ahp_gt_set_max_speed(0, ui->MaxSpeed_0->value());
-    ahp_gt_set_acceleration_angle(0, (ui->Acceleration_0->maximum() - ui->Acceleration_0->value())*M_PI / 1800.0);
+    ahp_gt_set_acceleration_angle(0, ui->Acceleration_0->maximum() - ui->Acceleration_0->value() * M_PI / 1800.0);
     ahp_gt_set_direction_invert(0, ui->Invert_0->isChecked());
     ahp_gt_set_stepping_conf(0, (GT1SteppingConfiguration)ui->Coil_0->currentIndex());
     ahp_gt_set_stepping_mode(0, (GT1SteppingMode)ui->SteppingMode_0->currentIndex());
@@ -316,7 +316,7 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_worm_teeth(1, ui->Worm_1->value());
     ahp_gt_set_crown_teeth(1, ui->Crown_1->value());
     ahp_gt_set_max_speed(1, ui->MaxSpeed_1->value());
-    ahp_gt_set_acceleration_angle(1, (ui->Acceleration_1->maximum() - ui->Acceleration_1->value())*M_PI / 1800.0);
+    ahp_gt_set_acceleration_angle(1, ui->Acceleration_1->maximum() - ui->Acceleration_1->value() * M_PI / 1800.0);
     ahp_gt_set_direction_invert(1, ui->Invert_1->isChecked());
     ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)ui->Coil_1->currentIndex());
     ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_1->currentIndex());
@@ -816,14 +816,14 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ](int value)
     {
         saveIni(ini);
-        ahp_gt_set_acceleration_angle(0, (ui->Acceleration_0->maximum() - ui->Acceleration_0->value())*M_PI / 1800.0);
+        ahp_gt_set_acceleration_angle(0, (ui->Acceleration_0->maximum() - ui->Acceleration_0->value()) * M_PI / 1800.0);
         ui->Acceleration_label_0->setText("Acceleration: " + QString::number(2.0 - (double)value / 10.0) + "°");
     });
     connect(ui->Acceleration_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
         saveIni(ini);
-        ahp_gt_set_acceleration_angle(1,  (ui->Acceleration_1->maximum() - ui->Acceleration_1->value())*M_PI / 1800.0);
+        ahp_gt_set_acceleration_angle(1,  (ui->Acceleration_1->maximum() - ui->Acceleration_1->value()) * M_PI / 1800.0);
         ui->Acceleration_label_1->setText("Acceleration: " + QString::number(2.0 - (double)value / 10.0) + "°");
     });
     connect(ui->MaxSpeed_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
