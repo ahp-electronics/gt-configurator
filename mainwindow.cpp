@@ -290,8 +290,6 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_motor_teeth(0, ui->Motor_0->value());
     ahp_gt_set_worm_teeth(0, ui->Worm_0->value());
     ahp_gt_set_crown_teeth(0, ui->Crown_0->value());
-    ahp_gt_set_max_speed(0, ui->MaxSpeed_0->value());
-    ahp_gt_set_acceleration_angle(0, ui->Acceleration_0->maximum() - ui->Acceleration_0->value() * M_PI / 1800.0);
     ahp_gt_set_direction_invert(0, ui->Invert_0->isChecked());
     ahp_gt_set_stepping_conf(0, (GT1SteppingConfiguration)ui->Coil_0->currentIndex());
     ahp_gt_set_stepping_mode(0, (GT1SteppingMode)ui->SteppingMode_0->currentIndex());
@@ -315,8 +313,6 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_motor_teeth(1, ui->Motor_1->value());
     ahp_gt_set_worm_teeth(1, ui->Worm_1->value());
     ahp_gt_set_crown_teeth(1, ui->Crown_1->value());
-    ahp_gt_set_max_speed(1, ui->MaxSpeed_1->value());
-    ahp_gt_set_acceleration_angle(1, ui->Acceleration_1->maximum() - ui->Acceleration_1->value() * M_PI / 1800.0);
     ahp_gt_set_direction_invert(1, ui->Invert_1->isChecked());
     ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)ui->Coil_1->currentIndex());
     ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_1->currentIndex());
@@ -683,70 +679,70 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Invert_0, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
             [ = ](int state)
     {
-        saveIni(ini);
         ahp_gt_set_direction_invert(0, ui->Invert_0->isChecked());
+        saveIni(ini);
     });
     connect(ui->Invert_1, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
             [ = ](int state)
     {
-        saveIni(ini);
         ahp_gt_set_direction_invert(1, ui->Invert_1->isChecked());
+        saveIni(ini);
     });
     connect(ui->MotorSteps_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         ahp_gt_set_motor_steps(0, ui->MotorSteps_0->value());
         UpdateValues(0);
+        saveIni(ini);
     });
     connect(ui->Worm_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         ahp_gt_set_worm_teeth(0, ui->Worm_0->value());
         UpdateValues(0);
+        saveIni(ini);
     });
     connect(ui->Motor_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         ahp_gt_set_motor_teeth(0, ui->Motor_0->value());
         UpdateValues(0);
+        saveIni(ini);
     });
     connect(ui->Crown_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         ahp_gt_set_crown_teeth(0, ui->Crown_0->value());
         UpdateValues(0);
+        saveIni(ini);
     });
     connect(ui->MotorSteps_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         ahp_gt_set_motor_steps(1, ui->MotorSteps_1->value());
         UpdateValues(1);
+        saveIni(ini);
     });
     connect(ui->Worm_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         ahp_gt_set_worm_teeth(1, ui->Worm_1->value());
         UpdateValues(1);
+        saveIni(ini);
     });
     connect(ui->Motor_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         ahp_gt_set_motor_teeth(1, ui->Motor_1->value());
         UpdateValues(1);
+        saveIni(ini);
     });
     connect(ui->Crown_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         ahp_gt_set_crown_teeth(1, ui->Crown_1->value());
         UpdateValues(1);
+        saveIni(ini);
     });
     connect(ui->Ra_P, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
@@ -815,32 +811,32 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Acceleration_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         ahp_gt_set_acceleration_angle(0, (ui->Acceleration_0->maximum() - ui->Acceleration_0->value()) * M_PI / 1800.0);
         ui->Acceleration_label_0->setText("Acceleration: " + QString::number(2.0 - (double)value / 10.0) + "°");
+        saveIni(ini);
     });
     connect(ui->Acceleration_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         ahp_gt_set_acceleration_angle(1,  (ui->Acceleration_1->maximum() - ui->Acceleration_1->value()) * M_PI / 1800.0);
         ui->Acceleration_label_1->setText("Acceleration: " + QString::number(2.0 - (double)value / 10.0) + "°");
+        saveIni(ini);
     });
     connect(ui->MaxSpeed_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         ahp_gt_set_max_speed(0, ui->MaxSpeed_0->value());
         ui->MaxSpeed_label_0->setText("Maximum speed: " + QString::number(value) + "x");
         UpdateValues(0);
+        saveIni(ini);
     });
     connect(ui->MaxSpeed_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         ahp_gt_set_max_speed(1, ui->MaxSpeed_1->value());
         ui->MaxSpeed_label_1->setText("Maximum speed: " + QString::number(value) + "x");
         UpdateValues(1);
+        saveIni(ini);
     });
     connect(ui->Ra_Speed, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
@@ -855,10 +851,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->PWMFreq, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         ahp_gt_set_pwm_frequency(ui->PWMFreq->value());
         ahp_gt_set_mount_type(mounttype[ui->MountType->currentIndex()]);
         ui->PWMFreq_label->setText("PWM: " + QString::number(1500 + 700 * value) + " Hz");
+        saveIni(ini);
     });
     connect(ui->PPEC, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             [ = ](bool checked)
@@ -869,10 +865,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->MountStyle, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             [ = ](int index)
     {
-        saveIni(ini);
         ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
         ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
         ahp_gt_set_mount_flags((GT1Flags)(ui->MountStyle->currentIndex() == 1));
+        saveIni(ini);
     });
     connect(ui->Write, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked = false)
@@ -891,76 +887,75 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Inductance_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         UpdateValues(0);
+        saveIni(ini);
     });
     connect(ui->Resistance_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         UpdateValues(0);
+        saveIni(ini);
     });
     connect(ui->Current_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         UpdateValues(0);
+        saveIni(ini);
     });
     connect(ui->Voltage_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         UpdateValues(0);
+        saveIni(ini);
     });
     connect(ui->Inductance_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         UpdateValues(1);
+        saveIni(ini);
     });
     connect(ui->Resistance_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         UpdateValues(1);
+        saveIni(ini);
     });
     connect(ui->Current_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         UpdateValues(1);
+        saveIni(ini);
     });
     connect(ui->Voltage_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        saveIni(ini);
         UpdateValues(1);
+        saveIni(ini);
     });
     connect(ui->SteppingMode_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
     {
-        saveIni(ini);
         ahp_gt_set_stepping_mode(0, (GT1SteppingMode)ui->SteppingMode_0->currentIndex());
         UpdateValues(0);
+        saveIni(ini);
     });
     connect(ui->SteppingMode_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
     {
-        saveIni(ini);
         ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_1->currentIndex());
         UpdateValues(1);
+        saveIni(ini);
     });
     connect(ui->Coil_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
     {
-        saveIni(ini);
         ahp_gt_set_stepping_conf(0, (GT1SteppingConfiguration)ui->Coil_0->currentIndex());
+        saveIni(ini);
     });
     connect(ui->Coil_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
     {
-        saveIni(ini);
         ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)ui->Coil_1->currentIndex());
+        saveIni(ini);
     });
     connect(ui->GPIO_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
     {
-        saveIni(ini);
         switch(ui->GPIO_0->currentIndex())
         {
             case 0:
@@ -975,10 +970,10 @@ MainWindow::MainWindow(QWidget *parent)
             default:
                 break;
         }
+        saveIni(ini);
     });
     connect(ui->GPIO_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ]  (int index)
     {
-        saveIni(ini);
         switch(ui->GPIO_1->currentIndex())
         {
             case 0:
@@ -993,6 +988,7 @@ MainWindow::MainWindow(QWidget *parent)
             default:
                 break;
         }
+        saveIni(ini);
     });
     connect(ui->Goto, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), [ = ]  (bool checked)
     {
