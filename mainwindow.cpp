@@ -243,6 +243,7 @@ void MainWindow::readIni(QString ini)
     QSettings *settings = new QSettings(ini, QSettings::Format::IniFormat);
     ui->Notes->setText(QByteArray::fromBase64(settings->value("Notes").toString().toUtf8()));
 
+    ui->Address->setValue(settings->value("Address", ahp_gt_get_address()).toInt());
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency()).toInt());
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
@@ -252,6 +253,7 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
     ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
     ahp_gt_set_pwm_frequency(ui->PWMFreq->value());
+    ahp_gt_set_address(ui->Address->value());
 
 
     ui->MotorSteps_0->setValue(settings->value("MotorSteps_0", ahp_gt_get_motor_steps(0)).toInt());
@@ -384,6 +386,7 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Voltage_1", ui->Voltage_1->value());
 
     settings->setValue("MountType", ui->MountType->currentIndex());
+    settings->setValue("Address", ui->Address->value());
     settings->setValue("PWMFreq", ui->PWMFreq->value());
     settings->setValue("MountStyle", ui->MountStyle->currentIndex());
     settings->setValue("PPEC", ui->PPEC->isChecked());
@@ -847,6 +850,12 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ](int value)
     {
         ui->Dec_Speed_label->setText("Dec speed: " + QString::number(value) + "x");
+    });
+    connect(ui->Address, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            [ = ](int value)
+    {
+        ahp_gt_set_address(ui->Address->value());
+        saveIni(ini);
     });
     connect(ui->PWMFreq, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)

@@ -1050,7 +1050,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>390</y>
+       <y>400</y>
        <width>471</width>
        <height>81</height>
       </rect>
@@ -1075,9 +1075,9 @@
       <property name="geometry">
        <rect>
         <x>60</x>
-        <y>40</y>
+        <y>30</y>
         <width>86</width>
-        <height>25</height>
+        <height>21</height>
        </rect>
       </property>
       <item>
@@ -1144,9 +1144,9 @@
      <widget class="QLabel" name="PWMFreq_label">
       <property name="geometry">
        <rect>
-        <x>320</x>
-        <y>29</y>
-        <width>141</width>
+        <x>300</x>
+        <y>30</y>
+        <width>161</width>
         <height>16</height>
        </rect>
       </property>
@@ -1157,9 +1157,9 @@
      <widget class="QSlider" name="PWMFreq">
       <property name="geometry">
        <rect>
-        <x>320</x>
+        <x>300</x>
         <y>50</y>
-        <width>141</width>
+        <width>161</width>
         <height>20</height>
        </rect>
       </property>
@@ -1182,10 +1182,10 @@
      <widget class="QComboBox" name="MountStyle">
       <property name="geometry">
        <rect>
-        <x>150</x>
-        <y>40</y>
+        <x>60</x>
+        <y>55</y>
         <width>86</width>
-        <height>25</height>
+        <height>20</height>
        </rect>
       </property>
       <item>
@@ -1207,14 +1207,46 @@
      <widget class="QCheckBox" name="PPEC">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>150</x>
         <y>30</y>
-        <width>61</width>
+        <width>51</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
        <string>PEC</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Address">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>50</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>127</number>
+      </property>
+      <property name="value">
+       <number>1</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_12">
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>49</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Bus Address:</string>
       </property>
      </widget>
     </widget>
