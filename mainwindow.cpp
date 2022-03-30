@@ -492,14 +492,21 @@ MainWindow::MainWindow(QWidget *parent)
             {
                 socket.setReadBufferSize(4096);
                 fd = socket.socketDescriptor();
-                if(fd > -1)
-                    success = ahp_gt_connect_fd(fd);
+                if(fd > -1) {
+                    ahp_gt_select_device(0);
+                    if(!ahp_gt_connect_fd(fd)) {
+                        success = ahp_gt_detect_device();
+                    }
+                }
             }
         }
         else
         {
             portname.append(ui->ComPort->currentText());
-            success = ahp_gt_connect(portname.toUtf8());
+            ahp_gt_select_device(0);
+            if(!ahp_gt_connect(portname.toUtf8())) {
+                success = ahp_gt_detect_device();
+            }
         }
         if(!success)
         {
