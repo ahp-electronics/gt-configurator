@@ -19,10 +19,16 @@ SetupIconFile=icon.ico
 [Files] 
 Source: "../bin/{#TargetName}64/*"; DestDir: "{app}"; Check: Is64BitInstallMode ; Flags: solidbreak recursesubdirs
 Source: "../bin/{#TargetName}32/*"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: solidbreak recursesubdirs
+Source: "./driver/dpinst32.exe"; DestDir: {app}\driver; DestName: dpinst.exe; Check: not IsWin64; Flags: ignoreversion
+Source: "./driver/dpinst64.exe"; DestDir: {app}\driver; DestName: dpinst.exe; Check: IsWin64; Flags: ignoreversion
+Source: "./driver/gt*"; DestDir: {app}\driver;
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#TargetName}.exe"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#TargetName}.exe"
+
+[Run]
+Filename: "{app}\driver\dpinst.exe"; Parameters: "/F /A /LM /SA"; WorkingDir: {app}/driver;
 
 [Code]
 function VersionInstalled(const ProductID: string): String;
