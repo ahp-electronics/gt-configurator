@@ -5,7 +5,7 @@
 #include <QThread>
 #include <QSettings>
 #include <QMainWindow>
-#include <QTcpSocket>
+#include <QUdpSocket>
 #include <QDateTime>
 #include <ahp_gt.h>
 #include "threads.h"
@@ -56,7 +56,7 @@ class MainWindow : public QMainWindow
         QSettings * settings;
         QString ini;
         QString firmwareFilename;
-        QTcpSocket socket;
+        QUdpSocket socket;
         int percent { 0 };
         int finished { 1 };
         bool threadsRunning;
