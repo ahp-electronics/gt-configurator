@@ -21,7 +21,8 @@ Source: "../bin/{#TargetName}64/*"; DestDir: "{app}"; Check: Is64BitInstallMode 
 Source: "../bin/{#TargetName}32/*"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: solidbreak recursesubdirs
 Source: "./driver/dpinst32.exe"; DestDir: {app}\driver; DestName: dpinst.exe; Check: not IsWin64; Flags: ignoreversion
 Source: "./driver/dpinst64.exe"; DestDir: {app}\driver; DestName: dpinst.exe; Check: IsWin64; Flags: ignoreversion
-Source: "./driver/gt*"; DestDir: {app}\driver;
+Source: "./driver/gtdir*"; DestDir: {app}\driver;
+Source: "./driver/ahpbootloader*"; DestDir: {app}\driver;
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#TargetName}.exe"
