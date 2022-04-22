@@ -424,7 +424,7 @@ MainWindow::MainWindow(QWidget *parent)
     QString lastPort = settings->value("LastPort", "").toString();
     if(lastPort != "")
         ui->ComPort->addItem(lastPort);
-    ui->ComPort->addItem("localhost:9600");
+    ui->ComPort->addItem("localhost:11880");
     QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
     if(ports.length() > 0)
     {
