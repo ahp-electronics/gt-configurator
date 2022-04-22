@@ -13,7 +13,7 @@ Compression=lzma2
 SolidCompression=yes
 OutputDir="./"
 ArchitecturesInstallIn64BitMode=x64
-OutputBaseFilename={#MyAppName}_Setup
+OutputBaseFilename={#TargetName}_setup
 SetupIconFile=icon.ico
 
 [Files] 
@@ -29,7 +29,7 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#TargetName}.exe"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#TargetName}.exe"
 
 [Run]
-Filename: "{app}\driver\dpinst.exe"; Parameters: "/F /A /LM /SA"; WorkingDir: {app}/driver;
+Filename: "{app}\driver\dpinst.exe"; Parameters: "/F /A /SW"; WorkingDir: {app}/driver;
 
 [Code]
 function VersionInstalled(const ProductID: string): String;
