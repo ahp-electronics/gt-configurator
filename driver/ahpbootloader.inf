@@ -8,7 +8,7 @@ Signature = "$Windows NT$"
 Class     = USBDevice
 ClassGUID = {88BAE032-5A81-49f0-BC3D-A4FF138216D6}
 Provider  = %ManufacturerName%
-CatalogFile = gt1bootloader.cat
+CatalogFile = ahpbootloader.cat
 DriverVer=07/09/2021,19.12.20.000
 
 ; ========== Manufacturer/Models sections ===========
