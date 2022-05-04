@@ -40,36 +40,36 @@ find_package(USB REQUIRED)
 include_directories(${AHPGT_INCLUDE_DIR} ${DFU_INCLUDE_DIR} ${USB_INCLUDE_DIR})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt-configurator.iss.cmake ${CMAKE_SOURCE_DIR}/gt-configurator.iss )
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt-configurator.iss.cmake ${CMAKE_CURRENT_SOURCE_DIR}/gt-configurator.iss )
 add_definitions(-DHAVE_NANOSLEEP)
 
 set(DFU_SOURCES
-    ${CMAKE_SOURCE_DIR}/dfu/dfu.c
-    ${CMAKE_SOURCE_DIR}/dfu/dfu_load.c
-    ${CMAKE_SOURCE_DIR}/dfu/dfuse.c
-    ${CMAKE_SOURCE_DIR}/dfu/quirks.c
-    ${CMAKE_SOURCE_DIR}/dfu/dfu_file.c
-    ${CMAKE_SOURCE_DIR}/dfu/dfu_util.c
-    ${CMAKE_SOURCE_DIR}/dfu/dfuse_mem.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dfu/dfu.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dfu/dfu_load.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dfu/dfuse.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dfu/quirks.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dfu/dfu_file.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dfu/dfu_util.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/dfu/dfuse_mem.c
    )
 
 if(ANDROID)
   add_library(gt-configurator SHARED ${DFU_SOURCES}
-    ${CMAKE_SOURCE_DIR}/main.cpp
-    ${CMAKE_SOURCE_DIR}/mainwindow.cpp
-    ${CMAKE_SOURCE_DIR}/mainwindow.h
-    ${CMAKE_SOURCE_DIR}/threads.h
-    ${CMAKE_SOURCE_DIR}/mainwindow.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/threads.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.ui
   )
 else(ANDROID)
   add_executable(gt-configurator ${DFU_SOURCES}
-    ${CMAKE_SOURCE_DIR}/main.cpp
-    ${CMAKE_SOURCE_DIR}/mainwindow.cpp
-    ${CMAKE_SOURCE_DIR}/mainwindow.h
-    ${CMAKE_SOURCE_DIR}/mainwindow.ui
-    ${CMAKE_SOURCE_DIR}/threads.h
-    ${CMAKE_SOURCE_DIR}/resource.qrc
-    ${CMAKE_SOURCE_DIR}/app.rc
+    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/threads.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/resource.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/app.rc
   )
   if(WIN32)
     add_definitions(-D _win32_IE=0x0500 -D WINVER=0x0500)
@@ -77,7 +77,7 @@ else(ANDROID)
   endif(WIN32)
 endif(ANDROID)
 
-link_directories(${CMAKE_LIBRARY_PATH} ${CMAKE_BINARY_DIR})
+link_directories(${CMAKE_LIBRARY_PATH} ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(gt-configurator PRIVATE ${AHPGT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIB} ${USB_LIBRARIES} Qt5::Widgets Qt5::SerialPort Qt5::Network)
 install(TARGETS gt-configurator RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
