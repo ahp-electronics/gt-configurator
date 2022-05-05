@@ -40,7 +40,7 @@ find_package(USB REQUIRED)
 include_directories(${AHPGT_INCLUDE_DIR} ${DFU_INCLUDE_DIR} ${USB_INCLUDE_DIR})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt-configurator.iss.cmake ${CMAKE_CURRENT_SOURCE_DIR}/gt-configurator.iss )
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt-configurator.iss.cmake ${CMAKE_CURRENT_BINARY_DIR}/gt-configurator.iss )
 add_definitions(-DHAVE_NANOSLEEP)
 
 set(DFU_SOURCES
