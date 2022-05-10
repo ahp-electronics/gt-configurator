@@ -199,33 +199,6 @@ out:
     return ret;
 }
 
-void MainWindow::WriteValues(MainWindow *wnd)
-{
-    wnd->saveIni(wnd->getDefaultIni());
-    wnd->percent = 0;
-    wnd->finished = 0;
-    if(wnd->ui->Write->text() == "Flash")
-    {
-        if(!wnd->flashFirmware())
-        {
-            QFile *f = new QFile(wnd->firmwareFilename);
-            f->open(QIODevice::ReadOnly);
-            wnd->settings->setValue("firmware", f->readAll().toBase64());
-            f->close();
-            f->~QFile();
-        }
-    }
-    else
-    {
-        ahp_gt_write_values(0, &wnd->percent, &wnd->finished);
-        ahp_gt_write_values(1, &wnd->percent, &wnd->finished);
-        ahp_gt_set_position(0, 0);
-        ahp_gt_set_position(1, 0);
-    }
-    wnd->finished = 1;
-    wnd->percent = 0;
-}
-
 void MainWindow::readIni(QString ini)
 {
     QString dir = QDir(ini).dirName();
@@ -437,6 +410,33 @@ MainWindow::MainWindow(QWidget *parent)
     else
         ui->ComPort->addItem("No serial ports available");
     ui->MountType->setCurrentIndex(0);
+    WriteThread = new Thread(this);
+    connect(WriteThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * thread) {
+        saveIni(getDefaultIni());
+        percent = 0;
+        finished = 0;
+        if(ui->Write->text() == "Flash")
+        {
+            if(!flashFirmware())
+            {
+                QFile *f = new QFile(firmwareFilename);
+                f->open(QIODevice::ReadOnly);
+                settings->setValue("firmware", f->readAll().toBase64());
+                f->close();
+                f->~QFile();
+            }
+        }
+        else
+        {
+            ahp_gt_write_values(0, &percent, &finished);
+            ahp_gt_write_values(1, &percent, &finished);
+            ahp_gt_set_position(0, 0);
+            ahp_gt_set_position(1, 0);
+        }
+        finished = 1;
+        percent = 0;
+        thread->unlock();
+    });
     connect(ui->LoadFW, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked)
     {
@@ -898,7 +898,8 @@ MainWindow::MainWindow(QWidget *parent)
         {
             ui->ComPort->setEnabled(false);
         }
-        std::thread(WriteValues, this).detach();
+
+        WriteThread->start();
     });
     connect(ui->Inductance_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
