@@ -15,8 +15,9 @@ OutputDir="./"
 ArchitecturesInstallIn64BitMode=x64
 OutputBaseFilename={#TargetName}_setup
 SetupIconFile=icon.ico
+SignTool=signtool
 
-[Files] 
+[Files]
 Source: "../bin/{#TargetName}64/*"; DestDir: "{app}"; Check: Is64BitInstallMode ; Flags: solidbreak recursesubdirs
 Source: "../bin/{#TargetName}32/*"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: solidbreak recursesubdirs
 Source: "../{#TargetName}/driver/dpinst32.exe"; DestDir: {app}\driver; DestName: dpinst.exe; Check: not IsWin64; Flags: ignoreversion
