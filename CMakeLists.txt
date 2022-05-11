@@ -43,7 +43,7 @@ include_directories(${USB_INCLUDE_DIR})
 
 add_definitions(-DHAVE_NANOSLEEP)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/icon.ico ${CMAKE_CURRENT_BINARY_DIR}/icon.ico )
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/icon.ico ${CMAKE_CURRENT_BINARY_DIR}/icon.ico COPYONLY )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt-configurator.iss.cmake ${CMAKE_CURRENT_BINARY_DIR}/gt-configurator.iss )
 
