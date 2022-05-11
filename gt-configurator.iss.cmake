@@ -15,7 +15,6 @@ OutputDir="./"
 ArchitecturesInstallIn64BitMode=x64
 OutputBaseFilename={#TargetName}_setup
 SetupIconFile=icon.ico
-SignTool=signtool
 
 [Files]
 Source: "../bin/{#TargetName}64/*"; DestDir: "{app}"; Check: Is64BitInstallMode ; Flags: solidbreak recursesubdirs
