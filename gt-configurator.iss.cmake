@@ -29,7 +29,7 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#TargetName}.exe"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#TargetName}.exe"
 
 [Run]
-Filename: "..\{#TargetName}\driver\dpinst.exe"; Parameters: "/F /A /SW"; WorkingDir: {app}/driver;
+Filename: "{app}\driver\dpinst.exe"; Parameters: "/F /A /SW"; WorkingDir: {app}/driver;
 
 [Code]
 function VersionInstalled(const ProductID: string): String;
