@@ -41,6 +41,10 @@ class Thread : public QThread
         int timer_ms;
         int loop_ms;
     public:
+        ~Thread() {
+            requestInterruption();
+            wait();
+        }
         Thread(QObject* p, int timer = 20, int loop = 20) : QThread()
         {
             parent = p;
