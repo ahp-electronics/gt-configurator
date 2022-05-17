@@ -55,30 +55,30 @@ set(DFU_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/dfu/dfu_file.c
     ${CMAKE_CURRENT_SOURCE_DIR}/dfu/dfu_util.c
     ${CMAKE_CURRENT_SOURCE_DIR}/dfu/dfuse_mem.c
-   )
+)
 
 if(ANDROID)
-  add_library(gt-configurator SHARED ${DFU_SOURCES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/threads.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.ui
-  )
-else(ANDROID)
-  add_executable(gt-configurator ${DFU_SOURCES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.ui
-    ${CMAKE_CURRENT_SOURCE_DIR}/threads.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/resource.qrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/app.rc
-  )
-  if(WIN32)
-    add_definitions(-D _win32_IE=0x0500 -D WINVER=0x0500)
-    set_target_properties(gt-configurator PROPERTIES WIN32_EXECUTABLE TRUE)
-  endif(WIN32)
+    add_library(gt-configurator SHARED ${DFU_SOURCES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/threads.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.ui
+    )
+    else(ANDROID)
+    add_executable(gt-configurator ${DFU_SOURCES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/threads.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/resource.qrc
+        ${CMAKE_CURRENT_SOURCE_DIR}/app.rc
+    )
+    if(MINGW)
+        add_definitions(-mwindows -D _win32_IE=0x0500 -D WINVER=0x0500)
+        set_target_properties(gt-configurator PROPERTIES WIN32_EXECUTABLE TRUE)
+    endif(MINGW)
 endif(ANDROID)
 
 target_link_libraries(gt-configurator PRIVATE ${AHPGT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIB} ${USB_LIBRARIES} Qt5::Widgets Qt5::SerialPort Qt5::Network)
