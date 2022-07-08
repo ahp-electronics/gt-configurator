@@ -36,38 +36,49 @@ class Thread : public QThread
 {
         Q_OBJECT
     private:
+        QString Name;
         QObject* parent;
         QMutex mutex;
-        int timer_ms;
-        int loop_ms;
+        double timer_ms;
+        double loop_ms;
+        bool runnning { false };
+        bool stopped { false };
     public:
         ~Thread() {
-            requestInterruption();
-            wait();
+            stop();
         }
-        Thread(QObject* p, int timer = 20, int loop = 20) : QThread()
+        Thread(QObject* p, double timer = 20, double loop = 2, QString name = "") : QThread()
         {
             parent = p;
             timer_ms = timer;
             loop_ms = loop;
+            Name = name;
+        }
+        void stop()
+        {
+            requestInterruption();
+            unlock();
+            wait();
         }
         void run()
         {
             lastPollTime = QDateTime::currentDateTimeUtc();
+            stopped = false;
+            runnning = true;
             while(!isInterruptionRequested())
             {
-                if(lock())
-                {
-                    timer_ms = loop_ms;
-                    lastPollTime = QDateTime::currentDateTimeUtc();
-                    emit threadLoop(this);
-                }
-                QThread::msleep(timer_ms);
+                QDateTime now = QDateTime::currentDateTimeUtc();
+                usleep(fmax(1, (timer_ms-lastPollTime.msecsTo(now))*1000));
+                lock();
+                lastPollTime = QDateTime::currentDateTimeUtc();
+                emit threadLoop(this);
+                timer_ms = loop_ms;
             }
+            runnning = false;
         }
-        bool lock()
+        void lock()
         {
-            return mutex.tryLock();
+            while(!mutex.tryLock(5));
         }
         void unlock()
         {
@@ -81,7 +92,10 @@ class Thread : public QThread
         {
             loop_ms = loop;
         }
-        QObject *getParent() { return parent; }
+        QObject *getParent()
+        {
+            return parent;
+        }
     private:
         QDateTime lastPollTime;
     signals:

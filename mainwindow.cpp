@@ -412,7 +412,7 @@ MainWindow::MainWindow(QWidget *parent)
         ui->ComPort->addItem("No serial ports available");
     ui->MountType->setCurrentIndex(0);
     WriteThread = new Thread(this);
-    connect(WriteThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * thread) {
+    connect(WriteThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * thread) {
         saveIni(getDefaultIni());
         percent = 0;
         finished = 0;
@@ -436,12 +436,12 @@ MainWindow::MainWindow(QWidget *parent)
         }
         finished = 1;
         percent = 0;
-        thread->unlock();
+        thread->stop();
     });
     connect(ServerThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * thread) {
         ahp_gt_start_synscan_server(11882, &finished);
-        thread->requestInterruption();
-        thread->unlock();
+        thread->stop();
+        ProgressThread->start();
     });
     connect(ui->LoadFW, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked)
@@ -887,6 +887,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Server, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             [ = ](bool checked)
     {
+        ProgressThread->stop();
         finished = !checked;
         if(checked)
             ServerThread->start();
