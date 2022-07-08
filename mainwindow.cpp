@@ -440,8 +440,10 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ServerThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * thread) {
         ahp_gt_start_synscan_server(11882, &finished);
-        thread->stop();
-        IndicationThread->start();
+        finished = true;
+        threadsRunning = true;
+        thread->requestInterruption();
+        thread->unlock();
     });
     connect(ui->LoadFW, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked)
@@ -887,10 +889,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Server, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             [ = ](bool checked)
     {
-        IndicationThread->stop();
-        finished = !checked;
-        if(checked)
+        if(checked) {
+            finished = false;
+            threadsRunning = false;
             ServerThread->start();
+        } else {
+            finished = true;
+        }
     });
     connect(ui->MountStyle, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             [ = ](int index)
@@ -1069,9 +1074,18 @@ MainWindow::MainWindow(QWidget *parent)
                     ui->Rate_1->setText("as/sec: " + QString::number(Speed));
                 }
             }
+            ui->progress->setValue(percent);
+            ui->WorkArea->setEnabled(finished);
+            ui->Control->setEnabled(true);
+            ui->WriteArea->setEnabled(true);
+            ui->AdvancedRA->setEnabled(true);
+            ui->AdvancedDec->setEnabled(true);
+        } else {
+            ui->Control->setEnabled(false);
+            ui->WriteArea->setEnabled(false);
+            ui->AdvancedRA->setEnabled(false);
+            ui->AdvancedDec->setEnabled(false);
         }
-        ui->progress->setValue(percent);
-        ui->WorkArea->setEnabled(finished);
 
         parent->unlock();
     });

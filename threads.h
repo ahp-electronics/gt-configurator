@@ -57,8 +57,7 @@ class Thread : public QThread
         void stop()
         {
             requestInterruption();
-            unlock();
-            wait();
+            while(runnning) usleep(100);
         }
         void run()
         {
@@ -69,16 +68,17 @@ class Thread : public QThread
             {
                 QDateTime now = QDateTime::currentDateTimeUtc();
                 usleep(fmax(1, (timer_ms-lastPollTime.msecsTo(now))*1000));
-                lock();
-                lastPollTime = QDateTime::currentDateTimeUtc();
-                emit threadLoop(this);
-                timer_ms = loop_ms;
+                if(lock()) {
+                    lastPollTime = QDateTime::currentDateTimeUtc();
+                    emit threadLoop(this);
+                    timer_ms = loop_ms;
+                }
             }
             runnning = false;
         }
-        void lock()
+        bool lock()
         {
-            while(!mutex.tryLock(5));
+            return mutex.tryLock(5);
         }
         void unlock()
         {

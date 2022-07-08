@@ -59,7 +59,7 @@ class MainWindow : public QMainWindow
         QUdpSocket socket;
         int percent { 0 };
         int finished { 1 };
-        bool threadsRunning;
+        int threadsRunning;
         bool isConnected;
         int axisstatus[2];
         int motionmode[2];
