@@ -441,7 +441,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ServerThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * thread) {
         ahp_gt_start_synscan_server(11882, &finished);
         thread->stop();
-        ProgressThread->start();
+        IndicationThread->start();
     });
     connect(ui->LoadFW, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked)
@@ -887,7 +887,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Server, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             [ = ](bool checked)
     {
-        ProgressThread->stop();
+        IndicationThread->stop();
         finished = !checked;
         if(checked)
             ServerThread->start();
@@ -1030,7 +1030,6 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ProgressThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * parent)
     {
-        ui->WorkArea->setEnabled(finished);
         ui->progress->setValue(percent);
         parent->unlock();
     });
@@ -1071,8 +1070,8 @@ MainWindow::MainWindow(QWidget *parent)
                 }
             }
         }
-        ui->WorkArea->setEnabled(finished);
         ui->progress->setValue(percent);
+        ui->WorkArea->setEnabled(finished);
 
         parent->unlock();
     });
