@@ -52,6 +52,7 @@ class MainWindow : public QMainWindow
         Thread *ProgressThread;
         Thread *StatusThread;
         Thread *WriteThread;
+        Thread *ServerThread;
         QSettings * settings;
         QString ini;
         QString firmwareFilename;

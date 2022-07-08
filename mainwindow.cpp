@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include <unistd.h>
 #include <ctime>
 #include <cmath>
@@ -375,6 +375,7 @@ MainWindow::MainWindow(QWidget *parent)
     IndicationThread = new Thread(this, 100, 500);
     ProgressThread = new Thread(this, 10, 10);
     StatusThread = new Thread(this, 10, 100);
+    ServerThread = new Thread(this);
     setAccessibleName("GT Configurator");
     firmwareFilename = QStandardPaths::standardLocations(QStandardPaths::TempLocation).at(0) + "/" + strrand(32);
     QString homedir = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).at(0);
@@ -435,6 +436,11 @@ MainWindow::MainWindow(QWidget *parent)
         }
         finished = 1;
         percent = 0;
+        thread->unlock();
+    });
+    connect(ServerThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * thread) {
+        ahp_gt_start_synscan_server(11882, &finished);
+        thread->requestInterruption();
         thread->unlock();
     });
     connect(ui->LoadFW, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
@@ -877,6 +883,13 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
         ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
+    });
+    connect(ui->Server, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            [ = ](bool checked)
+    {
+        finished = !checked;
+        if(checked)
+            ServerThread->start();
     });
     connect(ui->MountStyle, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             [ = ](int index)

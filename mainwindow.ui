@@ -1249,6 +1249,19 @@
        <string>Bus Address:</string>
       </property>
      </widget>
+     <widget class="QCheckBox" name="Server">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>30</y>
+        <width>91</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Server</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QComboBox" name="ComPort">
      <property name="geometry">
