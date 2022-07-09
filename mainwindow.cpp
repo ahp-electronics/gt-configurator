@@ -438,7 +438,8 @@ MainWindow::MainWindow(QWidget *parent)
         ui->WorkArea->setEnabled(true);
         finished = 1;
         percent = 0;
-        thread->stop();
+        thread->requestInterruption();
+        thread->unlock();
     });
     connect(ServerThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * thread) {
         ahp_gt_start_synscan_server(11882, &finished);
