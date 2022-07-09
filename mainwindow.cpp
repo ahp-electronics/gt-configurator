@@ -1,4 +1,4 @@
-﻿#include "mainwindow.h"
+#include "mainwindow.h"
 #include <unistd.h>
 #include <ctime>
 #include <cmath>
@@ -416,6 +416,7 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(getDefaultIni());
         percent = 0;
         finished = 0;
+        ui->WorkArea->setEnabled(false);
         if(ui->Write->text() == "Flash")
         {
             if(!flashFirmware())
@@ -434,6 +435,7 @@ MainWindow::MainWindow(QWidget *parent)
             ahp_gt_set_position(0, 0);
             ahp_gt_set_position(1, 0);
         }
+        ui->WorkArea->setEnabled(true);
         finished = 1;
         percent = 0;
         thread->stop();
@@ -1075,7 +1077,6 @@ MainWindow::MainWindow(QWidget *parent)
                 }
             }
             ui->progress->setValue(percent);
-            ui->WorkArea->setEnabled(finished);
             ui->Control->setEnabled(true);
             ui->WriteArea->setEnabled(true);
             ui->AdvancedRA->setEnabled(true);
