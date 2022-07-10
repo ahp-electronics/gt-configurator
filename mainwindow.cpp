@@ -889,17 +889,6 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
         ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
     });
-    connect(ui->Server, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            [ = ](bool checked)
-    {
-        if(checked) {
-            finished = false;
-            threadsRunning = false;
-            ServerThread->start();
-        } else {
-            finished = true;
-        }
-    });
     connect(ui->MountStyle, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             [ = ](int index)
     {
@@ -1082,7 +1071,15 @@ MainWindow::MainWindow(QWidget *parent)
             ui->WriteArea->setEnabled(true);
             ui->AdvancedRA->setEnabled(true);
             ui->AdvancedDec->setEnabled(true);
+            if(ui->Server->isChecked()) {
+                finished = false;
+                threadsRunning = false;
+                ServerThread->start();
+            }
         } else {
+            if(!ui->Server->isChecked()) {
+                finished = true;
+            }
             ui->Control->setEnabled(false);
             ui->WriteArea->setEnabled(false);
             ui->AdvancedRA->setEnabled(false);
