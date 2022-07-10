@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include <unistd.h>
 #include <ctime>
 #include <cmath>
@@ -306,8 +306,8 @@ void MainWindow::readIni(QString ini)
             break;
     }
     UpdateValues(1);
-    ahp_gt_set_position(0, 0);
-    ahp_gt_set_position(1, 0);
+    ahp_gt_set_position(0, fmod(0x800000 * M_PI * 2 / ahp_gt_get_totalsteps(0), M_PI * 2));
+    ahp_gt_set_position(1, fmod(0x800000 * M_PI * 2 / ahp_gt_get_totalsteps(1), M_PI * 2));
 }
 
 void MainWindow::saveIni(QString ini)
@@ -432,8 +432,8 @@ MainWindow::MainWindow(QWidget *parent)
         {
             ahp_gt_write_values(0, &percent, &finished);
             ahp_gt_write_values(1, &percent, &finished);
-            ahp_gt_set_position(0, 0);
-            ahp_gt_set_position(1, 0);
+            ahp_gt_set_position(0, fmod(0x800000 * M_PI * 2 / ahp_gt_get_totalsteps(0), M_PI * 2));
+            ahp_gt_set_position(1, fmod(0x800000 * M_PI * 2 / ahp_gt_get_totalsteps(1), M_PI * 2));
         }
         ui->WorkArea->setEnabled(true);
         finished = 1;
