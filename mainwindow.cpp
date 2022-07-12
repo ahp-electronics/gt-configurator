@@ -558,7 +558,7 @@ MainWindow::MainWindow(QWidget *parent)
         ui->Notes->setEnabled(false);
         ui->RA->setEnabled(false);
         ui->DEC->setEnabled(false);
-        ui->WorkArea->setEnabled(false);
+        ui->WorkArea->setEnabled(true);
         ui->Control->setEnabled(false);
         ui->commonSettings->setEnabled(false);
         ui->AdvancedRA->setEnabled(false);
@@ -1032,7 +1032,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(IndicationThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * parent)
     {
-        if(ahp_gt_is_connected() && finished)
+        if(ahp_gt_is_detected(ahp_gt_get_current_device()) && finished)
         {
             for(int a = 0; a < 2; a++)
             {
@@ -1081,7 +1081,7 @@ MainWindow::MainWindow(QWidget *parent)
                 finished = true;
             }
             ui->Control->setEnabled(false);
-            ui->WriteArea->setEnabled(false);
+            ui->WriteArea->setEnabled(!ahp_gt_is_connected());
             ui->AdvancedRA->setEnabled(false);
             ui->AdvancedDec->setEnabled(false);
         }
