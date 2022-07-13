@@ -26,7 +26,7 @@ class MainWindow : public QMainWindow
         MainWindow(QWidget *parent = nullptr);
         ~MainWindow();
 
-        int flashFirmware();
+        int flashFirmware(const char *filename, int *progress, int *finished);
         void saveIni(QString ini);
         void readIni(QString ini);
         inline QString getDefaultIni()

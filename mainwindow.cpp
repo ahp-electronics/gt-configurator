@@ -45,160 +45,6 @@ char *strrand(int len)
     return ret;
 }
 
-int MainWindow::flashFirmware()
-{
-    dfu_status status;
-    libusb_context *ctx;
-    dfu_file file;
-    memset(&file, 0, sizeof(file));
-    int ret = libusb_init(&ctx);
-    int transfer_size = 0;
-    int func_dfu_transfer_size;
-    if(dfu_root != NULL)
-        free(dfu_root);
-    dfu_root = NULL;
-    finished = 0;
-    if (ret)
-    {
-        fprintf(stderr, "unable to initialize libusb: %s", libusb_error_name(ret));
-        return EIO;
-    }
-    strcpy(file.name, firmwareFilename.toStdString().c_str());
-    dfu_load_file(&file, MAYBE_SUFFIX, MAYBE_PREFIX);
-
-    if (match_vendor < 0 && file.idVendor != 0xffff)
-    {
-        match_vendor = file.idVendor;
-    }
-    if (match_product < 0 && file.idProduct != 0xffff)
-    {
-        match_product = file.idProduct;
-    }
-    probe_devices(ctx);
-
-    if (dfu_root == NULL)
-    {
-        ret = ENODEV;
-        goto out;
-    }
-    else if (dfu_root->next != NULL)
-    {
-        /* We cannot safely support more than one DFU capable device
-         * with same vendor/product ID, since during DFU we need to do
-         * a USB bus reset, after which the target device will get a
-         * new address */
-        fprintf(stderr, "More than one DFU capable USB device found! "
-                "Try `--list' and specify the serial number "
-                "or disconnect all but one device\n");
-        ret = ENODEV;
-        goto out;
-    }
-
-    if (((file.idVendor  != 0xffff && file.idVendor  != dfu_root->vendor) ||
-            (file.idProduct != 0xffff && file.idProduct != dfu_root->product)))
-    {
-        fprintf(stderr, "Error: File ID %04x:%04x does "
-                "not match device (%04x:%04x)",
-                file.idVendor, file.idProduct,
-                dfu_root->vendor, dfu_root->product);
-        ret = EINVAL;
-        goto out;
-    }
-
-    ret = libusb_open(dfu_root->dev, &dfu_root->dev_handle);
-    if (ret || !dfu_root->dev_handle)
-        errx(EX_IOERR, "Cannot open device: %s", libusb_error_name(ret));
-
-    ret = libusb_claim_interface(dfu_root->dev_handle, dfu_root->interface);
-    if (ret < 0)
-    {
-        errx(EX_IOERR, "Cannot claim interface - %s", libusb_error_name(ret));
-    }
-
-    ret = libusb_set_interface_alt_setting(dfu_root->dev_handle, dfu_root->interface, dfu_root->altsetting);
-    if (ret < 0)
-    {
-        errx(EX_IOERR, "Cannot set alternate interface: %s", libusb_error_name(ret));
-    }
-
-status_again:
-    ret = dfu_get_status(dfu_root, &status );
-    if (ret < 0)
-    {
-        fprintf(stderr, "error get_status: %s", libusb_error_name(ret));
-    }
-
-    QThread::msleep(status.bwPollTimeout);
-
-    switch (status.bState)
-    {
-        case DFU_STATE_appIDLE:
-        case DFU_STATE_appDETACH:
-            fprintf(stderr, "Device still in Runtime Mode!");
-            break;
-        case DFU_STATE_dfuERROR:
-            if (dfu_clear_status(dfu_root->dev_handle, dfu_root->interface) < 0)
-            {
-                fprintf(stderr, "error clear_status");
-            }
-            goto status_again;
-            break;
-        case DFU_STATE_dfuDNLOAD_IDLE:
-        case DFU_STATE_dfuUPLOAD_IDLE:
-            if (dfu_abort(dfu_root->dev_handle, dfu_root->interface) < 0)
-            {
-                fprintf(stderr, "can't send DFU_ABORT");
-            }
-            goto status_again;
-            break;
-        case DFU_STATE_dfuIDLE:
-            break;
-        default:
-            break;
-    }
-
-    if (DFU_STATUS_OK != status.bStatus )
-    {
-        /* Clear our status & try again. */
-        if (dfu_clear_status(dfu_root->dev_handle, dfu_root->interface) < 0)
-            fprintf(stderr, "USB communication error");
-        if (dfu_get_status(dfu_root, &status) < 0)
-            fprintf(stderr, "USB communication error");
-        if (DFU_STATUS_OK != status.bStatus)
-            fprintf(stderr, "Status is not OK: %d", status.bStatus);
-
-        QThread::msleep(status.bwPollTimeout);
-    }
-
-    func_dfu_transfer_size = libusb_le16_to_cpu(dfu_root->func_dfu.wTransferSize);
-    if (func_dfu_transfer_size)
-    {
-        if (!transfer_size)
-            transfer_size = func_dfu_transfer_size;
-    }
-    else
-    {
-        if (!transfer_size)
-            fprintf(stderr, "Transfer size must be specified");
-    }
-
-    if (transfer_size < dfu_root->bMaxPacketSize0)
-    {
-        transfer_size = dfu_root->bMaxPacketSize0;
-    }
-
-    if (dfuload_do_dnload(dfu_root, transfer_size, &file, &percent) < 0)
-    {
-        ret = EFAULT;
-    }
-
-    libusb_close(dfu_root->dev_handle);
-    dfu_root->dev_handle = NULL;
-out:
-    libusb_exit(ctx);
-    return ret;
-}
-
 void MainWindow::readIni(QString ini)
 {
     QString dir = QDir(ini).dirName();
@@ -306,8 +152,8 @@ void MainWindow::readIni(QString ini)
             break;
     }
     UpdateValues(1);
-    ahp_gt_set_position(0, fmod(0x800000 * M_PI * 2 / ahp_gt_get_totalsteps(0), M_PI * 2));
-    ahp_gt_set_position(1, fmod(0x800000 * M_PI * 2 / ahp_gt_get_totalsteps(1), M_PI * 2));
+    ahp_gt_set_position(0, M_PI / 2.0);
+    ahp_gt_set_position(1, M_PI / 2.0);
 }
 
 void MainWindow::saveIni(QString ini)
@@ -419,7 +265,7 @@ MainWindow::MainWindow(QWidget *parent)
         ui->WorkArea->setEnabled(false);
         if(ui->Write->text() == "Flash")
         {
-            if(!flashFirmware())
+            if(!dfu_flash(firmwareFilename.toStdString().c_str(), &percent, &finished))
             {
                 QFile *f = new QFile(firmwareFilename);
                 f->open(QIODevice::ReadOnly);
@@ -432,8 +278,8 @@ MainWindow::MainWindow(QWidget *parent)
         {
             ahp_gt_write_values(0, &percent, &finished);
             ahp_gt_write_values(1, &percent, &finished);
-            ahp_gt_set_position(0, fmod(0x800000 * M_PI * 2 / ahp_gt_get_totalsteps(0), M_PI * 2));
-            ahp_gt_set_position(1, fmod(0x800000 * M_PI * 2 / ahp_gt_get_totalsteps(1), M_PI * 2));
+            ahp_gt_set_position(0, M_PI / 2.0);
+            ahp_gt_set_position(1, M_PI / 2.0);
         }
         ui->WorkArea->setEnabled(true);
         finished = 1;

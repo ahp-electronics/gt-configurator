@@ -138,6 +138,8 @@ extern const char *match_serial_dfu;
 #include "dfuse.h"
 #include "quirks.h"
 
+int dfu_flash(const char *filename, int *progress, int *finished);
+
 int dfu_detach( libusb_device_handle *device,
                 const unsigned short interface,
                 const unsigned short timeout );
