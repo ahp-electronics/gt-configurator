@@ -288,6 +288,7 @@ MainWindow::MainWindow(QWidget *parent)
         thread->unlock();
     });
     connect(ServerThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * thread) {
+        ahp_gt_set_aligned(1);
         ahp_gt_start_synscan_server(11882, &finished);
         finished = true;
         threadsRunning = true;
