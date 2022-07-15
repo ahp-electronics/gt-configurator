@@ -338,7 +338,7 @@ MainWindow::MainWindow(QWidget *parent)
         int fd = -1;
         int port = 9600;
         QString address = "localhost";
-        int success = 1;
+        int failure = 1;
         if(ui->ComPort->currentText().contains(':'))
         {
             address = ui->ComPort->currentText().split(":")[0];
@@ -353,7 +353,7 @@ MainWindow::MainWindow(QWidget *parent)
                 if(fd > -1) {
                     ahp_gt_select_device(0);
                     if(!ahp_gt_connect_fd(fd)) {
-                        success = ahp_gt_detect_device();
+                        failure = ahp_gt_detect_device();
                     }
                 }
             }
@@ -363,15 +363,14 @@ MainWindow::MainWindow(QWidget *parent)
             portname.append(ui->ComPort->currentText());
             ahp_gt_select_device(0);
             if(!ahp_gt_connect(portname.toUtf8())) {
-                success = ahp_gt_detect_device();
+                failure = ahp_gt_detect_device();
             }
         }
-        if(!success)
+        if(!failure)
         {
             settings->setValue("LastPort", ui->ComPort->currentText());
             ui->Write->setText("Write");
             ui->Write->setEnabled(true);
-            isConnected = true;
             ahp_gt_read_values(0);
             ahp_gt_read_values(1);
             ui->LoadFW->setEnabled(false);
@@ -389,6 +388,7 @@ MainWindow::MainWindow(QWidget *parent)
             ui->loadConfig->setEnabled(true);
             ui->saveConfig->setEnabled(true);
             readIni(ini);
+            isConnected = true;
             finished = true;
         }
     });
@@ -398,6 +398,8 @@ MainWindow::MainWindow(QWidget *parent)
         ui->Write->setText("Write");
         ui->Write->setEnabled(false);
         isConnected = false;
+        finished = false;
+        ui->Server->setChecked(false);
         ui->LoadFW->setEnabled(true);
         ui->Connect->setEnabled(true);
         ui->Disconnect->setEnabled(false);
@@ -879,7 +881,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(IndicationThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * parent)
     {
-        if(ahp_gt_is_detected(ahp_gt_get_current_device()) && finished)
+        if(isConnected && finished)
         {
             for(int a = 0; a < 2; a++)
             {
@@ -924,11 +926,11 @@ MainWindow::MainWindow(QWidget *parent)
                 ServerThread->start();
             }
         } else {
-            if(!ui->Server->isChecked()) {
+            if(isConnected && !ui->Server->isChecked()) {
                 finished = true;
             }
             ui->Control->setEnabled(false);
-            ui->WriteArea->setEnabled(!ahp_gt_is_connected());
+            ui->WriteArea->setEnabled(!isConnected);
             ui->AdvancedRA->setEnabled(false);
             ui->AdvancedDec->setEnabled(false);
         }
@@ -937,7 +939,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(StatusThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * parent)
     {
-        if(ahp_gt_is_connected() && finished)
+        if(isConnected && finished)
         {
             for(int a = 0; a < 2; a++)
             {
