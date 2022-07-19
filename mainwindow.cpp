@@ -343,19 +343,9 @@ MainWindow::MainWindow(QWidget *parent)
         {
             address = ui->ComPort->currentText().split(":")[0];
             port = ui->ComPort->currentText().split(":")[1].toInt();
-            update();
-            socket.connectToHost(address, port);
-            socket.waitForConnected();
-            if(socket.isValid())
-            {
-                socket.setReadBufferSize(4096);
-                fd = socket.socketDescriptor();
-                if(fd > -1) {
-                    ahp_gt_select_device(0);
-                    if(!ahp_gt_connect_fd(fd)) {
-                        failure = ahp_gt_detect_device();
-                    }
-                }
+            ahp_gt_select_device(0);
+            if(!ahp_gt_connect_udp(port)) {
+                failure = ahp_gt_detect_device();
             }
         }
         else

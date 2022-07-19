@@ -25,6 +25,7 @@
 #include <stdlib.h>
 
 #include <libusb.h>
+#include <unistd.h>
 
 #include "portable.h"
 #include "dfu.h"
