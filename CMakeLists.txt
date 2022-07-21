@@ -83,5 +83,5 @@ endif(ANDROID)
 
 target_link_libraries(gt-configurator PRIVATE ${AHPGT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIB} ${USB_LIBRARIES} Qt5::Widgets Qt5::SerialPort Qt5::Network)
 install(TARGETS gt-configurator RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-install(FILES gt-configurator.png DESTINATION /usr/share/icons)
-install(FILES gt-configurator.desktop DESTINATION /usr/share/applications)
+install(FILES gt-configurator.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons)
+install(FILES gt-configurator.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
