@@ -335,7 +335,6 @@ MainWindow::MainWindow(QWidget *parent)
 #ifndef _WIN32
         portname.append("/dev/");
 #endif
-        int fd = -1;
         int port = 9600;
         QString address = "localhost";
         int failure = 1;
@@ -344,7 +343,7 @@ MainWindow::MainWindow(QWidget *parent)
             address = ui->ComPort->currentText().split(":")[0];
             port = ui->ComPort->currentText().split(":")[1].toInt();
             ahp_gt_select_device(0);
-            if(!ahp_gt_connect_udp(port)) {
+            if(!ahp_gt_connect_udp(address.toStdString().c_str(), port)) {
                 failure = ahp_gt_detect_device();
             }
         }
