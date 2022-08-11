@@ -63,6 +63,9 @@ class MainWindow : public QMainWindow
         bool isConnected;
         int axisstatus[2];
         int motionmode[2];
+        bool correcting_tracking[2] { false, false };
+        bool stop_correction[2] { true, true };
+        bool correct_tracking[2] { false, false };
         bool initial;
         int timer { 1000 };
         void UpdateValues(int axis);

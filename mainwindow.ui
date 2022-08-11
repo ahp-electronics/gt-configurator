@@ -957,7 +957,7 @@
        <rect>
         <x>10</x>
         <y>380</y>
-        <width>131</width>
+        <width>121</width>
         <height>16</height>
        </rect>
       </property>
@@ -1040,6 +1040,19 @@
       </property>
       <property name="text">
        <string>De Target</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="TuneTrack">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>380</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Fix tracking</string>
       </property>
      </widget>
     </widget>
@@ -1204,19 +1217,6 @@
        </property>
       </item>
      </widget>
-     <widget class="QCheckBox" name="PPEC">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>30</y>
-        <width>51</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>PEC</string>
-      </property>
-     </widget>
      <widget class="QSpinBox" name="Address">
       <property name="geometry">
        <rect>
@@ -1252,7 +1252,7 @@
      <widget class="QCheckBox" name="Server">
       <property name="geometry">
        <rect>
-        <x>210</x>
+        <x>150</x>
         <y>30</y>
         <width>91</width>
         <height>20</height>

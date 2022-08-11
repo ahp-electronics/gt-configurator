@@ -66,11 +66,11 @@ void MainWindow::readIni(QString ini)
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency()).toInt());
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
-    ui->PPEC->setChecked(settings->value("PPEC", false).toBool());
+    ui->TuneTrack->setChecked(settings->value("TuneTrack", false).toBool());
     ahp_gt_set_mount_type((MountType)ui->MountType->currentIndex());
     ahp_gt_set_mount_flags((GT1Flags)(ui->MountStyle->currentIndex() == 1));
-    ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
-    ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
+    ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2)));
+    ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2)));
     ahp_gt_set_pwm_frequency(ui->PWMFreq->value());
     ahp_gt_set_address(ui->Address->value());
 
@@ -208,7 +208,6 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Address", ui->Address->value());
     settings->setValue("PWMFreq", ui->PWMFreq->value());
     settings->setValue("MountStyle", ui->MountStyle->currentIndex());
-    settings->setValue("PPEC", ui->PPEC->isChecked());
     settings->setValue("Notes", QString(ui->Notes->text().toUtf8().toBase64()));
     s->~QSettings();
     settings = oldsettings;
@@ -721,17 +720,21 @@ MainWindow::MainWindow(QWidget *parent)
         ui->PWMFreq_label->setText("PWM: " + QString::number(1500 + 700 * value) + " Hz");
         saveIni(ini);
     });
-    connect(ui->PPEC, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+    connect(ui->TuneTrack, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             [ = ](bool checked)
     {
-        ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
-        ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
+        stop_correction[0] = true;
+        if(checked) {
+            correct_tracking[0] = true;
+        } else {
+            correct_tracking[0] = false;
+        }
     });
     connect(ui->MountStyle, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             [ = ](int index)
     {
-        ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
-        ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) | ui->PPEC->isChecked()));
+        ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2)));
+        ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2)));
         ahp_gt_set_mount_flags((GT1Flags)(ui->MountStyle->currentIndex() == 1));
         saveIni(ini);
     });
@@ -934,6 +937,15 @@ MainWindow::MainWindow(QWidget *parent)
             {
                 status[a] = ahp_gt_get_status(a);
                 currentSteps[a] = ahp_gt_get_position(a);
+                if(correct_tracking[a] && stop_correction[a]) {
+                    correcting_tracking[a] = true;
+                    stop_correction[a] = false;
+                    ahp_gt_correct_tracking(a, SIDEREAL_DAY * ahp_gt_get_wormsteps(a) / ahp_gt_get_totalsteps(a), (int*)&stop_correction[a]);
+                }
+                if(correcting_tracking[a] && stop_correction[a]) {
+                    correcting_tracking[a] = false;
+                    ui->TuneTrack->setChecked(false);
+                }
             }
         }
         parent->unlock();
