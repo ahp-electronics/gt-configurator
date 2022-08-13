@@ -16,8 +16,7 @@
 #include <QFileDialog>
 #include <QTimer>
 #include <errno.h>
-#include <libusb.h>
-#include "dfu/dfu.h"
+#include <libdfu.h>
 #include "./ui_mainwindow.h"
 static const double SIDEREAL_DAY = 86164.0916000;
 static MountType mounttype[] =

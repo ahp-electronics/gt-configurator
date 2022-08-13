@@ -32,30 +32,17 @@ LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
 
 find_package(Qt5 COMPONENTS Widgets SerialPort Network REQUIRED)
 find_package(AHPGT REQUIRED)
+find_package(DFU REQUIRED)
 find_package(Threads REQUIRED)
 find_package(M REQUIRED)
-find_package(USB REQUIRED)
 
 include_directories(${CMAKE_INCLUDE_PATH})
 include_directories(${AHPGT_INCLUDE_DIR})
 include_directories(${DFU_INCLUDE_DIR})
-include_directories(${USB_INCLUDE_DIR})
-
-add_definitions(-DHAVE_NANOSLEEP)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/icon.ico ${CMAKE_CURRENT_BINARY_DIR}/icon.ico COPYONLY )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt-configurator.iss.cmake ${CMAKE_CURRENT_BINARY_DIR}/gt-configurator.iss )
-
-set(DFU_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/dfu/dfu.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/dfu/dfu_load.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/dfu/dfuse.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/dfu/quirks.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/dfu/dfu_file.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/dfu/dfu_util.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/dfu/dfuse_mem.c
-)
 
 if(ANDROID)
     add_library(gt-configurator SHARED ${DFU_SOURCES}
@@ -83,7 +70,7 @@ if(ANDROID)
     endif(WIN32)
 endif(ANDROID)
 
-target_link_libraries(gt-configurator PRIVATE ${AHPGT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIB} ${USB_LIBRARIES} Qt5::Widgets Qt5::SerialPort Qt5::Network)
+target_link_libraries(gt-configurator PRIVATE ${DFU_LIBRARIES} ${AHPGT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIB} Qt5::Widgets Qt5::SerialPort Qt5::Network)
 install(TARGETS gt-configurator RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install(FILES gt-configurator.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons)
 install(FILES gt-configurator.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
