@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1100</width>
-    <height>621</height>
+    <height>657</height>
    </rect>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -18,425 +18,20 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>-10</y>
+      <y>80</y>
       <width>1081</width>
-      <height>551</height>
+      <height>451</height>
      </rect>
     </property>
-    <property name="title">
-     <string/>
+    <property name="contextMenuPolicy">
+     <enum>Qt::NoContextMenu</enum>
     </property>
-    <widget class="QGroupBox" name="RA">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>231</width>
-       <height>331</height>
-      </rect>
-     </property>
-     <property name="title">
-      <string>RA</string>
-     </property>
-     <widget class="QSpinBox" name="MotorSteps_0">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>30</y>
-        <width>91</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>16777215</number>
-      </property>
-      <property name="value">
-       <number>200</number>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Worm_0">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>90</y>
-        <width>91</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>16777215</number>
-      </property>
-      <property name="value">
-       <number>50</number>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Crown_0">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>120</y>
-        <width>91</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>16777215</number>
-      </property>
-      <property name="value">
-       <number>360</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Motor Steps</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_4">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>90</y>
-        <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Worm teeth</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_5">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>120</y>
-        <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Crown teeth</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="Coil_0">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>150</y>
-        <width>91</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <item>
-       <property name="text">
-        <string>AABB</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>ABAB</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>ABBA</string>
-       </property>
-      </item>
-     </widget>
-     <widget class="QLabel" name="label_6">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>150</y>
-        <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Coil config.</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="GPIO_0">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>180</y>
-        <width>91</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <item>
-       <property name="text">
-        <string>NONE</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>ST4</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>DRIVER</string>
-       </property>
-      </item>
-     </widget>
-     <widget class="QLabel" name="label_7">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>180</y>
-        <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>ST4 config.</string>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Motor_0">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>60</y>
-        <width>91</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>16777215</number>
-      </property>
-      <property name="value">
-       <number>10</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_15">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>60</y>
-        <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Motor teeth</string>
-      </property>
-     </widget>
-     <widget class="QSlider" name="MaxSpeed_0">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>270</y>
-        <width>211</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>1000</number>
-      </property>
-      <property name="value">
-       <number>200</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::NoTicks</enum>
-      </property>
-      <property name="tickInterval">
-       <number>50</number>
-      </property>
-     </widget>
-     <widget class="QSlider" name="Acceleration_0">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>300</y>
-        <width>101</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="maximum">
-       <number>100</number>
-      </property>
-      <property name="singleStep">
-       <number>1</number>
-      </property>
-      <property name="value">
-       <number>10</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::NoTicks</enum>
-      </property>
-      <property name="tickInterval">
-       <number>8</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="MaxSpeed_label_0">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>250</y>
-        <width>201</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Max speed</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="Acceleration_label_0">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>300</y>
-        <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Acceleration</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="Invert_0">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>230</y>
-        <width>91</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Invert axis</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="SteppingMode_0">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>210</y>
-        <width>91</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <item>
-       <property name="text">
-        <string>Mixed</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Microstep</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Half-step</string>
-       </property>
-      </item>
-     </widget>
-     <widget class="QLabel" name="label_9">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>210</y>
-        <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Stepping mode</string>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QGroupBox" name="WriteArea">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>480</y>
-       <width>1061</width>
-       <height>61</height>
-      </rect>
-     </property>
-     <property name="title">
-      <string/>
-     </property>
-     <widget class="QPushButton" name="Write">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>89</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Write</string>
-      </property>
-     </widget>
-     <widget class="QProgressBar" name="progress">
-      <property name="geometry">
-       <rect>
-        <x>200</x>
-        <y>30</y>
-        <width>851</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="value">
-       <number>0</number>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="LoadFW">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>30</y>
-        <width>89</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Check FW..</string>
-      </property>
-     </widget>
-    </widget>
+    <property name="title">
+     <string>Work area</string>
+    </property>
+    <property name="flat">
+     <bool>false</bool>
+    </property>
     <widget class="QGroupBox" name="DEC">
      <property name="enabled">
       <bool>false</bool>
@@ -444,7 +39,7 @@
      <property name="geometry">
       <rect>
        <x>250</x>
-       <y>60</y>
+       <y>30</y>
        <width>231</width>
        <height>331</height>
       </rect>
@@ -797,7 +392,7 @@
      <property name="geometry">
       <rect>
        <x>490</x>
-       <y>60</y>
+       <y>30</y>
        <width>251</width>
        <height>411</height>
       </rect>
@@ -958,7 +553,7 @@
         <x>10</x>
         <y>380</y>
         <width>121</width>
-        <height>16</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="text">
@@ -1048,7 +643,7 @@
         <x>140</x>
         <y>380</y>
         <width>101</width>
-        <height>16</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="text">
@@ -1063,7 +658,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>400</y>
+       <y>360</y>
        <width>471</width>
        <height>81</height>
       </rect>
@@ -1263,80 +858,6 @@
       </property>
      </widget>
     </widget>
-    <widget class="QComboBox" name="ComPort">
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>30</y>
-       <width>141</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-     <property name="currentText">
-      <string>localhost:9600</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>71</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>COM Port:</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="Connect">
-     <property name="geometry">
-      <rect>
-       <x>240</x>
-       <y>30</y>
-       <width>89</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Connect</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="loadConfig">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>440</x>
-       <y>30</y>
-       <width>89</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Load config</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="saveConfig">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>540</x>
-       <y>30</y>
-       <width>89</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Save config</string>
-     </property>
-    </widget>
     <widget class="QGroupBox" name="AdvancedRA">
      <property name="enabled">
       <bool>false</bool>
@@ -1344,7 +865,7 @@
      <property name="geometry">
       <rect>
        <x>750</x>
-       <y>60</y>
+       <y>30</y>
        <width>321</width>
        <height>201</height>
       </rect>
@@ -1683,7 +1204,7 @@
      <property name="geometry">
       <rect>
        <x>750</x>
-       <y>270</y>
+       <y>240</y>
        <width>321</width>
        <height>201</height>
       </rect>
@@ -2015,6 +1536,414 @@
       </property>
      </widget>
     </widget>
+    <widget class="QGroupBox" name="RA">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>231</width>
+       <height>331</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>RA</string>
+     </property>
+     <widget class="QSpinBox" name="MotorSteps_0">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>30</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>16777215</number>
+      </property>
+      <property name="value">
+       <number>200</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Worm_0">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>90</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>16777215</number>
+      </property>
+      <property name="value">
+       <number>50</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Crown_0">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>120</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>16777215</number>
+      </property>
+      <property name="value">
+       <number>360</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>111</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Motor Steps</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>111</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Worm teeth</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>120</y>
+        <width>111</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Crown teeth</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="Coil_0">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>150</y>
+        <width>91</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>AABB</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ABAB</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ABBA</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>150</y>
+        <width>111</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Coil config.</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="GPIO_0">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>180</y>
+        <width>91</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>NONE</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ST4</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>DRIVER</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>180</y>
+        <width>111</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>ST4 config.</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Motor_0">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>60</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>16777215</number>
+      </property>
+      <property name="value">
+       <number>10</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_15">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>60</y>
+        <width>111</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Motor teeth</string>
+      </property>
+     </widget>
+     <widget class="QSlider" name="MaxSpeed_0">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>270</y>
+        <width>211</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+      <property name="value">
+       <number>200</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::NoTicks</enum>
+      </property>
+      <property name="tickInterval">
+       <number>50</number>
+      </property>
+     </widget>
+     <widget class="QSlider" name="Acceleration_0">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>300</y>
+        <width>101</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="value">
+       <number>10</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::NoTicks</enum>
+      </property>
+      <property name="tickInterval">
+       <number>8</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="MaxSpeed_label_0">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>250</y>
+        <width>201</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Max speed</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="Acceleration_label_0">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>300</y>
+        <width>111</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Acceleration</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="Invert_0">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>230</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Invert axis</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="SteppingMode_0">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>210</y>
+        <width>91</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>Mixed</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Microstep</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Half-step</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="label_9">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>210</y>
+        <width>111</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Stepping mode</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="Connection">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>1081</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Connection</string>
+    </property>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>COM Port:</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="ComPort">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>30</y>
+       <width>141</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+     <property name="currentText">
+      <string>localhost:9600</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="Connect">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>30</y>
+       <width>89</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Connect</string>
+     </property>
+    </widget>
     <widget class="QPushButton" name="Disconnect">
      <property name="enabled">
       <bool>false</bool>
@@ -2031,15 +1960,47 @@
       <string>Disconnect</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="loadConfig">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>30</y>
+       <width>89</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Load config</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="saveConfig">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>540</x>
+       <y>30</y>
+       <width>89</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Save config</string>
+     </property>
+    </widget>
     <widget class="QLabel" name="labelNotes">
      <property name="enabled">
       <bool>false</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>660</x>
+       <x>640</x>
        <y>30</y>
-       <width>67</width>
+       <width>51</width>
        <height>17</height>
       </rect>
      </property>
@@ -2053,11 +2014,69 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>710</x>
+       <x>690</x>
        <y>30</y>
-       <width>361</width>
+       <width>381</width>
        <height>21</height>
       </rect>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="WriteArea">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>540</y>
+      <width>1081</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Write area</string>
+    </property>
+    <widget class="QPushButton" name="Write">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>89</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Write</string>
+     </property>
+    </widget>
+    <widget class="QProgressBar" name="progress">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>30</y>
+       <width>871</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="LoadFW">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>30</y>
+       <width>89</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Check FW..</string>
      </property>
     </widget>
    </widget>

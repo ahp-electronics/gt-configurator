@@ -106,6 +106,7 @@ void MainWindow::readIni(QString ini)
     ui->Coil_1->setCurrentIndex(settings->value("Coil_1", ahp_gt_get_stepping_conf(1)).toInt());
     ui->SteppingMode_1->setCurrentIndex(settings->value("SteppingMode_1", ahp_gt_get_stepping_mode(1)).toInt());
 
+    ahp_gt_set_timing(0, settings->value("TimingValue_1", 1500000).toInt());
     ahp_gt_set_motor_steps(0, ui->MotorSteps_0->value());
     ahp_gt_set_motor_teeth(0, ui->Motor_0->value());
     ahp_gt_set_worm_teeth(0, ui->Worm_0->value());
@@ -129,6 +130,7 @@ void MainWindow::readIni(QString ini)
     }
     UpdateValues(0);
 
+    ahp_gt_set_timing(1, settings->value("TimingValue_1", 1500000).toInt());
     ahp_gt_set_motor_steps(1, ui->MotorSteps_1->value());
     ahp_gt_set_motor_teeth(1, ui->Motor_1->value());
     ahp_gt_set_worm_teeth(1, ui->Worm_1->value());
@@ -187,6 +189,7 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Resistance_0", ui->Resistance_0->value());
     settings->setValue("Current_0", ui->Current_0->value());
     settings->setValue("Voltage_0", ui->Voltage_0->value());
+    settings->setValue("TimingValue_0", ahp_gt_get_timing(0));
 
     settings->setValue("Invert_1", ui->Invert_1->isChecked());
     settings->setValue("SteppingMode_1", ui->SteppingMode_1->currentIndex());
@@ -202,6 +205,8 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Resistance_1", ui->Resistance_1->value());
     settings->setValue("Current_1", ui->Current_1->value());
     settings->setValue("Voltage_1", ui->Voltage_1->value());
+
+    settings->setValue("TimingValue_1", ahp_gt_get_timing(1));
 
     settings->setValue("MountType", ui->MountType->currentIndex());
     settings->setValue("Address", ui->Address->value());
@@ -237,7 +242,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
     settings = new QSettings(ini, QSettings::Format::IniFormat);
     isConnected = false;
-    this->setFixedSize(1100, 570);
+    this->setFixedSize(1100, 640);
     ui->setupUi(this);
     QString lastPort = settings->value("LastPort", "").toString();
     if(lastPort != "")
@@ -260,7 +265,8 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(getDefaultIni());
         percent = 0;
         finished = 0;
-        ui->WorkArea->setEnabled(false);
+        ui->WriteArea->setEnabled(false);
+        ui->Connection->setEnabled(false);
         if(ui->Write->text() == "Flash")
         {
             if(!dfu_flash(firmwareFilename.toStdString().c_str(), &percent, &finished))
@@ -279,7 +285,8 @@ MainWindow::MainWindow(QWidget *parent)
             ahp_gt_set_position(0, M_PI / 2.0);
             ahp_gt_set_position(1, M_PI / 2.0);
         }
-        ui->WorkArea->setEnabled(true);
+        ui->WriteArea->setEnabled(true);
+        ui->Connection->setEnabled(true);
         finished = 1;
         percent = 0;
         thread->requestInterruption();
@@ -287,9 +294,9 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ServerThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * thread) {
         ahp_gt_set_aligned(1);
-        ahp_gt_start_synscan_server(11882, &finished);
-        finished = true;
-        threadsRunning = true;
+        threadsStopped = false;
+        ahp_gt_start_synscan_server(11882, &threadsStopped);
+        threadsStopped = true;
         thread->requestInterruption();
         thread->unlock();
     });
@@ -319,6 +326,7 @@ MainWindow::MainWindow(QWidget *parent)
         response->manager()->deleteLater();
         ui->Write->setText("Flash");
         ui->Write->setEnabled(true);
+        ui->Connection->setEnabled(false);
         ui->RA->setEnabled(false);
         ui->DEC->setEnabled(false);
         ui->Control->setEnabled(false);
@@ -367,7 +375,6 @@ MainWindow::MainWindow(QWidget *parent)
             ui->Notes->setEnabled(true);
             ui->RA->setEnabled(true);
             ui->DEC->setEnabled(true);
-            ui->WorkArea->setEnabled(true);
             ui->Control->setEnabled(true);
             ui->commonSettings->setEnabled(true);
             ui->AdvancedRA->setEnabled(true);
@@ -377,6 +384,7 @@ MainWindow::MainWindow(QWidget *parent)
             readIni(ini);
             isConnected = true;
             finished = true;
+            ui->ComPort->setEnabled(false);
         }
     });
     connect(ui->Disconnect, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
@@ -384,6 +392,7 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ui->Write->setText("Write");
         ui->Write->setEnabled(false);
+        ui->ComPort->setEnabled(true);
         isConnected = false;
         finished = false;
         ui->Server->setChecked(false);
@@ -394,7 +403,6 @@ MainWindow::MainWindow(QWidget *parent)
         ui->Notes->setEnabled(false);
         ui->RA->setEnabled(false);
         ui->DEC->setEnabled(false);
-        ui->WorkArea->setEnabled(true);
         ui->Control->setEnabled(false);
         ui->commonSettings->setEnabled(false);
         ui->AdvancedRA->setEnabled(false);
@@ -724,6 +732,8 @@ MainWindow::MainWindow(QWidget *parent)
     {
         stop_correction[0] = true;
         if(checked) {
+            ui->Tracking->setChecked(false);
+            ui->Tracking->setEnabled(false);
             correct_tracking[0] = true;
         } else {
             correct_tracking[0] = false;
@@ -744,10 +754,6 @@ MainWindow::MainWindow(QWidget *parent)
         {
             //UpdateValues(0);
             //UpdateValues(1);
-        }
-        else
-        {
-            ui->ComPort->setEnabled(false);
         }
 
         WriteThread->start();
@@ -865,6 +871,16 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_goto_absolute(1, (double)ui->TargetSteps_1->value()*M_PI * 2.0 / (double)ahp_gt_get_totalsteps(1),
                              ui->Dec_Speed->value());
     });
+    connect(ui->Server, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
+    {
+        if(checked) {
+            threadsStopped = false;
+            ServerThread->start();
+        }
+        if(!threadsStopped && !checked) {
+            threadsStopped = true;
+        }
+    });
     connect(ProgressThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * parent)
     {
         ui->progress->setValue(percent);
@@ -876,54 +892,23 @@ MainWindow::MainWindow(QWidget *parent)
         {
             for(int a = 0; a < 2; a++)
             {
-                int totalsteps = ahp_gt_get_totalsteps(a);
-                QDateTime now = QDateTime::currentDateTimeUtc();
-                double diffTime = (double)lastPollTime[a].msecsTo(now);
-                lastPollTime[a] = now;
-                double Steps = currentSteps[a];
-                double diffSteps = Steps - lastSteps[a];
-                lastSteps[a] = Steps;
-                Steps *= totalsteps / M_PI / 2.0;
-                diffSteps *= 180.0 * 60.0 * 60.0 / M_PI;
-                double Speed = 0.0;
-                for(int s = 0; s < _n_speeds; s++)
-                {
-                    if(s < _n_speeds - 1)
-                        lastSpeeds[a][s] = lastSpeeds[a][s + 1];
-                    else
-                        lastSpeeds[a][s] = diffSteps * 1000.0 / diffTime;
-                    Speed += lastSpeeds[a][s];
-                }
-                Speed /= _n_speeds;
                 if(a == 0)
                 {
-                    ui->CurrentSteps_0->setText(QString::number((int)Steps));
-                    ui->Rate_0->setText("as/sec: " + QString::number(Speed));
+                    ui->CurrentSteps_0->setText(QString::number((int)currentSteps[a]));
+                    ui->Rate_0->setText("as/sec: " + QString::number(Speed[a]));
                 }
                 if(a == 1)
                 {
-                    ui->CurrentSteps_1->setText(QString::number(Steps));
-                    ui->Rate_1->setText("as/sec: " + QString::number(Speed));
+                    ui->CurrentSteps_1->setText(QString::number(currentSteps[a]));
+                    ui->Rate_1->setText("as/sec: " + QString::number(Speed[a]));
                 }
             }
             ui->progress->setValue(percent);
-            ui->Control->setEnabled(true);
+            ui->WorkArea->setEnabled(true);
             ui->WriteArea->setEnabled(true);
-            ui->AdvancedRA->setEnabled(true);
-            ui->AdvancedDec->setEnabled(true);
-            if(ui->Server->isChecked()) {
-                finished = false;
-                threadsRunning = false;
-                ServerThread->start();
-            }
         } else {
-            if(isConnected && !ui->Server->isChecked()) {
-                finished = true;
-            }
-            ui->Control->setEnabled(false);
             ui->WriteArea->setEnabled(!isConnected);
-            ui->AdvancedRA->setEnabled(false);
-            ui->AdvancedDec->setEnabled(false);
+            ui->WorkArea->setEnabled(false);
         }
 
         parent->unlock();
@@ -935,17 +920,37 @@ MainWindow::MainWindow(QWidget *parent)
             for(int a = 0; a < 2; a++)
             {
                 status[a] = ahp_gt_get_status(a);
-                currentSteps[a] = ahp_gt_get_position(a);
+                QDateTime now = QDateTime::currentDateTimeUtc();
+                double diffTime = (double)lastPollTime[a].msecsTo(now);
+                lastPollTime[a] = now;
+                currentSteps[a] = ahp_gt_get_position(a) * ahp_gt_get_totalsteps(a) / M_PI / 2.0;
+                double diffSteps = currentSteps[a] - lastSteps[a];
+                lastSteps[a] = currentSteps[a];
+                diffSteps *= 360.0 * 60.0 * 60.0 / ahp_gt_get_totalsteps(a);
+                Speed[a] = 0.0;
+                for(int s = 0; s < _n_speeds; s++)
+                {
+                    if(s < _n_speeds - 1)
+                        lastSpeeds[a][s] = lastSpeeds[a][s + 1];
+                    else
+                        lastSpeeds[a][s] = diffSteps * 1000.0 / diffTime;
+                    Speed[a] += lastSpeeds[a][s];
+                }
+                Speed[a] /= _n_speeds;
                 if(correct_tracking[a] && stop_correction[a]) {
                     correcting_tracking[a] = true;
                     stop_correction[a] = false;
                     ahp_gt_correct_tracking(a, SIDEREAL_DAY * ahp_gt_get_wormsteps(a) / ahp_gt_get_totalsteps(a), (int*)&stop_correction[a]);
+                    saveIni(ini);
+
                 }
                 if(correcting_tracking[a] && stop_correction[a]) {
                     correcting_tracking[a] = false;
                     ui->TuneTrack->setChecked(false);
+                    ui->Tracking->setEnabled(true);
                 }
             }
+            ui->Write->setText("Write");
         }
         parent->unlock();
     });
@@ -958,7 +963,7 @@ MainWindow::~MainWindow()
 {
     if(QFile(firmwareFilename).exists())
         unlink(firmwareFilename.toUtf8());
-    threadsRunning = false;
+    threadsStopped = true;
     delete ui;
 }
 

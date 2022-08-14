@@ -9,7 +9,7 @@
 #include <ahp_gt.h>
 #include "threads.h"
 
-#define _n_speeds 1
+#define _n_speeds 5
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -43,6 +43,7 @@ class MainWindow : public QMainWindow
         }
 
     private:
+        double Speed[2];
         double currentSteps[2];
         SkywatcherAxisStatus status[2];
         QDateTime lastPollTime[2];
@@ -59,7 +60,7 @@ class MainWindow : public QMainWindow
         QUdpSocket socket;
         int percent { 0 };
         int finished { 1 };
-        int threadsRunning;
+        int threadsStopped;
         bool isConnected;
         int axisstatus[2];
         int motionmode[2];
