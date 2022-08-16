@@ -338,9 +338,6 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ](bool checked)
     {
         QString portname;
-#ifndef _WIN32
-        portname.append("/dev/");
-#endif
         int port = 9600;
         QString address = "localhost";
         int failure = 1;
