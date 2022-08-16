@@ -63,10 +63,9 @@ if(ANDROID)
         ${CMAKE_CURRENT_SOURCE_DIR}/app.rc
     )
     if(WIN32)
-        target_link_libraries(gt-configurator PRIVATE comctl32)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wl,--subsystem,windows")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--subsystem,windows")
-        set_target_properties(gt-configurator PROPERTIES WIN32_EXECUTABLE TRUE)
+      add_definitions(-static-libstdc++ -static-libgcc -mwindows -D _win32_IE=0x0500 -D WINVER=0x0500)
+      set_target_properties(gt-configurator PROPERTIES WIN32_EXECUTABLE TRUE)
+      target_link_libraries(gt-configurator PRIVATE comctl32)
     endif(WIN32)
 endif(ANDROID)
 
