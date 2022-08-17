@@ -958,6 +958,16 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    IndicationThread->stop();
+    ProgressThread->stop();
+    StatusThread->stop();
+    WriteThread->stop();
+    ServerThread->stop();
+    IndicationThread->wait();
+    ProgressThread->wait();
+    StatusThread->wait();
+    WriteThread->wait();
+    ServerThread->wait();
     if(QFile(firmwareFilename).exists())
         unlink(firmwareFilename.toUtf8());
     threadsStopped = true;
