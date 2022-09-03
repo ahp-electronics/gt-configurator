@@ -400,7 +400,7 @@
      <property name="title">
       <string>Control</string>
      </property>
-     <widget class="QPushButton" name="Dec_P">
+     <widget class="QPushButton" name="N">
       <property name="geometry">
        <rect>
         <x>90</x>
@@ -410,10 +410,10 @@
        </rect>
       </property>
       <property name="text">
-       <string>DEC+</string>
+       <string>N</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="Ra_P">
+     <widget class="QPushButton" name="W">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -423,10 +423,10 @@
        </rect>
       </property>
       <property name="text">
-       <string>RA+</string>
+       <string>W</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="Ra_N">
+     <widget class="QPushButton" name="E">
       <property name="geometry">
        <rect>
         <x>160</x>
@@ -436,7 +436,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>RA-</string>
+       <string>E</string>
       </property>
      </widget>
      <widget class="QPushButton" name="Stop">
@@ -452,7 +452,7 @@
        <string>STOP</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="Dec_N">
+     <widget class="QPushButton" name="S">
       <property name="geometry">
        <rect>
         <x>90</x>
@@ -462,14 +462,14 @@
        </rect>
       </property>
       <property name="text">
-       <string>DEC-</string>
+       <string>S</string>
       </property>
      </widget>
      <widget class="QSlider" name="Ra_Speed">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>310</y>
+        <y>300</y>
         <width>221</width>
         <height>21</height>
        </rect>
@@ -497,7 +497,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>290</y>
+        <y>280</y>
         <width>221</width>
         <height>17</height>
        </rect>
@@ -510,7 +510,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>330</y>
+        <y>320</y>
         <width>221</width>
         <height>17</height>
        </rect>
@@ -523,7 +523,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>350</y>
+        <y>340</y>
         <width>221</width>
         <height>21</height>
        </rect>
@@ -552,19 +552,19 @@
        <rect>
         <x>10</x>
         <y>380</y>
-        <width>121</width>
+        <width>71</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>Tracking Test</string>
+       <string>Track</string>
       </property>
      </widget>
      <widget class="QPushButton" name="Goto">
       <property name="geometry">
        <rect>
         <x>170</x>
-        <y>270</y>
+        <y>260</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -577,7 +577,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>270</y>
+        <y>260</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -596,7 +596,7 @@
       <property name="geometry">
        <rect>
         <x>90</x>
-        <y>270</y>
+        <y>260</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -615,7 +615,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>250</y>
+        <y>240</y>
         <width>71</width>
         <height>17</height>
        </rect>
@@ -628,7 +628,7 @@
       <property name="geometry">
        <rect>
         <x>90</x>
-        <y>250</y>
+        <y>240</y>
         <width>71</width>
         <height>17</height>
        </rect>
@@ -637,17 +637,82 @@
        <string>De Target</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="TuneTrack">
+     <widget class="QCheckBox" name="TuneRa">
       <property name="geometry">
        <rect>
-        <x>140</x>
+        <x>90</x>
         <y>380</y>
-        <width>101</width>
+        <width>71</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>Fix tracking</string>
+       <string>Fix RA</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="SE">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>170</y>
+        <width>61</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>SE</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="NE">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>30</y>
+        <width>61</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>NE</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="NW">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>61</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>NW</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="SW">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>170</y>
+        <width>61</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>SW</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="TuneDec">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>380</y>
+        <width>71</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Fix Dec</string>
       </property>
      </widget>
     </widget>

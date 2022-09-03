@@ -65,7 +65,6 @@ void MainWindow::readIni(QString ini)
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency()).toInt());
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
-    ui->TuneTrack->setChecked(settings->value("TuneTrack", false).toBool());
     ahp_gt_set_mount_type((MountType)ui->MountType->currentIndex());
     ahp_gt_set_mount_flags((GT1Flags)(ui->MountStyle->currentIndex() == 1));
     ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2)));
@@ -240,6 +239,8 @@ MainWindow::MainWindow(QWidget *parent)
         f->close();
         f->~QFile();
     }
+    stop_correction[0] = true;
+    stop_correction[1] = true;
     settings = new QSettings(ini, QSettings::Format::IniFormat);
     isConnected = false;
     this->setFixedSize(1100, 640);
@@ -606,7 +607,7 @@ MainWindow::MainWindow(QWidget *parent)
         UpdateValues(1);
         saveIni(ini);
     });
-    connect(ui->Ra_P, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
+    connect(ui->W, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
         oldTracking = ui->Tracking->isChecked();
@@ -614,7 +615,7 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_stop_motion(0, 1);
         ahp_gt_start_motion(0, ui->Ra_Speed->value());
     });
-    connect(ui->Ra_N, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
+    connect(ui->E, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
         oldTracking = ui->Tracking->isChecked();
@@ -622,16 +623,48 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_stop_motion(0, 1);
         ahp_gt_start_motion(0, -ui->Ra_Speed->value());
     });
-    connect(ui->Dec_P, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
+    connect(ui->N, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
         ahp_gt_stop_motion(1, 1);
         ahp_gt_start_motion(1, ui->Dec_Speed->value());
     });
-    connect(ui->Dec_N, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
+    connect(ui->S, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
         ahp_gt_stop_motion(1, 1);
+        ahp_gt_start_motion(1, -ui->Dec_Speed->value());
+    });
+    connect(ui->NW, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
+            [ = ]()
+    {
+        ahp_gt_stop_motion(0, 1);
+        ahp_gt_stop_motion(1, 1);
+        ahp_gt_start_motion(0, ui->Ra_Speed->value());
+        ahp_gt_start_motion(1, ui->Dec_Speed->value());
+    });
+    connect(ui->NE, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
+            [ = ]()
+    {
+        ahp_gt_stop_motion(0, 1);
+        ahp_gt_stop_motion(1, 1);
+        ahp_gt_start_motion(0, -ui->Ra_Speed->value());
+        ahp_gt_start_motion(1, ui->Dec_Speed->value());
+    });
+    connect(ui->SW, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
+            [ = ]()
+    {
+        ahp_gt_stop_motion(0, 1);
+        ahp_gt_stop_motion(1, 1);
+        ahp_gt_start_motion(0, ui->Ra_Speed->value());
+        ahp_gt_start_motion(1, -ui->Dec_Speed->value());
+    });
+    connect(ui->SE, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
+            [ = ]()
+    {
+        ahp_gt_stop_motion(0, 1);
+        ahp_gt_stop_motion(1, 1);
+        ahp_gt_start_motion(0, -ui->Ra_Speed->value());
         ahp_gt_start_motion(1, -ui->Dec_Speed->value());
     });
     connect(ui->Stop, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
@@ -640,26 +673,50 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_stop_motion(0, 1);
         ahp_gt_stop_motion(1, 1);
     });
-    connect(ui->Ra_P, static_cast<void (QPushButton::*)()>(&QPushButton::released),
+    connect(ui->W, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
         ahp_gt_stop_motion(0, 1);
         ui->Tracking->setChecked(oldTracking);
     });
-    connect(ui->Ra_N, static_cast<void (QPushButton::*)()>(&QPushButton::released),
+    connect(ui->E, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
         ahp_gt_stop_motion(0, 1);
         ui->Tracking->setChecked(oldTracking);
     });
-    connect(ui->Dec_P, static_cast<void (QPushButton::*)()>(&QPushButton::released),
+    connect(ui->N, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
         ahp_gt_stop_motion(1, 1);
     });
-    connect(ui->Dec_N, static_cast<void (QPushButton::*)()>(&QPushButton::released),
+    connect(ui->S, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
+        ahp_gt_stop_motion(1, 1);
+    });
+    connect(ui->NW, static_cast<void (QPushButton::*)()>(&QPushButton::released),
+            [ = ]()
+    {
+        ahp_gt_stop_motion(0, 1);
+        ahp_gt_stop_motion(1, 1);
+    });
+    connect(ui->NE, static_cast<void (QPushButton::*)()>(&QPushButton::released),
+            [ = ]()
+    {
+        ahp_gt_stop_motion(0, 1);
+        ahp_gt_stop_motion(1, 1);
+    });
+    connect(ui->SW, static_cast<void (QPushButton::*)()>(&QPushButton::released),
+            [ = ]()
+    {
+        ahp_gt_stop_motion(0, 1);
+        ahp_gt_stop_motion(1, 1);
+    });
+    connect(ui->SE, static_cast<void (QPushButton::*)()>(&QPushButton::released),
+            [ = ]()
+    {
+        ahp_gt_stop_motion(0, 1);
         ahp_gt_stop_motion(1, 1);
     });
     connect(ui->Tracking, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
@@ -724,16 +781,54 @@ MainWindow::MainWindow(QWidget *parent)
         ui->PWMFreq_label->setText("PWM: " + QString::number(1500 + 700 * value) + " Hz");
         saveIni(ini);
     });
-    connect(ui->TuneTrack, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+    connect(ui->TuneRa, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), this,
             [ = ](bool checked)
     {
-        stop_correction[0] = true;
-        if(checked) {
-            ui->Tracking->setChecked(false);
-            ui->Tracking->setEnabled(false);
-            correct_tracking[0] = true;
+        stop_correction[0] = !checked;
+        if(stop_correction[0]) {
+            ui->TuneDec->setEnabled(true);
+            ui->E->setEnabled(true);
+            ui->W->setEnabled(true);
+            ui->NE->setEnabled(true);
+            ui->NW->setEnabled(true);
+            ui->SE->setEnabled(true);
+            ui->SW->setEnabled(true);
+            ui->Stop->setEnabled(true);
+            ui->Tracking->setEnabled(true);
         } else {
-            correct_tracking[0] = false;
+            ui->TuneDec->setEnabled(false);
+            ui->E->setEnabled(false);
+            ui->W->setEnabled(false);
+            ui->NE->setEnabled(false);
+            ui->NW->setEnabled(false);
+            ui->SE->setEnabled(false);
+            ui->SW->setEnabled(false);
+            ui->Stop->setEnabled(false);
+            ui->Tracking->setEnabled(false);
+        }
+    });
+    connect(ui->TuneDec, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), this,
+            [ = ](bool checked)
+    {
+        stop_correction[1] = !checked;
+        if(stop_correction[1]) {
+            ui->TuneRa->setEnabled(true);
+            ui->S->setEnabled(true);
+            ui->N->setEnabled(true);
+            ui->NE->setEnabled(true);
+            ui->NW->setEnabled(true);
+            ui->SE->setEnabled(true);
+            ui->SW->setEnabled(true);
+            ui->Stop->setEnabled(true);
+        } else {
+            ui->TuneRa->setEnabled(false);
+            ui->S->setEnabled(false);
+            ui->N->setEnabled(false);
+            ui->NE->setEnabled(false);
+            ui->NW->setEnabled(false);
+            ui->SE->setEnabled(false);
+            ui->SW->setEnabled(false);
+            ui->Stop->setEnabled(false);
         }
     });
     connect(ui->MountStyle, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -900,6 +995,7 @@ MainWindow::MainWindow(QWidget *parent)
                     ui->Rate_1->setText("as/sec: " + QString::number(Speed[a]));
                 }
             }
+            ui->Write->setText("Write");
             ui->progress->setValue(percent);
             ui->WorkArea->setEnabled(true);
             ui->WriteArea->setEnabled(true);
@@ -934,20 +1030,15 @@ MainWindow::MainWindow(QWidget *parent)
                     Speed[a] += lastSpeeds[a][s];
                 }
                 Speed[a] /= _n_speeds;
-                if(correct_tracking[a] && stop_correction[a]) {
-                    correcting_tracking[a] = true;
-                    stop_correction[a] = false;
-                    ahp_gt_correct_tracking(a, SIDEREAL_DAY * ahp_gt_get_wormsteps(a) / ahp_gt_get_totalsteps(a), (int*)&stop_correction[a]);
-                    saveIni(ini);
-
-                }
-                if(correcting_tracking[a] && stop_correction[a]) {
-                    correcting_tracking[a] = false;
-                    ui->TuneTrack->setChecked(false);
-                    ui->Tracking->setEnabled(true);
-                }
             }
-            ui->Write->setText("Write");
+            if(!stop_correction[0]) {
+                ahp_gt_correct_tracking(0, SIDEREAL_DAY * ahp_gt_get_wormsteps(0) / ahp_gt_get_totalsteps(0), &stop_correction[0]);
+                ui->TuneRa->setChecked(false);
+            }
+            if(!stop_correction[1]) {
+                ahp_gt_correct_tracking(1, SIDEREAL_DAY * ahp_gt_get_wormsteps(1) / ahp_gt_get_totalsteps(1), &stop_correction[1]);
+                ui->TuneDec->setChecked(false);
+            }
         }
         parent->unlock();
     });
