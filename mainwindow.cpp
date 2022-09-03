@@ -1043,8 +1043,8 @@ MainWindow::MainWindow(QWidget *parent)
             for(int a = 0; a < 2; a++)
             {
                 status[a] = ahp_gt_get_status(a);
-                if(a == 0 && status[a].Running == 0)
-                    ui->Tracking->setChecked(oldTracking);
+                if(a == 0 && status[a].Running == 0 && !ui->Tracking->isChecked() && oldTracking)
+                    ui->Tracking->click();
                 QDateTime now = QDateTime::currentDateTimeUtc();
                 double diffTime = (double)lastPollTime[a].msecsTo(now);
                 lastPollTime[a] = now;
@@ -1064,9 +1064,13 @@ MainWindow::MainWindow(QWidget *parent)
                 Speed[a] /= _n_speeds;
             }
             if(!stop_correction[0]) {
+                if(ui->Tracking->isChecked())
+                    ui->Tracking->click();
                 ahp_gt_correct_tracking(0, SIDEREAL_DAY * ahp_gt_get_wormsteps(0) / ahp_gt_get_totalsteps(0), &stop_correction[0]);
-                if(ui->TuneRa->isChecked())
+                if(!ui->TuneRa->isChecked() && oldTracking)
                     ui->TuneRa->click();
+                if(!ui->Tracking->isChecked() && oldTracking)
+                    ui->Tracking->click();
             }
             if(!stop_correction[1]) {
                 ahp_gt_correct_tracking(1, SIDEREAL_DAY * ahp_gt_get_wormsteps(1) / ahp_gt_get_totalsteps(1), &stop_correction[1]);
