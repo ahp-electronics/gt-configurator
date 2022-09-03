@@ -266,8 +266,9 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(getDefaultIni());
         percent = 0;
         finished = 0;
-        ui->WriteArea->setEnabled(false);
+        ui->Write->setEnabled(false);
         ui->Connection->setEnabled(false);
+        finished = 0;
         if(ui->Write->text() == "Flash")
         {
             if(!dfu_flash(firmwareFilename.toStdString().c_str(), &percent, &finished))
@@ -278,6 +279,7 @@ MainWindow::MainWindow(QWidget *parent)
                 f->close();
                 f->~QFile();
             }
+            ui->Connection->setEnabled(true);
         }
         else
         {
@@ -285,10 +287,8 @@ MainWindow::MainWindow(QWidget *parent)
             ahp_gt_write_values(1, &percent, &finished);
             ahp_gt_set_position(0, M_PI / 2.0);
             ahp_gt_set_position(1, M_PI / 2.0);
+            ui->Write->setEnabled(true);
         }
-        ui->WriteArea->setEnabled(true);
-        ui->Connection->setEnabled(true);
-        finished = 1;
         percent = 0;
         thread->requestInterruption();
         thread->unlock();
@@ -794,6 +794,7 @@ MainWindow::MainWindow(QWidget *parent)
             ui->SE->setEnabled(true);
             ui->SW->setEnabled(true);
             ui->Stop->setEnabled(true);
+            ui->Goto->setEnabled(true);
             ui->Tracking->setEnabled(true);
         } else {
             ui->TuneDec->setEnabled(false);
@@ -804,6 +805,7 @@ MainWindow::MainWindow(QWidget *parent)
             ui->SE->setEnabled(false);
             ui->SW->setEnabled(false);
             ui->Stop->setEnabled(false);
+            ui->Goto->setEnabled(false);
             ui->Tracking->setEnabled(false);
         }
     });
@@ -820,6 +822,7 @@ MainWindow::MainWindow(QWidget *parent)
             ui->SE->setEnabled(true);
             ui->SW->setEnabled(true);
             ui->Stop->setEnabled(true);
+            ui->Goto->setEnabled(true);
         } else {
             ui->TuneRa->setEnabled(false);
             ui->S->setEnabled(false);
@@ -829,6 +832,7 @@ MainWindow::MainWindow(QWidget *parent)
             ui->SE->setEnabled(false);
             ui->SW->setEnabled(false);
             ui->Stop->setEnabled(false);
+            ui->Goto->setEnabled(false);
         }
     });
     connect(ui->MountStyle, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -975,7 +979,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ProgressThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * parent)
     {
-        ui->progress->setValue(percent);
+        ui->progress->setValue(fmax(ui->progress->minimum(), fmin(ui->progress->maximum(), percent)));
         parent->unlock();
     });
     connect(IndicationThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * parent)
@@ -998,9 +1002,7 @@ MainWindow::MainWindow(QWidget *parent)
             ui->Write->setText("Write");
             ui->progress->setValue(percent);
             ui->WorkArea->setEnabled(true);
-            ui->WriteArea->setEnabled(true);
         } else {
-            ui->WriteArea->setEnabled(!isConnected);
             ui->WorkArea->setEnabled(false);
         }
 
@@ -1033,11 +1035,13 @@ MainWindow::MainWindow(QWidget *parent)
             }
             if(!stop_correction[0]) {
                 ahp_gt_correct_tracking(0, SIDEREAL_DAY * ahp_gt_get_wormsteps(0) / ahp_gt_get_totalsteps(0), &stop_correction[0]);
-                ui->TuneRa->setChecked(false);
+                if(ui->TuneRa->isChecked())
+                    ui->TuneRa->click();
             }
             if(!stop_correction[1]) {
                 ahp_gt_correct_tracking(1, SIDEREAL_DAY * ahp_gt_get_wormsteps(1) / ahp_gt_get_totalsteps(1), &stop_correction[1]);
-                ui->TuneDec->setChecked(false);
+                if(ui->TuneDec->isChecked())
+                    ui->TuneDec->click();
             }
         }
         parent->unlock();
