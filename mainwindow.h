@@ -43,6 +43,8 @@ class MainWindow : public QMainWindow
         }
 
     private:
+        bool axis_lospeed[2] { false, false };
+        bool axisdirection[2] { false, false };
         double Speed[2];
         double currentSteps[2];
         SkywatcherAxisStatus status[2];

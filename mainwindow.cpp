@@ -266,6 +266,7 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(getDefaultIni());
         percent = 0;
         finished = 0;
+        ui->WorkArea->setEnabled(false);
         ui->Write->setEnabled(false);
         ui->Connection->setEnabled(false);
         finished = 0;
@@ -279,7 +280,6 @@ MainWindow::MainWindow(QWidget *parent)
                 f->close();
                 f->~QFile();
             }
-            ui->Connection->setEnabled(true);
         }
         else
         {
@@ -288,7 +288,9 @@ MainWindow::MainWindow(QWidget *parent)
             ahp_gt_set_position(0, M_PI / 2.0);
             ahp_gt_set_position(1, M_PI / 2.0);
             ui->Write->setEnabled(true);
+            ui->WorkArea->setEnabled(true);
         }
+        ui->Connection->setEnabled(true);
         percent = 0;
         thread->requestInterruption();
         thread->unlock();
@@ -379,6 +381,7 @@ MainWindow::MainWindow(QWidget *parent)
             ui->AdvancedDec->setEnabled(true);
             ui->loadConfig->setEnabled(true);
             ui->saveConfig->setEnabled(true);
+            ui->WorkArea->setEnabled(true);
             readIni(ini);
             isConnected = true;
             finished = true;
@@ -612,112 +615,142 @@ MainWindow::MainWindow(QWidget *parent)
     {
         oldTracking = ui->Tracking->isChecked();
         ui->Tracking->setChecked(false);
-        ahp_gt_stop_motion(0, 1);
+        ahp_gt_stop_motion(0, axisdirection[0] != true || axis_lospeed[0] != (fabs(ui->Ra_Speed->value()) < 128.0));
         ahp_gt_start_motion(0, ui->Ra_Speed->value());
+        axisdirection[0] = true;
+        axis_lospeed[0] = (fabs(ui->Ra_Speed->value()) < 128.0);
     });
     connect(ui->E, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
         oldTracking = ui->Tracking->isChecked();
         ui->Tracking->setChecked(false);
-        ahp_gt_stop_motion(0, 1);
+        ahp_gt_stop_motion(0, axisdirection[0] != false || axis_lospeed[0] != (fabs(ui->Ra_Speed->value()) < 128.0));
         ahp_gt_start_motion(0, -ui->Ra_Speed->value());
+        axisdirection[0] = false;
+        axis_lospeed[0] = (fabs(ui->Ra_Speed->value()) < 128.0);
     });
     connect(ui->N, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
-        ahp_gt_stop_motion(1, 1);
+        ahp_gt_stop_motion(1, axisdirection[1] != true || axis_lospeed[1] != (fabs(ui->Dec_Speed->value()) < 128.0));
         ahp_gt_start_motion(1, ui->Dec_Speed->value());
+        axisdirection[1] = true;
+        axis_lospeed[1] = (fabs(ui->Dec_Speed->value()) < 128.0);
     });
     connect(ui->S, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
-        ahp_gt_stop_motion(1, 1);
+        ahp_gt_stop_motion(1, axisdirection[1] != false || axis_lospeed[1] != (fabs(ui->Dec_Speed->value()) < 128.0));
         ahp_gt_start_motion(1, -ui->Dec_Speed->value());
+        axisdirection[1] = false;
+        axis_lospeed[1] = (fabs(ui->Dec_Speed->value()) < 128.0);
     });
     connect(ui->NW, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
-        ahp_gt_stop_motion(0, 1);
-        ahp_gt_stop_motion(1, 1);
+        oldTracking = ui->Tracking->isChecked();
+        ui->Tracking->setChecked(false);
+        ahp_gt_stop_motion(0, axisdirection[0] != true || axis_lospeed[0] != (fabs(ui->Ra_Speed->value()) < 128.0));
         ahp_gt_start_motion(0, ui->Ra_Speed->value());
+        ahp_gt_stop_motion(1, axisdirection[1] != true || axis_lospeed[1] != (fabs(ui->Dec_Speed->value()) < 128.0));
         ahp_gt_start_motion(1, ui->Dec_Speed->value());
+        axisdirection[0] = true;
+        axis_lospeed[0] = (fabs(ui->Ra_Speed->value()) < 128.0);
+        axisdirection[1] = true;
+        axis_lospeed[1] = (fabs(ui->Dec_Speed->value()) < 128.0);
     });
     connect(ui->NE, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
-        ahp_gt_stop_motion(0, 1);
-        ahp_gt_stop_motion(1, 1);
+        oldTracking = ui->Tracking->isChecked();
+        ui->Tracking->setChecked(false);
+        ahp_gt_stop_motion(0, axisdirection[0] != false || axis_lospeed[0] != (fabs(ui->Ra_Speed->value()) < 128.0));
         ahp_gt_start_motion(0, -ui->Ra_Speed->value());
+        ahp_gt_stop_motion(1, axisdirection[1] != true || axis_lospeed[1] != (fabs(ui->Dec_Speed->value()) < 128.0));
         ahp_gt_start_motion(1, ui->Dec_Speed->value());
+        axisdirection[0] = false;
+        axis_lospeed[0] = (fabs(ui->Ra_Speed->value()) < 128.0);
+        axisdirection[1] = true;
+        axis_lospeed[1] = (fabs(ui->Dec_Speed->value()) < 128.0);
     });
     connect(ui->SW, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
-        ahp_gt_stop_motion(0, 1);
-        ahp_gt_stop_motion(1, 1);
+        oldTracking = ui->Tracking->isChecked();
+        ui->Tracking->setChecked(false);
+        ahp_gt_stop_motion(0, axisdirection[0] != true || axis_lospeed[0] != (fabs(ui->Ra_Speed->value()) < 128.0));
         ahp_gt_start_motion(0, ui->Ra_Speed->value());
+        ahp_gt_stop_motion(1, axisdirection[1] != false || axis_lospeed[1] != (fabs(ui->Dec_Speed->value()) < 128.0));
         ahp_gt_start_motion(1, -ui->Dec_Speed->value());
+        axisdirection[0] = true;
+        axis_lospeed[0] = (fabs(ui->Ra_Speed->value()) < 128.0);
+        axisdirection[1] = false;
+        axis_lospeed[1] = (fabs(ui->Dec_Speed->value()) < 128.0);
     });
     connect(ui->SE, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
-        ahp_gt_stop_motion(0, 1);
-        ahp_gt_stop_motion(1, 1);
+        oldTracking = ui->Tracking->isChecked();
+        ui->Tracking->setChecked(false);
+        ahp_gt_stop_motion(0, axisdirection[0] != false || axis_lospeed[0] != (fabs(ui->Ra_Speed->value()) < 128.0));
         ahp_gt_start_motion(0, -ui->Ra_Speed->value());
+        ahp_gt_stop_motion(1, axisdirection[1] != false || axis_lospeed[1] != (fabs(ui->Dec_Speed->value()) < 128.0));
         ahp_gt_start_motion(1, -ui->Dec_Speed->value());
+        axisdirection[0] = false;
+        axis_lospeed[0] = (fabs(ui->Ra_Speed->value()) < 128.0);
+        axisdirection[1] = false;
+        axis_lospeed[1] = (fabs(ui->Dec_Speed->value()) < 128.0);
     });
     connect(ui->Stop, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
-        ahp_gt_stop_motion(0, 1);
-        ahp_gt_stop_motion(1, 1);
+        ahp_gt_stop_motion(0, 0);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->W, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(0, 1);
-        ui->Tracking->setChecked(oldTracking);
+        ahp_gt_stop_motion(0, 0);
     });
     connect(ui->E, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(0, 1);
-        ui->Tracking->setChecked(oldTracking);
+        ahp_gt_stop_motion(0, 0);
     });
     connect(ui->N, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(1, 1);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->S, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(1, 1);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->NW, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(0, 1);
-        ahp_gt_stop_motion(1, 1);
+        ahp_gt_stop_motion(0, 0);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->NE, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(0, 1);
-        ahp_gt_stop_motion(1, 1);
+        ahp_gt_stop_motion(0, 0);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->SW, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(0, 1);
-        ahp_gt_stop_motion(1, 1);
+        ahp_gt_stop_motion(0, 0);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->SE, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(0, 1);
-        ahp_gt_stop_motion(1, 1);
+        ahp_gt_stop_motion(0, 0);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->Tracking, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
             [ = ](int state)
@@ -999,11 +1032,6 @@ MainWindow::MainWindow(QWidget *parent)
                     ui->Rate_1->setText("as/sec: " + QString::number(Speed[a]));
                 }
             }
-            ui->Write->setText("Write");
-            ui->progress->setValue(percent);
-            ui->WorkArea->setEnabled(true);
-        } else {
-            ui->WorkArea->setEnabled(false);
         }
 
         parent->unlock();
@@ -1015,6 +1043,8 @@ MainWindow::MainWindow(QWidget *parent)
             for(int a = 0; a < 2; a++)
             {
                 status[a] = ahp_gt_get_status(a);
+                if(a == 0 && status[a].Running == 0)
+                    ui->Tracking->setChecked(oldTracking);
                 QDateTime now = QDateTime::currentDateTimeUtc();
                 double diffTime = (double)lastPollTime[a].msecsTo(now);
                 lastPollTime[a] = now;
