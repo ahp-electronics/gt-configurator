@@ -74,7 +74,8 @@ class MainWindow : public QMainWindow
         int timer { 1000 };
         void UpdateValues(int axis);
         Ui::MainWindow *ui;
-        bool oldTracking;
+        bool oldTracking[2] { false, false };
+        bool isTracking[2] { false, false };
         static void WriteValues(MainWindow *wnd);
         QMutex RAmutex, DEmutex;
 };
