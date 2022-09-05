@@ -1053,8 +1053,8 @@ MainWindow::MainWindow(QWidget *parent)
             }
             currentSteps[a] = ahp_gt_get_position(a) * ahp_gt_get_totalsteps(a) / M_PI / 2.0;
             status[a] = ahp_gt_get_status(a);
-            QDateTime now = QDateTime::currentDateTimeUtc();
-            double diffTime = (double)lastPollTime[a].msecsTo(now);
+            double now = status[a].timestamp;
+            double diffTime = (double)now-lastPollTime[a];
             lastPollTime[a] = now;
             double diffSteps = currentSteps[a] - lastSteps[a];
             lastSteps[a] = currentSteps[a];
@@ -1098,8 +1098,8 @@ MainWindow::MainWindow(QWidget *parent)
             }
             currentSteps[a] = ahp_gt_get_position(a) * ahp_gt_get_totalsteps(a) / M_PI / 2.0;
             status[a] = ahp_gt_get_status(a);
-            QDateTime now = QDateTime::currentDateTimeUtc();
-            double diffTime = (double)lastPollTime[a].msecsTo(now);
+            double now = status[a].timestamp;
+            double diffTime = (double)now-lastPollTime[a];
             lastPollTime[a] = now;
             double diffSteps = currentSteps[a] - lastSteps[a];
             lastSteps[a] = currentSteps[a];

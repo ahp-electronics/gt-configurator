@@ -48,7 +48,7 @@ class MainWindow : public QMainWindow
         double Speed[2];
         double currentSteps[2];
         SkywatcherAxisStatus status[2];
-        QDateTime lastPollTime[2];
+        double lastPollTime[2];
         double lastSteps[2];
         double lastSpeeds[2][_n_speeds];
         Thread *RaThread;
