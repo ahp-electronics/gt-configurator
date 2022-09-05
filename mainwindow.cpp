@@ -1051,9 +1051,9 @@ MainWindow::MainWindow(QWidget *parent)
                 ahp_gt_stop_motion(a, 0);
                 isTracking[a] = false;
             }
-            currentSteps[a] = ahp_gt_get_position(a) * ahp_gt_get_totalsteps(a) / M_PI / 2.0;
+            double now = 0;
+            currentSteps[a] = ahp_gt_get_position(a, &now) * ahp_gt_get_totalsteps(a) / M_PI / 2.0;
             status[a] = ahp_gt_get_status(a);
-            double now = status[a].timestamp;
             double diffTime = (double)now-lastPollTime[a];
             lastPollTime[a] = now;
             double diffSteps = currentSteps[a] - lastSteps[a];
@@ -1065,7 +1065,7 @@ MainWindow::MainWindow(QWidget *parent)
                 if(s < _n_speeds - 1)
                     lastSpeeds[a][s] = lastSpeeds[a][s + 1];
                 else
-                    lastSpeeds[a][s] = diffSteps * 1000.0 / diffTime;
+                    lastSpeeds[a][s] = diffSteps / diffTime;
                 Speed[a] += lastSpeeds[a][s];
             }
             Speed[a] /= _n_speeds;
@@ -1096,9 +1096,9 @@ MainWindow::MainWindow(QWidget *parent)
                 ahp_gt_stop_motion(0, 0);
                 isTracking[a] = false;
             }
-            currentSteps[a] = ahp_gt_get_position(a) * ahp_gt_get_totalsteps(a) / M_PI / 2.0;
+            double now = 0;
+            currentSteps[a] = ahp_gt_get_position(a, &now) * ahp_gt_get_totalsteps(a) / M_PI / 2.0;
             status[a] = ahp_gt_get_status(a);
-            double now = status[a].timestamp;
             double diffTime = (double)now-lastPollTime[a];
             lastPollTime[a] = now;
             double diffSteps = currentSteps[a] - lastSteps[a];
@@ -1110,7 +1110,7 @@ MainWindow::MainWindow(QWidget *parent)
                 if(s < _n_speeds - 1)
                     lastSpeeds[a][s] = lastSpeeds[a][s + 1];
                 else
-                    lastSpeeds[a][s] = diffSteps * 1000.0 / diffTime;
+                    lastSpeeds[a][s] = diffSteps / diffTime;
                 Speed[a] += lastSpeeds[a][s];
             }
             Speed[a] /= _n_speeds;
