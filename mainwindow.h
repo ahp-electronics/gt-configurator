@@ -9,7 +9,7 @@
 #include <ahp_gt.h>
 #include "threads.h"
 
-#define _n_speeds 10
+#define _n_speeds 1
 
 QT_BEGIN_NAMESPACE
 namespace Ui
