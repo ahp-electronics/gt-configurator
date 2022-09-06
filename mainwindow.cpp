@@ -1040,6 +1040,9 @@ MainWindow::MainWindow(QWidget *parent)
         int a = 0;
         if(isConnected && finished)
         {
+            double now = 0;
+            currentSteps[a] = ahp_gt_get_position(a, &now) * ahp_gt_get_totalsteps(a) / M_PI / 2.0;
+            status[a] = ahp_gt_get_status(a);
             if(oldTracking[a]) {
                 if(status[a].Running == 0) {
                     ahp_gt_start_tracking(a);
@@ -1051,9 +1054,6 @@ MainWindow::MainWindow(QWidget *parent)
                 ahp_gt_stop_motion(a, 0);
                 isTracking[a] = false;
             }
-            double now = 0;
-            currentSteps[a] = ahp_gt_get_position(a, &now) * ahp_gt_get_totalsteps(a) / M_PI / 2.0;
-            status[a] = ahp_gt_get_status(a);
             double diffTime = (double)now-lastPollTime[a];
             lastPollTime[a] = now;
             double diffSteps = currentSteps[a] - lastSteps[a];
@@ -1085,6 +1085,9 @@ MainWindow::MainWindow(QWidget *parent)
         int a = 1;
         if(isConnected && finished)
         {
+            double now = 0;
+            currentSteps[a] = ahp_gt_get_position(a, &now) * ahp_gt_get_totalsteps(a) / M_PI / 2.0;
+            status[a] = ahp_gt_get_status(a);
             if(oldTracking[a]) {
                 if(status[a].Running == 0) {
                     ahp_gt_start_tracking(0);
@@ -1096,9 +1099,6 @@ MainWindow::MainWindow(QWidget *parent)
                 ahp_gt_stop_motion(0, 0);
                 isTracking[a] = false;
             }
-            double now = 0;
-            currentSteps[a] = ahp_gt_get_position(a, &now) * ahp_gt_get_totalsteps(a) / M_PI / 2.0;
-            status[a] = ahp_gt_get_status(a);
             double diffTime = (double)now-lastPollTime[a];
             lastPollTime[a] = now;
             double diffSteps = currentSteps[a] - lastSteps[a];
