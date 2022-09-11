@@ -414,6 +414,8 @@ MainWindow::MainWindow(QWidget *parent)
         ui->AdvancedDec->setEnabled(false);
         ui->loadConfig->setEnabled(false);
         ui->saveConfig->setEnabled(false);
+        ahp_gt_stop_motion(0, 0);
+        ahp_gt_stop_motion(1, 0);
         ahp_gt_disconnect();
     });
     connect(ui->loadConfig, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
@@ -1154,6 +1156,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    if(isConnected)
+        ui->Disconnect->click();
     RaThread->stop();
     DecThread->stop();
     IndicationThread->stop();
