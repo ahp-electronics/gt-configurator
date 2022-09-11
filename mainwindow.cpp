@@ -223,8 +223,8 @@ MainWindow::MainWindow(QWidget *parent)
     IndicationThread = new Thread(this, 100, 500);
     ProgressThread = new Thread(this, 10, 10);
     StatusThread = new Thread(this, 10, 100);
-    RaThread = new Thread(this, 10, 100);
-    DecThread = new Thread(this, 10, 100);
+    RaThread = new Thread(this, 500, 1000);
+    DecThread = new Thread(this, 1000, 1000);
     ServerThread = new Thread(this);
     setAccessibleName("GT Configurator");
     firmwareFilename = QStandardPaths::standardLocations(QStandardPaths::TempLocation).at(0) + "/" + strrand(32);
@@ -385,6 +385,8 @@ MainWindow::MainWindow(QWidget *parent)
             ui->saveConfig->setEnabled(true);
             ui->WorkArea->setEnabled(true);
             readIni(ini);
+            oldTracking[0] = false;
+            isTracking[0] = false;
             isConnected = true;
             finished = true;
             ui->ComPort->setEnabled(false);
@@ -707,6 +709,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Stop, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
+        oldTracking[0] = false;
+        oldTracking[1] = false;
         ahp_gt_stop_motion(0, 0);
         ahp_gt_stop_motion(1, 0);
     });
@@ -878,6 +882,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Write, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked = false)
     {
+        oldTracking[0] = false;
+        oldTracking[1] = false;
         if(ui->Write->text() == "Write")
         {
             //UpdateValues(0);
@@ -994,6 +1000,8 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ui->Goto, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), [ = ]  (bool checked)
     {
+        isTracking[0] = false;
+        isTracking[1] = false;
         ahp_gt_goto_absolute(0, (double)ui->TargetSteps_0->value()*M_PI * 2.0 / (double)ahp_gt_get_totalsteps(0),
                              ui->Ra_Speed->value());
         ahp_gt_goto_absolute(1, (double)ui->TargetSteps_1->value()*M_PI * 2.0 / (double)ahp_gt_get_totalsteps(1),
@@ -1001,6 +1009,8 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ui->Server, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
     {
+        oldTracking[0] = false;
+        oldTracking[1] = false;
         if(checked) {
             threadsStopped = false;
             ServerThread->start();
@@ -1040,47 +1050,48 @@ MainWindow::MainWindow(QWidget *parent)
         int a = 0;
         if(isConnected && finished)
         {
+            currentSteps[a] = ahp_gt_get_position(a, &status[a].timestamp) * ahp_gt_get_totalsteps(a) / M_PI / 2.0;
+            if(oldTracking[a] && !isTracking[a]) {
                 status[a] = ahp_gt_get_status(a);
-                currentSteps[a] = status[a].position * ahp_gt_get_totalsteps(a) / M_PI / 2.0;
-                if(oldTracking[a]) {
-                    if(status[a].Running == 0) {
-                        ahp_gt_start_tracking(a);
-                        axis_lospeed[a] = true;
-                        isTracking[a] = true;
-                    }
+                if(status[a].Running == 0) {
+                    ahp_gt_start_tracking(a);
+                    axis_lospeed[a] = true;
+                    isTracking[a] = true;
                 }
-                if(!oldTracking[a] && isTracking[a]) {
-                    ahp_gt_stop_motion(a, 0);
-                    isTracking[a] = false;
+            }
+            if(!oldTracking[a] && isTracking[a]) {
+                ahp_gt_stop_motion(a, 0);
+                isTracking[a] = false;
+            }
+            double diffTime = (double)status[a].timestamp-lastPollTime[a];
+            lastPollTime[a] = status[a].timestamp;
+            double diffSteps = currentSteps[a] - lastSteps[a];
+            lastSteps[a] = currentSteps[a];
+            diffSteps *= 360.0 * 60.0 * 60.0 / ahp_gt_get_totalsteps(a);
+            Speed[a] = 0.0;
+            for(int s = 0; s < _n_speeds; s++)
+            {
+                if(s < _n_speeds - 1)
+                    lastSpeeds[a][s] = lastSpeeds[a][s + 1];
+                else
+                    lastSpeeds[a][s] = diffSteps / diffTime;
+                Speed[a] += lastSpeeds[a][s];
+            }
+            Speed[a] /= _n_speeds;
+            if(!stop_correction[a]) {
+                bool oldtracking = oldTracking[a];
+                oldTracking[a] = false;
+                isTracking[a] = false;
+                ahp_gt_correct_tracking(a, SIDEREAL_DAY * ahp_gt_get_wormsteps(a) / ahp_gt_get_totalsteps(a), &stop_correction[a]);
+                if(a == 0) {
+                    if(ui->TuneRa->isChecked())
+                        ui->TuneRa->click();
+                } else {
+                    if(ui->TuneDec->isChecked())
+                        ui->TuneDec->click();
                 }
-                double diffTime = (double)status[a].timestamp-lastPollTime[a];
-                lastPollTime[a] = status[a].timestamp;
-                double diffSteps = currentSteps[a] - lastSteps[a];
-                lastSteps[a] = currentSteps[a];
-                diffSteps *= 360.0 * 60.0 * 60.0 / ahp_gt_get_totalsteps(a);
-                Speed[a] = 0.0;
-                for(int s = 0; s < _n_speeds; s++)
-                {
-                    if(s < _n_speeds - 1)
-                        lastSpeeds[a][s] = lastSpeeds[a][s + 1];
-                    else
-                        lastSpeeds[a][s] = diffSteps / diffTime;
-                    Speed[a] += lastSpeeds[a][s];
-                }
-                Speed[a] /= _n_speeds;
-                if(!stop_correction[a]) {
-                    bool oldtracking = oldTracking[a];
-                    oldTracking[a] = false;
-                    ahp_gt_correct_tracking(a, SIDEREAL_DAY * ahp_gt_get_wormsteps(a) / ahp_gt_get_totalsteps(a), &stop_correction[a]);
-                    if(a == 0) {
-                        if(ui->TuneRa->isChecked())
-                            ui->TuneRa->click();
-                    } else {
-                        if(ui->TuneDec->isChecked())
-                            ui->TuneDec->click();
-                    }
-                    oldTracking[a] = oldtracking;
-                }
+                oldTracking[a] = oldtracking;
+            }
         }
         parent->unlock();
     });
@@ -1089,47 +1100,48 @@ MainWindow::MainWindow(QWidget *parent)
         int a = 1;
         if(isConnected && finished)
         {
+            currentSteps[a] = ahp_gt_get_position(a, &status[a].timestamp) * ahp_gt_get_totalsteps(a) / M_PI / 2.0;
+            if(oldTracking[a] && !isTracking[a]) {
                 status[a] = ahp_gt_get_status(a);
-                currentSteps[a] = status[a].position * ahp_gt_get_totalsteps(a) / M_PI / 2.0;
-                if(oldTracking[a]) {
-                    if(status[a].Running == 0) {
-                        ahp_gt_start_tracking(a);
-                        axis_lospeed[a] = true;
-                        isTracking[a] = true;
-                    }
+                if(status[a].Running == 0) {
+                    ahp_gt_start_tracking(a);
+                    axis_lospeed[a] = true;
+                    isTracking[a] = true;
                 }
-                if(!oldTracking[a] && isTracking[a]) {
-                    ahp_gt_stop_motion(a, 0);
-                    isTracking[a] = false;
+            }
+            if(!oldTracking[a] && isTracking[a]) {
+                ahp_gt_stop_motion(a, 0);
+                isTracking[a] = false;
+            }
+            double diffTime = (double)status[a].timestamp-lastPollTime[a];
+            lastPollTime[a] = status[a].timestamp;
+            double diffSteps = currentSteps[a] - lastSteps[a];
+            lastSteps[a] = currentSteps[a];
+            diffSteps *= 360.0 * 60.0 * 60.0 / ahp_gt_get_totalsteps(a);
+            Speed[a] = 0.0;
+            for(int s = 0; s < _n_speeds; s++)
+            {
+                if(s < _n_speeds - 1)
+                    lastSpeeds[a][s] = lastSpeeds[a][s + 1];
+                else
+                    lastSpeeds[a][s] = diffSteps / diffTime;
+                Speed[a] += lastSpeeds[a][s];
+            }
+            Speed[a] /= _n_speeds;
+            if(!stop_correction[a]) {
+                bool oldtracking = oldTracking[a];
+                oldTracking[a] = false;
+                isTracking[a] = false;
+                ahp_gt_correct_tracking(a, SIDEREAL_DAY * ahp_gt_get_wormsteps(a) / ahp_gt_get_totalsteps(a), &stop_correction[a]);
+                if(a == 0) {
+                    if(ui->TuneRa->isChecked())
+                        ui->TuneRa->click();
+                } else {
+                    if(ui->TuneDec->isChecked())
+                        ui->TuneDec->click();
                 }
-                double diffTime = (double)status[a].timestamp-lastPollTime[a];
-                lastPollTime[a] = status[a].timestamp;
-                double diffSteps = currentSteps[a] - lastSteps[a];
-                lastSteps[a] = currentSteps[a];
-                diffSteps *= 360.0 * 60.0 * 60.0 / ahp_gt_get_totalsteps(a);
-                Speed[a] = 0.0;
-                for(int s = 0; s < _n_speeds; s++)
-                {
-                    if(s < _n_speeds - 1)
-                        lastSpeeds[a][s] = lastSpeeds[a][s + 1];
-                    else
-                        lastSpeeds[a][s] = diffSteps / diffTime;
-                    Speed[a] += lastSpeeds[a][s];
-                }
-                Speed[a] /= _n_speeds;
-                if(!stop_correction[a]) {
-                    bool oldtracking = oldTracking[a];
-                    oldTracking[a] = false;
-                    ahp_gt_correct_tracking(a, SIDEREAL_DAY * ahp_gt_get_wormsteps(a) / ahp_gt_get_totalsteps(a), &stop_correction[a]);
-                    if(a == 0) {
-                        if(ui->TuneRa->isChecked())
-                            ui->TuneRa->click();
-                    } else {
-                        if(ui->TuneDec->isChecked())
-                            ui->TuneDec->click();
-                    }
-                    oldTracking[a] = oldtracking;
-                }
+                oldTracking[a] = oldtracking;
+            }
         }
         parent->unlock();
     });
@@ -1182,7 +1194,6 @@ void MainWindow::UpdateValues(int axis)
         double f = (2.0 * M_PI * Z / L);
         ui->MinFrequency_0->setText("PWM Hz: " + QString::number(f));
         ui->MaxFrequency_0->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(0) / SIDEREAL_DAY));
-        RaThread->setLoop(20000.0 * SIDEREAL_DAY / ahp_gt_get_totalsteps(0));
     }
     else if (axis == 1)
     {
@@ -1202,6 +1213,5 @@ void MainWindow::UpdateValues(int axis)
         double f = (2.0 * M_PI * Z / L);
         ui->MinFrequency_1->setText("PWM Hz: " + QString::number(f));
         ui->MaxFrequency_1->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(1) / SIDEREAL_DAY));
-        DecThread->setLoop(20000.0 * SIDEREAL_DAY / ahp_gt_get_totalsteps(1));
     }
 }
