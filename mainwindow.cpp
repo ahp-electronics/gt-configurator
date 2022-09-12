@@ -88,6 +88,7 @@ void MainWindow::readIni(QString ini)
     ui->GPIO_0->setCurrentIndex(settings->value("GPIO_0", ahp_gt_get_feature(0)).toInt());
     ui->Coil_0->setCurrentIndex(settings->value("Coil_0", ahp_gt_get_stepping_conf(0)).toInt());
     ui->SteppingMode_0->setCurrentIndex(settings->value("SteppingMode_0", ahp_gt_get_stepping_mode(0)).toInt());
+    ui->Mean_0->setValue(settings->value("Mean_0", 1).toInt());
 
     ui->MotorSteps_1->setValue(settings->value("MotorSteps_1", ahp_gt_get_motor_steps(1)).toInt());
     ui->Motor_1->setValue(settings->value("Motor_1", ahp_gt_get_motor_teeth(1)).toInt());
@@ -104,6 +105,7 @@ void MainWindow::readIni(QString ini)
     ui->GPIO_1->setCurrentIndex(settings->value("GPIO_1", ahp_gt_get_feature(1)).toInt());
     ui->Coil_1->setCurrentIndex(settings->value("Coil_1", ahp_gt_get_stepping_conf(1)).toInt());
     ui->SteppingMode_1->setCurrentIndex(settings->value("SteppingMode_1", ahp_gt_get_stepping_mode(1)).toInt());
+    ui->Mean_1->setValue(settings->value("Mean_1", 1).toInt());
 
     ahp_gt_set_timing(0, settings->value("TimingValue_1", 1500000).toInt());
     ahp_gt_set_motor_steps(0, ui->MotorSteps_0->value());
@@ -189,6 +191,7 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Current_0", ui->Current_0->value());
     settings->setValue("Voltage_0", ui->Voltage_0->value());
     settings->setValue("TimingValue_0", ahp_gt_get_timing(0));
+    settings->setValue("Mean_0", ui->Mean_0->value());
 
     settings->setValue("Invert_1", ui->Invert_1->isChecked());
     settings->setValue("SteppingMode_1", ui->SteppingMode_1->currentIndex());
@@ -204,8 +207,8 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Resistance_1", ui->Resistance_1->value());
     settings->setValue("Current_1", ui->Current_1->value());
     settings->setValue("Voltage_1", ui->Voltage_1->value());
-
     settings->setValue("TimingValue_1", ahp_gt_get_timing(1));
+    settings->setValue("Mean_1", ui->Mean_1->value());
 
     settings->setValue("MountType", ui->MountType->currentIndex());
     settings->setValue("Address", ui->Address->value());
@@ -1071,15 +1074,20 @@ MainWindow::MainWindow(QWidget *parent)
             lastSteps[a] = currentSteps[a];
             diffSteps *= 360.0 * 60.0 * 60.0 / ahp_gt_get_totalsteps(a);
             Speed[a] = 0.0;
+            int _n_speeds = 1;
+            if(a == 0)
+                _n_speeds = ui->Mean_0->value();
+            else
+                _n_speeds = ui->Mean_1->value();
             for(int s = 0; s < _n_speeds; s++)
             {
                 if(s < _n_speeds - 1)
                     lastSpeeds[a][s] = lastSpeeds[a][s + 1];
                 else
-                    lastSpeeds[a][s] = diffSteps / diffTime;
+                    lastSpeeds[a][s] = diffSteps;
                 Speed[a] += lastSpeeds[a][s];
             }
-            Speed[a] /= _n_speeds;
+            Speed[a] /= _n_speeds * diffTime;
             if(!stop_correction[a]) {
                 bool oldtracking = oldTracking[a];
                 oldTracking[a] = false;
@@ -1121,15 +1129,20 @@ MainWindow::MainWindow(QWidget *parent)
             lastSteps[a] = currentSteps[a];
             diffSteps *= 360.0 * 60.0 * 60.0 / ahp_gt_get_totalsteps(a);
             Speed[a] = 0.0;
+            int _n_speeds = 1;
+            if(a == 0)
+                _n_speeds = ui->Mean_0->value();
+            else
+                _n_speeds = ui->Mean_1->value();
             for(int s = 0; s < _n_speeds; s++)
             {
                 if(s < _n_speeds - 1)
                     lastSpeeds[a][s] = lastSpeeds[a][s + 1];
                 else
-                    lastSpeeds[a][s] = diffSteps / diffTime;
+                    lastSpeeds[a][s] = diffSteps;
                 Speed[a] += lastSpeeds[a][s];
             }
-            Speed[a] /= _n_speeds;
+            Speed[a] /= _n_speeds * diffTime;
             if(!stop_correction[a]) {
                 bool oldtracking = oldTracking[a];
                 oldTracking[a] = false;

@@ -1261,6 +1261,38 @@
        <string>Pos:</string>
       </property>
      </widget>
+     <widget class="QSpinBox" name="Mean_0">
+      <property name="geometry">
+       <rect>
+        <x>260</x>
+        <y>150</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>60</number>
+      </property>
+      <property name="value">
+       <number>1</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="Rate_2">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>150</y>
+        <width>61</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Mean (s)</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QGroupBox" name="AdvancedDec">
      <property name="enabled">
@@ -1598,6 +1630,38 @@
       </property>
       <property name="text">
        <string>as/sec:</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Mean_1">
+      <property name="geometry">
+       <rect>
+        <x>260</x>
+        <y>150</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>60</number>
+      </property>
+      <property name="value">
+       <number>1</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="Rate_3">
+      <property name="geometry">
+       <rect>
+        <x>190</x>
+        <y>150</y>
+        <width>61</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Mean (s)</string>
       </property>
      </widget>
     </widget>

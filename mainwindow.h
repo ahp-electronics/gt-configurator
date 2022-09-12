@@ -9,8 +9,6 @@
 #include <ahp_gt.h>
 #include "threads.h"
 
-#define _n_speeds 1
-
 QT_BEGIN_NAMESPACE
 namespace Ui
 {
@@ -50,7 +48,7 @@ class MainWindow : public QMainWindow
         SkywatcherAxisStatus status[2];
         double lastPollTime[2];
         double lastSteps[2];
-        double lastSpeeds[2][_n_speeds] { { 0 }, { 0 }};
+        double lastSpeeds[2][60] { { 0 }, { 0 }};
         Thread *RaThread;
         Thread *DecThread;
         Thread *IndicationThread;
