@@ -9,4 +9,4 @@ Icon=gt-configurator
 StartupNotify=true
 Terminal=false
 Type=Application
-Categories=GNOME;GTK;Development;IDE;
+Categories=Qt;KDE;Education;Science;Astronomy;
