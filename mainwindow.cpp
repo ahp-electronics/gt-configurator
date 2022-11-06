@@ -879,8 +879,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->MountStyle, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             [ = ](int index)
     {
-        ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2)));
-        ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2)));
+        ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0));
+        ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0));
         ahp_gt_set_mount_flags((GT1Flags)(ui->MountStyle->currentIndex() == 1));
         saveIni(ini);
     });
