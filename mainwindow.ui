@@ -1196,7 +1196,7 @@
        <string>Divider</string>
       </property>
      </widget>
-     <widget class="QLabel" name="MinFrequency_0">
+     <widget class="QLabel" name="PWMFrequency_0">
       <property name="geometry">
        <rect>
         <x>190</x>
@@ -1209,7 +1209,7 @@
        <string>PWM Hz:</string>
       </property>
      </widget>
-     <widget class="QLabel" name="MaxFrequency_0">
+     <widget class="QLabel" name="GotoFrequency_0">
       <property name="geometry">
        <rect>
         <x>190</x>
@@ -1567,7 +1567,7 @@
        <string>Divider</string>
       </property>
      </widget>
-     <widget class="QLabel" name="MinFrequency_1">
+     <widget class="QLabel" name="PWMFrequency_1">
       <property name="geometry">
        <rect>
         <x>190</x>
@@ -1580,7 +1580,7 @@
        <string>PWM Hz:</string>
       </property>
      </widget>
-     <widget class="QLabel" name="MaxFrequency_1">
+     <widget class="QLabel" name="GotoFrequency_1">
       <property name="geometry">
        <rect>
         <x>190</x>

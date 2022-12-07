@@ -70,6 +70,7 @@ class MainWindow : public QMainWindow
         int stop_correction[2] { true, true };
         bool initial;
         int timer { 1000 };
+        void disconnectControls(bool block);
         void UpdateValues(int axis);
         Ui::MainWindow *ui;
         bool oldTracking[2] { false, false };
