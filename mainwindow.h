@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <QUdpSocket>
 #include <QDateTime>
+#include <QStandardPaths>
 #include <ahp_gt.h>
 #include "threads.h"
 

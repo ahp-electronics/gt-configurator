@@ -5,13 +5,13 @@
 #include <cstring>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QStandardPaths>
 #include <QIODevice>
 #include <functional>
 #include <QTemporaryFile>
 #include <QSerialPort>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QStandardPaths>
 #include <QSerialPortInfo>
 #include <QFileDialog>
 #include <QTimer>
@@ -34,6 +34,33 @@ static MountType mounttype[] =
     isDOB,
     isCustom,
 };
+
+static QList<int> mounttypes({
+    ///Sky-Watcher EQ6
+    0x00,
+    ///Sky-Watcher HEQ5
+    0x01,
+    ///Sky-Watcher EQ5
+    0x02,
+    ///Sky-Watcher EQ3
+    0x03,
+    ///Sky-Watcher EQ8
+    0x04,
+    ///Sky-Watcher AZEQ6
+    0x05,
+    ///Sky-Watcher AZEQ5
+    0x06,
+    ///Sky-Watcher GT
+    0x80,
+    ///Fork Mount
+    0x81,
+    ///114GT
+    0x82,
+    ///Dobsonian mount
+    0x90,
+    ///Custom mount
+    0xF0,
+});
 
 char *strrand(int len)
 {
@@ -65,7 +92,7 @@ void MainWindow::readIni(QString ini)
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency()).toInt());
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
-    ahp_gt_set_mount_type((MountType)ui->MountType->currentIndex());
+    ahp_gt_set_mount_type((MountType)mounttypes[ui->MountType->currentIndex()]);
     ahp_gt_set_mount_flags((GT1Flags)((ui->MountStyle->currentIndex() == 1) ? isForkMount : 0));
     ahp_gt_set_features(0, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0));
     ahp_gt_set_features(1, (SkywatcherFeature)((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0));
@@ -1266,7 +1293,7 @@ void MainWindow::UpdateValues(int axis)
     }
     ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency());
     ui->Address->setValue(ahp_gt_get_address());
-    ui->MountType->setCurrentIndex(ahp_gt_get_mount_type());
+    ui->MountType->setCurrentIndex(mounttypes.indexOf(ahp_gt_get_mount_type()));
     int index = 0;
     index |= (ahp_gt_get_features(0) & isAZEQ ? 1 : 0);
     index |= (ahp_gt_get_features(1) & isAZEQ ? 1 : 0);
