@@ -60,7 +60,6 @@ class MainWindow : public QMainWindow
         QSettings * settings;
         QString ini;
         QString firmwareFilename;
-        QString base64;
         QUdpSocket socket;
         int percent { 0 };
         int finished { 1 };
