@@ -65,9 +65,10 @@ static QList<int> mounttypes({
 char *strrand(int len)
 {
     int i;
-    char* ret = (char*)malloc(len);
+    char* ret = (char*)malloc(len+1);
     for(i = 0; i < len; i++)
         ret[i] = 'a' + (rand() % 21);
+    ret[i] = 0;
     return ret;
 }
 
