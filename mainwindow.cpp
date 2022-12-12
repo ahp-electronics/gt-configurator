@@ -338,13 +338,13 @@ MainWindow::MainWindow(QWidget *parent)
         if(ui->Write->text() == "Flash")
         {
             if(QFile::exists(firmwareFilename)) {
-                QFile file(firmwareFilename);
-                file.open(QIODevice::ReadOnly);
-                if(!dfu_flash(file.handle(), &percent, &finished))
+                if(!dfu_flash_filename(firmwareFilename.toStdString().c_str(), &percent, &finished))
                 {
+                    QFile file(firmwareFilename);
+                    file.open(QIODevice::ReadOnly);
                     settings->setValue("firmware", file.readAll().toBase64());
+                    file.close();
                 }
-                file.close();
             }
         }
         else
