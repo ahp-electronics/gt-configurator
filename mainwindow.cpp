@@ -79,14 +79,12 @@ bool MainWindow::DownloadFirmware(QString url, QString filename, QSettings *sett
         QString base64 = settings->value("firmware", "").toString();
         if(response->error() != QNetworkReply::NetworkError::NoError) {
             base64 = settings->value("firmware", "").toString();
-            response->error(QNetworkReply::NetworkError::NoError);
         } else {
             QJsonDocument doc = QJsonDocument::fromJson(response->readAll());
             QJsonObject obj = doc.object();
             QString data = obj["data"].toString();
         }
         if(base64.isNull() || base64.isEmpty()) {
-            response->error(QNetworkReply::NetworkError::TimeoutError);
             return;
         }
         QByteArray bin = QByteArray::fromBase64(base64.toUtf8());
@@ -103,7 +101,7 @@ bool MainWindow::DownloadFirmware(QString url, QString filename, QSettings *sett
     connect(response, SIGNAL(finished()), &loop, SLOT(quit()));
     timer.start(timeout_ms);
     loop.exec();
-    if(response->error() != QNetworkReply::NetworkError::NoError) return false;
+    if(!QFile::exists(filename)) return false;
     return true;
 }
 
