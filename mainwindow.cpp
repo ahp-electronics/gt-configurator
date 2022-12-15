@@ -289,7 +289,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     IndicationThread = new Thread(this, 100, 500);
-    ProgressThread = new Thread(this, 100, 100);
+    ProgressThread = new Thread(this, 100, 10);
     StatusThread = new Thread(this, 100, 100);
     RaThread = new Thread(this, 500, 1000);
     DecThread = new Thread(this, 1000, 1000);
