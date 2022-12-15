@@ -75,22 +75,6 @@ char *strrand(int len)
 bool MainWindow::DownloadFirmware(QString url, QString filename, QSettings *settings, int timeout_ms)
 {
     QNetworkAccessManager* manager = new QNetworkAccessManager();
-    connect(manager, static_cast<void (QNetworkAccessManager::*)(QNetworkReply*)>(&QNetworkAccessManager::finished), this, [ = ] (QNetworkReply* response) {
-        QString base64 = settings->value("firmware", "").toString();
-        if(response->error() == QNetworkReply::NetworkError::NoError) {
-            QJsonDocument doc = QJsonDocument::fromJson(response->readAll());
-            QJsonObject obj = doc.object();
-            base64 = obj["data"].toString();
-        }
-        if(base64.isNull() || base64.isEmpty()) {
-            return;
-        }
-        QByteArray bin = QByteArray::fromBase64(base64.toUtf8());
-        QFile file(filename);
-        file.open(QIODevice::WriteOnly);
-        file.write(bin, bin.length());
-        file.close();
-    });
     QNetworkReply *response = manager->get(QNetworkRequest(QUrl(url)));
     QTimer timer;
     timer.setSingleShot(true);
@@ -99,6 +83,20 @@ bool MainWindow::DownloadFirmware(QString url, QString filename, QSettings *sett
     connect(response, SIGNAL(finished()), &loop, SLOT(quit()));
     timer.start(timeout_ms);
     loop.exec();
+    QString base64 = settings->value("firmware", "").toString();
+    if(response->error() == QNetworkReply::NetworkError::NoError) {
+        QJsonDocument doc = QJsonDocument::fromJson(response->readAll());
+        QJsonObject obj = doc.object();
+        base64 = obj["data"].toString();
+    }
+    if(base64.isNull() || base64.isEmpty()) {
+        return false;
+    }
+    QByteArray bin = QByteArray::fromBase64(base64.toUtf8());
+    QFile file(filename);
+    file.open(QIODevice::WriteOnly);
+    file.write(bin, bin.length());
+    file.close();
     response->deleteLater();
     response->manager()->deleteLater();
     if(!QFile::exists(filename)) return false;
