@@ -101,6 +101,8 @@ bool MainWindow::DownloadFirmware(QString url, QString filename, QSettings *sett
     connect(response, SIGNAL(finished()), &loop, SLOT(quit()));
     timer.start(timeout_ms);
     loop.exec();
+    response->deleteLater();
+    response->manager()->deleteLater();
     if(!QFile::exists(filename)) return false;
     return true;
 }
@@ -378,29 +380,8 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ](bool checked)
     {
         QString url = "https://www.iliaplatone.com/firmware.php?product=gt1";
-        QNetworkAccessManager* manager = new QNetworkAccessManager();
-        QNetworkReply* response = manager->get(QNetworkRequest(QUrl(url)));
-
-        QEventLoop loop;
-        connect(response, SIGNAL(finished()), &loop, SLOT(quit()));
-        connect(response, SIGNAL(error(QNetworkReply::NetworkError)), &loop, SLOT(quit()));
-        loop.exec();
-
-        QJsonDocument doc = QJsonDocument::fromJson(response->readAll());
-        QJsonObject obj = doc.object();
-        QString base64 = obj["data"].toString();
-        if(base64 == settings->value("firmware", "").toString()) return;
-        if(base64.isNull()) return;
-        if(base64.isEmpty()) return;
-        QByteArray data = QByteArray::fromBase64(base64.toUtf8());
-        QFile *f = new QFile(firmwareFilename);
-        f->open(QIODevice::WriteOnly);
-        f->write(data.data(), data.length());
-        f->close();
-        f->~QFile();
-        response->deleteLater();
-        response->manager()->deleteLater();
-        ui->Write->setText("Flash");
+        if(DownloadFirmware(url, firmwareFilename, settings))
+            ui->Write->setText("Flash");
         ui->Write->setEnabled(true);
         ui->Connection->setEnabled(false);
         ui->RA->setEnabled(false);
