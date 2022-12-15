@@ -77,12 +77,10 @@ bool MainWindow::DownloadFirmware(QString url, QString filename, QSettings *sett
     QNetworkAccessManager* manager = new QNetworkAccessManager();
     connect(manager, static_cast<void (QNetworkAccessManager::*)(QNetworkReply*)>(&QNetworkAccessManager::finished), this, [ = ] (QNetworkReply* response) {
         QString base64 = settings->value("firmware", "").toString();
-        if(response->error() != QNetworkReply::NetworkError::NoError) {
-            base64 = settings->value("firmware", "").toString();
-        } else {
+        if(response->error() == QNetworkReply::NetworkError::NoError) {
             QJsonDocument doc = QJsonDocument::fromJson(response->readAll());
             QJsonObject obj = doc.object();
-            QString data = obj["data"].toString();
+            base64 = obj["data"].toString();
         }
         if(base64.isNull() || base64.isEmpty()) {
             return;
