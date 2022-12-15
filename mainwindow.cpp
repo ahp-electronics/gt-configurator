@@ -340,14 +340,13 @@ MainWindow::MainWindow(QWidget *parent)
         finished = 0;
         if(ui->Write->text() == "Flash")
         {
-            if(QFile::exists(firmwareFilename)) {
-                if(!dfu_flash_filename(firmwareFilename.toStdString().c_str(), &percent, &finished))
-                {
-                    QFile file(firmwareFilename);
-                    file.open(QIODevice::ReadOnly);
-                    settings->setValue("firmware", file.readAll().toBase64());
-                    file.close();
-                }
+            if(!dfu_flash_filename(firmwareFilename.toStdString().c_str(), &percent, &finished))
+            {
+                QFile *f = new QFile(firmwareFilename);
+                f->open(QIODevice::ReadOnly);
+                settings->setValue("firmware", f->readAll().toBase64());
+                f->close();
+                f->~QFile();
             }
         }
         else
@@ -376,17 +375,36 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ](bool checked)
     {
         QString url = "https://www.iliaplatone.com/firmware.php?product=gt1";
-        if(DownloadFirmware(url, firmwareFilename, settings)) {
-            ui->Write->setText("Flash");
-            ui->Write->setEnabled(true);
-            ui->Connection->setEnabled(false);
-            ui->RA->setEnabled(false);
-            ui->DEC->setEnabled(false);
-            ui->Control->setEnabled(false);
-            ui->commonSettings->setEnabled(false);
-            ui->AdvancedRA->setEnabled(false);
-            ui->AdvancedDec->setEnabled(false);
-        }
+        QNetworkAccessManager* manager = new QNetworkAccessManager();
+        QNetworkReply* response = manager->get(QNetworkRequest(QUrl(url)));
+
+        QEventLoop loop;
+        connect(response, SIGNAL(finished()), &loop, SLOT(quit()));
+        connect(response, SIGNAL(error(QNetworkReply::NetworkError)), &loop, SLOT(quit()));
+        loop.exec();
+
+        QJsonDocument doc = QJsonDocument::fromJson(response->readAll());
+        QJsonObject obj = doc.object();
+        QString base64 = obj["data"].toString();
+        if(base64 == settings->value("firmware", "").toString()) return;
+        QByteArray data = QByteArray::fromBase64(base64.toUtf8());
+        QFile *f = new QFile(firmwareFilename);
+        f->open(QIODevice::WriteOnly);
+        f->write(data.data(), data.length());
+        f->close();
+        f->~QFile();
+        response->deleteLater();
+        response->manager()->deleteLater();
+        ui->Write->setText("Flash");
+        ui->Write->setEnabled(true);
+        ui->Connection->setEnabled(false);
+        ui->RA->setEnabled(false);
+        ui->DEC->setEnabled(false);
+        ui->Control->setEnabled(false);
+        ui->commonSettings->setEnabled(false);
+        ui->AdvancedRA->setEnabled(false);
+        ui->AdvancedDec->setEnabled(false);
+
     });
     connect(ui->Connect, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked)
