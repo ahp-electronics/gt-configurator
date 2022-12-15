@@ -342,13 +342,14 @@ MainWindow::MainWindow(QWidget *parent)
         finished = 0;
         if(ui->Write->text() == "Flash")
         {
-            if(!dfu_flash_filename(firmwareFilename.toStdString().c_str(), &percent, &finished))
-            {
-                QFile *f = new QFile(firmwareFilename);
-                f->open(QIODevice::ReadOnly);
-                settings->setValue("firmware", f->readAll().toBase64());
-                f->close();
-                f->~QFile();
+            if(QFile::exists(firmwareFilename)) {
+                QFile f(firmwareFilename);
+                f.open(QIODevice::ReadOnly);
+                if(!dfu_flash(f.handle(), &percent, &finished))
+                {
+                    settings->setValue("firmware", f.readAll().toBase64());
+                }
+                f.close();
             }
         }
         else
@@ -389,6 +390,8 @@ MainWindow::MainWindow(QWidget *parent)
         QJsonObject obj = doc.object();
         QString base64 = obj["data"].toString();
         if(base64 == settings->value("firmware", "").toString()) return;
+        if(base64.isNull()) return;
+        if(base64.isEmpty()) return;
         QByteArray data = QByteArray::fromBase64(base64.toUtf8());
         QFile *f = new QFile(firmwareFilename);
         f->open(QIODevice::WriteOnly);
