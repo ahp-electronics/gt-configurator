@@ -141,6 +141,7 @@ void MainWindow::readIni(QString ini)
     ui->MaxSpeed_0->setValue(settings->value("MaxSpeed_0", ahp_gt_get_max_speed(0)).toInt());
     ui->Acceleration_0->setValue(settings->value("Acceleration_0",
                                  ui->Acceleration_0->maximum() - ahp_gt_get_acceleration_angle(0) * 1800.0 / M_PI).toInt());
+    ui->Silent_0->setChecked(settings->value("Silent_0", (ahp_gt_get_mount_flags() & halfCurrentRA) != 0).toBool());
     ui->Invert_0->setChecked(settings->value("Invert_0", ahp_gt_get_direction_invert(0) == 1).toBool());
     ui->Inductance_0->setValue(settings->value("Inductance_0", 10).toInt());
     ui->Resistance_0->setValue(settings->value("Resistance_0", 20000).toInt());
@@ -158,6 +159,7 @@ void MainWindow::readIni(QString ini)
     ui->MaxSpeed_1->setValue(settings->value("MaxSpeed_1", ahp_gt_get_max_speed(1)).toInt());
     ui->Acceleration_1->setValue(settings->value("Acceleration_1",
                                  ui->Acceleration_1->maximum() - ahp_gt_get_acceleration_angle(1) * 1800.0 / M_PI).toInt());
+    ui->Silent_1->setChecked(settings->value("Silent_1", (ahp_gt_get_mount_flags() & halfCurrentDec) != 0).toBool());
     ui->Invert_1->setChecked(settings->value("Invert_1", ahp_gt_get_direction_invert(1) == 1).toBool());
     ui->Inductance_1->setValue(settings->value("Inductance_1", 10).toInt());
     ui->Resistance_1->setValue(settings->value("Resistance_1", 20000).toInt());
@@ -251,6 +253,7 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Voltage_0", ui->Voltage_0->value());
     settings->setValue("TimingValue_0", ahp_gt_get_timing(0));
     settings->setValue("Mean_0", ui->Mean_0->value());
+    settings->setValue("Silent_0", ui->Silent_0->isChecked());
 
     settings->setValue("Invert_1", ui->Invert_1->isChecked());
     settings->setValue("SteppingMode_1", ui->SteppingMode_1->currentIndex());
@@ -268,6 +271,7 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Voltage_1", ui->Voltage_1->value());
     settings->setValue("TimingValue_1", ahp_gt_get_timing(1));
     settings->setValue("Mean_1", ui->Mean_1->value());
+    settings->setValue("Silent_1", ui->Silent_1->isChecked());
 
     settings->setValue("MountType", ui->MountType->currentIndex());
     settings->setValue("Address", ui->Address->value());
@@ -743,6 +747,26 @@ MainWindow::MainWindow(QWidget *parent)
             default:
                 break;
         }
+        saveIni(ini);
+    });
+    connect(ui->Silent_0, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            [ = ](bool checked)
+    {
+        int flags = (int)ahp_gt_get_mount_flags();
+        flags &= ~halfCurrentRA;
+        if(checked)
+            flags |= halfCurrentRA;
+        ahp_gt_set_mount_flags((GT1Flags)flags);
+        saveIni(ini);
+    });
+    connect(ui->Silent_1, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            [ = ](bool checked)
+    {
+        int flags = (int)ahp_gt_get_mount_flags();
+        flags &= ~halfCurrentDec;
+        if(checked)
+            flags |= halfCurrentDec;
+        ahp_gt_set_mount_flags((GT1Flags)flags);
         saveIni(ini);
     });
     connect(ui->Address, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
@@ -1226,6 +1250,7 @@ void MainWindow::disconnectControls(bool block)
     ui->MountStyle->blockSignals(block);
     ui->PWMFreq->blockSignals(block);
 
+    ui->Silent_0->blockSignals(block);
     ui->Invert_0->blockSignals(block);
     ui->MotorSteps_0->blockSignals(block);
     ui->Worm_0->blockSignals(block);
@@ -1237,6 +1262,7 @@ void MainWindow::disconnectControls(bool block)
     ui->Coil_0->blockSignals(block);
     ui->GPIO_0->blockSignals(block);
 
+    ui->Silent_1->blockSignals(block);
     ui->Invert_1->blockSignals(block);
     ui->MotorSteps_1->blockSignals(block);
     ui->Worm_1->blockSignals(block);
@@ -1279,6 +1305,7 @@ void MainWindow::UpdateValues(int axis)
         ui->GPIO_0->setCurrentIndex(ahp_gt_get_feature(0));
         ui->Coil_0->setCurrentIndex(ahp_gt_get_stepping_conf(0));
         ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(0));
+        ui->Silent_0->setChecked((ahp_gt_get_mount_flags() & halfCurrentRA) != 0);
     }
     else if (axis == 1)
     {
@@ -1307,6 +1334,7 @@ void MainWindow::UpdateValues(int axis)
         ui->GPIO_1->setCurrentIndex(ahp_gt_get_feature(1));
         ui->Coil_1->setCurrentIndex(ahp_gt_get_stepping_conf(1));
         ui->SteppingMode_1->setCurrentIndex(ahp_gt_get_stepping_mode(1));
+        ui->Silent_1->setChecked((ahp_gt_get_mount_flags() & halfCurrentDec) != 0);
     }
     ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency());
     ui->Address->setValue(ahp_gt_get_address());
