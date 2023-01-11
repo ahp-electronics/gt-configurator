@@ -301,6 +301,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    ahp_set_app_name("GT Configurator");
+    ahp_set_debug_level(AHP_DEBUG_DEBUG);
     IndicationThread = new Thread(this, 100, 500);
     ProgressThread = new Thread(this, 100, 10);
     StatusThread = new Thread(this, 100, 100);
@@ -414,7 +416,6 @@ MainWindow::MainWindow(QWidget *parent)
         {
             address = ui->ComPort->currentText().split(":")[0];
             port = ui->ComPort->currentText().split(":")[1].toInt();
-            ahp_gt_select_device(0);
             if(!ahp_gt_connect_udp(address.toStdString().c_str(), port)) {
                 failure = ahp_gt_detect_device();
             }
@@ -422,7 +423,6 @@ MainWindow::MainWindow(QWidget *parent)
         else
         {
             portname.append(ui->ComPort->currentText());
-            ahp_gt_select_device(0);
             if(!ahp_gt_connect(portname.toUtf8())) {
                 failure = ahp_gt_detect_device();
             }
