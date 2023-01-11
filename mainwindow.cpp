@@ -126,14 +126,22 @@ void MainWindow::readIni(QString ini)
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency()).toInt());
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
+    ui->HighBauds->setChecked(settings->value("HighBauds", false).toBool());
     int flags = ahp_gt_get_mount_flags();
     int features0 = ahp_gt_get_features(0);
     int features1 = ahp_gt_get_features(0);
     features0 &= ~isAZEQ;
     features1 &= ~isAZEQ;
     flags &= ~isForkMount;
+    flags &= ~halfCurrentRA;
+    flags &= ~halfCurrentDec;
+    flags &= ~bauds_115200;
+    flags |= ((ui->MountStyle->currentIndex() == 1) ? isForkMount : 0);
+    flags |= (ui->Silent_0->isChecked() ? halfCurrentRA : 0);
+    flags |= (ui->Silent_1->isChecked() ? halfCurrentDec : 0);
+    flags |= (ui->HighBauds->isChecked() ? bauds_115200 : 0);
     ahp_gt_set_mount_type((MountType)mounttypes[ui->MountType->currentIndex()]);
-    ahp_gt_set_mount_flags((GT1Flags)(flags | ((ui->MountStyle->currentIndex() == 1) ? isForkMount : 0)));
+    ahp_gt_set_mount_flags((GT1Flags)flags);
     ahp_gt_set_features(0, (SkywatcherFeature)(features0 | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0)));
     ahp_gt_set_features(1, (SkywatcherFeature)(features1 | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0)));
     ahp_gt_set_pwm_frequency(ui->PWMFreq->value());
@@ -283,6 +291,7 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Address", ui->Address->value());
     settings->setValue("PWMFreq", ui->PWMFreq->value());
     settings->setValue("MountStyle", ui->MountStyle->currentIndex());
+    settings->setValue("HighBauds", ui->HighBauds->isChecked());
     settings->setValue("Notes", QString(ui->Notes->text().toUtf8().toBase64()));
     s->~QSettings();
     settings = oldsettings;
@@ -456,6 +465,7 @@ MainWindow::MainWindow(QWidget *parent)
         ui->ComPort->setEnabled(true);
         isConnected = false;
         finished = false;
+        ui->HighBauds->setChecked(false);
         ui->Server->setChecked(false);
         ui->LoadFW->setEnabled(true);
         ui->Connect->setEnabled(true);
@@ -779,6 +789,15 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ](int value)
     {
         ahp_gt_set_address(value);
+        saveIni(ini);
+    });
+    connect(ui->HighBauds, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
+    {
+        int flags = (int)ahp_gt_get_mount_flags();
+        flags &= ~bauds_115200;
+        if(checked)
+            flags |= bauds_115200;
+        ahp_gt_set_mount_flags((GT1Flags)flags);
         saveIni(ini);
     });
     connect(ui->PWMFreq, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
@@ -1352,5 +1371,6 @@ void MainWindow::UpdateValues(int axis)
         index |= (((ahp_gt_get_mount_flags() & isForkMount) != 0) ? 1 : 0);
     }
     ui->MountStyle->setCurrentIndex(index);
+    ui->HighBauds->setChecked((ahp_gt_get_mount_flags() & bauds_115200) != 0);
     disconnectControls(false);
 }
