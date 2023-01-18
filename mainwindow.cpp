@@ -1326,6 +1326,9 @@ void MainWindow::UpdateValues(int axis)
         ui->Worm_0->setValue(ahp_gt_get_worm_teeth(0));
         ui->Crown_0->setValue(ahp_gt_get_crown_teeth(0));
         ui->Acceleration_0->setValue(ui->Acceleration_0->maximum() - ahp_gt_get_acceleration_angle(0) * 1800.0 / M_PI);
+        ui->MaxSpeed_0->setValue(ahp_gt_get_multiplier(0));
+        ui->MaxSpeed_0->setMaximum(2000);
+        ui->Ra_Speed->setMaximum(2000);
         ui->MaxSpeed_0->setValue(ahp_gt_get_max_speed(0));
         ui->GPIO_0->setCurrentIndex(ahp_gt_get_feature(0));
         ui->Coil_0->setCurrentIndex(ahp_gt_get_stepping_conf(0));
@@ -1349,12 +1352,15 @@ void MainWindow::UpdateValues(int axis)
         double Z = sqrt(fmax(0, pow(mV / mI, 2.0) - pow(R, 2.0)));
         double f = (2.0 * M_PI * Z / L);
         ui->PWMFrequency_1->setText("PWM Hz: " + QString::number(f));
-        ui->GotoFrequency_1->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(1)/ SIDEREAL_DAY));
+        ui->GotoFrequency_1->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(1) / SIDEREAL_DAY));
         ui->MotorSteps_1->setValue(ahp_gt_get_motor_steps(1));
         ui->Motor_1->setValue(ahp_gt_get_motor_teeth(1));
         ui->Worm_1->setValue(ahp_gt_get_worm_teeth(1));
         ui->Crown_1->setValue(ahp_gt_get_crown_teeth(1));
         ui->Acceleration_1->setValue(ui->Acceleration_1->maximum() - ahp_gt_get_acceleration_angle(1) * 1800.0 / M_PI);
+        ui->MaxSpeed_1->setValue(ahp_gt_get_multiplier(1));
+        ui->MaxSpeed_1->setMaximum(2000);
+        ui->Dec_Speed->setMaximum(2000);
         ui->MaxSpeed_1->setValue(ahp_gt_get_max_speed(1));
         ui->GPIO_1->setCurrentIndex(ahp_gt_get_feature(1));
         ui->Coil_1->setCurrentIndex(ahp_gt_get_stepping_conf(1));
