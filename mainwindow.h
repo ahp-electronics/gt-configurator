@@ -54,7 +54,6 @@ class MainWindow : public QMainWindow
         Thread *DecThread;
         Thread *IndicationThread;
         Thread *ProgressThread;
-        Thread *StatusThread;
         Thread *WriteThread;
         Thread *ServerThread;
         QSettings * settings;

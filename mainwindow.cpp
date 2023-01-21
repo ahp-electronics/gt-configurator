@@ -305,7 +305,6 @@ MainWindow::MainWindow(QWidget *parent)
     ahp_set_debug_level(AHP_DEBUG_DEBUG);
     IndicationThread = new Thread(this, 100, 500);
     ProgressThread = new Thread(this, 100, 10);
-    StatusThread = new Thread(this, 100, 100);
     RaThread = new Thread(this, 500, 1000);
     DecThread = new Thread(this, 1000, 1000);
     ServerThread = new Thread(this);
@@ -699,14 +698,12 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ](int value)
     {
         ahp_gt_set_max_speed(0, ui->MaxSpeed_0->value());
-        ui->MaxSpeed_label_0->setText("Maximum speed: " + QString::number(value) + "x");
         saveIni(ini);
     });
     connect(ui->MaxSpeed_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
         ahp_gt_set_max_speed(1, ui->MaxSpeed_1->value());
-        ui->MaxSpeed_label_1->setText("Maximum speed: " + QString::number(value) + "x");
         saveIni(ini);
     });
     connect(ui->SteppingMode_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
@@ -1241,7 +1238,6 @@ MainWindow::MainWindow(QWidget *parent)
     RaThread->start();
     DecThread->start();
     ProgressThread->start();
-    StatusThread->start();
 }
 
 MainWindow::~MainWindow()
@@ -1252,14 +1248,12 @@ MainWindow::~MainWindow()
     DecThread->stop();
     IndicationThread->stop();
     ProgressThread->stop();
-    StatusThread->stop();
     WriteThread->stop();
     ServerThread->stop();
     RaThread->wait();
     DecThread->wait();
     IndicationThread->wait();
     ProgressThread->wait();
-    StatusThread->wait();
     WriteThread->wait();
     ServerThread->wait();
     if(QFile(firmwareFilename).exists())
@@ -1326,11 +1320,10 @@ void MainWindow::UpdateValues(int axis)
         ui->Worm_0->setValue(ahp_gt_get_worm_teeth(0));
         ui->Crown_0->setValue(ahp_gt_get_crown_teeth(0));
         ui->Acceleration_0->setValue(ui->Acceleration_0->maximum() - ahp_gt_get_acceleration_angle(0) * 1800.0 / M_PI);
-        ui->MaxSpeed_0->setValue(ahp_gt_get_multiplier(0));
         ui->MaxSpeed_0->setMaximum(2000);
         ui->Ra_Speed->setMaximum(2000);
+        ui->MaxSpeed_label_0->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(0)) + "x");
         ui->MaxSpeed_0->setValue(ahp_gt_get_max_speed(0));
-        ui->GPIO_0->setCurrentIndex(ahp_gt_get_feature(0));
         ui->Coil_0->setCurrentIndex(ahp_gt_get_stepping_conf(0));
         ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(0));
         ui->Silent_0->setChecked((ahp_gt_get_mount_flags() & halfCurrentRA) != 0);
@@ -1358,14 +1351,41 @@ void MainWindow::UpdateValues(int axis)
         ui->Worm_1->setValue(ahp_gt_get_worm_teeth(1));
         ui->Crown_1->setValue(ahp_gt_get_crown_teeth(1));
         ui->Acceleration_1->setValue(ui->Acceleration_1->maximum() - ahp_gt_get_acceleration_angle(1) * 1800.0 / M_PI);
-        ui->MaxSpeed_1->setValue(ahp_gt_get_multiplier(1));
         ui->MaxSpeed_1->setMaximum(2000);
         ui->Dec_Speed->setMaximum(2000);
+        ui->MaxSpeed_label_1->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(1)) + "x");
         ui->MaxSpeed_1->setValue(ahp_gt_get_max_speed(1));
-        ui->GPIO_1->setCurrentIndex(ahp_gt_get_feature(1));
         ui->Coil_1->setCurrentIndex(ahp_gt_get_stepping_conf(1));
         ui->SteppingMode_1->setCurrentIndex(ahp_gt_get_stepping_mode(1));
         ui->Silent_1->setChecked((ahp_gt_get_mount_flags() & halfCurrentDec) != 0);
+    }
+    switch(ahp_gt_get_feature(0))
+    {
+        case GpioUnused:
+            ui->GPIO_0->setCurrentIndex(0);
+            break;
+        case GpioAsST4:
+            ui->GPIO_0->setCurrentIndex(1);
+            break;
+        case GpioAsPulseDrive:
+            ui->GPIO_0->setCurrentIndex(2);
+            break;
+        default:
+            break;
+    }
+    switch(ahp_gt_get_feature(1))
+    {
+        case GpioUnused:
+            ui->GPIO_1->setCurrentIndex(0);
+            break;
+        case GpioAsST4:
+            ui->GPIO_1->setCurrentIndex(1);
+            break;
+        case GpioAsPulseDrive:
+            ui->GPIO_1->setCurrentIndex(2);
+            break;
+        default:
+            break;
     }
     ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency());
     ui->Address->setValue(ahp_gt_get_address());
