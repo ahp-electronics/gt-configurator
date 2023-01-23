@@ -184,7 +184,7 @@ void MainWindow::readIni(QString ini)
     ui->SteppingMode_1->setCurrentIndex(settings->value("SteppingMode_1", ahp_gt_get_stepping_mode(1)).toInt());
     ui->Mean_1->setValue(settings->value("Mean_1", 1).toInt());
 
-    ahp_gt_set_timing(0, settings->value("TimingValue_1", 1500000).toInt());
+    ahp_gt_set_timing(0, settings->value("TimingValue_0", 1500000).toInt());
     ahp_gt_set_motor_steps(0, ui->MotorSteps_0->value());
     ahp_gt_set_motor_teeth(0, ui->Motor_0->value());
     ahp_gt_set_worm_teeth(0, ui->Worm_0->value());
