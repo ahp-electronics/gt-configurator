@@ -1323,7 +1323,8 @@ void MainWindow::UpdateValues(int axis)
         ui->MaxSpeed_0->setMaximum(2000);
         ui->Ra_Speed->setMaximum(2000);
         ui->MaxSpeed_label_0->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(0)) + "x");
-        ui->MaxSpeed_0->setValue(ahp_gt_get_max_speed(0));
+        if(ahp_gt_get_stepping_mode(0) != HalfStep)
+            ui->MaxSpeed_0->setValue(ahp_gt_get_max_speed(0));
         ui->Coil_0->setCurrentIndex(ahp_gt_get_stepping_conf(0));
         ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(0));
         ui->Silent_0->setChecked((ahp_gt_get_mount_flags() & halfCurrentRA) != 0);
@@ -1354,7 +1355,8 @@ void MainWindow::UpdateValues(int axis)
         ui->MaxSpeed_1->setMaximum(2000);
         ui->Dec_Speed->setMaximum(2000);
         ui->MaxSpeed_label_1->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(1)) + "x");
-        ui->MaxSpeed_1->setValue(ahp_gt_get_max_speed(1));
+        if(ahp_gt_get_stepping_mode(1) != HalfStep)
+            ui->MaxSpeed_1->setValue(ahp_gt_get_max_speed(1));
         ui->Coil_1->setCurrentIndex(ahp_gt_get_stepping_conf(1));
         ui->SteppingMode_1->setCurrentIndex(ahp_gt_get_stepping_mode(1));
         ui->Silent_1->setChecked((ahp_gt_get_mount_flags() & halfCurrentDec) != 0);
