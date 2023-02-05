@@ -21,7 +21,7 @@ Source: "../bin/{#TargetName}64/*"; DestDir: "{app}"; Check: Is64BitInstallMode 
 Source: "../bin/{#TargetName}32/*"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: solidbreak recursesubdirs
 Source: "../{#TargetName}/driver/dpinst32.exe"; DestDir: {app}/driver; DestName: dpinst.exe; Check: not IsWin64; Flags: ignoreversion
 Source: "../{#TargetName}/driver/dpinst64.exe"; DestDir: {app}/driver; DestName: dpinst.exe; Check: IsWin64; Flags: ignoreversion
-Source: "../{#TargetName}/driver/gtdir*"; DestDir: {app}/driver;
+Source: "../{#TargetName}/driver/ser2pl*"; DestDir: {app}/driver;
 Source: "../{#TargetName}/driver/ahpbootloader*"; DestDir: {app}/driver;
 
 [Icons]
