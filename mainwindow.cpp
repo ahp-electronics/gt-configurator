@@ -1390,6 +1390,7 @@ void MainWindow::UpdateValues(int axis)
             break;
     }
     ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency());
+    ui->PWMFreq_label->setText("PWM: " + QString::number(1500 + 700 * ui->PWMFreq->value()) + " Hz");
     ui->Address->setValue(ahp_gt_get_address());
     ui->MountType->setCurrentIndex(mounttypes.indexOf(ahp_gt_get_mount_type()));
     int index = 0;
