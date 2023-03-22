@@ -38,7 +38,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>490</x>
+       <x>500</x>
        <y>30</y>
        <width>251</width>
        <height>411</height>
@@ -115,10 +115,10 @@
      <widget class="QSlider" name="Ra_Speed">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>300</y>
-        <width>221</width>
-        <height>21</height>
+        <x>90</x>
+        <y>370</y>
+        <width>141</width>
+        <height>16</height>
        </rect>
       </property>
       <property name="minimum">
@@ -144,9 +144,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>280</y>
-        <width>221</width>
-        <height>17</height>
+        <y>370</y>
+        <width>81</width>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
@@ -157,9 +157,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>320</y>
-        <width>221</width>
-        <height>17</height>
+        <y>390</y>
+        <width>81</width>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
@@ -169,10 +169,10 @@
      <widget class="QSlider" name="Dec_Speed">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>340</y>
-        <width>221</width>
-        <height>21</height>
+        <x>90</x>
+        <y>390</y>
+        <width>141</width>
+        <height>16</height>
        </rect>
       </property>
       <property name="minimum">
@@ -198,9 +198,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>380</y>
+        <y>350</y>
         <width>71</width>
-        <height>21</height>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
@@ -210,22 +210,22 @@
      <widget class="QPushButton" name="Goto">
       <property name="geometry">
        <rect>
-        <x>170</x>
-        <y>260</y>
-        <width>71</width>
-        <height>21</height>
+        <x>160</x>
+        <y>326</y>
+        <width>61</width>
+        <height>20</height>
        </rect>
       </property>
       <property name="text">
        <string>Goto</string>
       </property>
      </widget>
-     <widget class="QSpinBox" name="TargetSteps_0">
+     <widget class="QSpinBox" name="Ra_0">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>260</y>
-        <width>71</width>
+        <x>90</x>
+        <y>240</y>
+        <width>51</width>
         <height>21</height>
        </rect>
       </property>
@@ -239,12 +239,12 @@
        <number>0</number>
       </property>
      </widget>
-     <widget class="QSpinBox" name="TargetSteps_1">
+     <widget class="QSpinBox" name="Dec_0">
       <property name="geometry">
        <rect>
         <x>90</x>
         <y>260</y>
-        <width>71</width>
+        <width>51</width>
         <height>21</height>
        </rect>
       </property>
@@ -264,7 +264,7 @@
         <x>10</x>
         <y>240</y>
         <width>71</width>
-        <height>17</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="text">
@@ -274,10 +274,10 @@
      <widget class="QLabel" name="Ra_Speed_label_3">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>240</y>
+        <x>10</x>
+        <y>260</y>
         <width>71</width>
-        <height>17</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="text">
@@ -287,10 +287,10 @@
      <widget class="QCheckBox" name="TuneRa">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>380</y>
+        <x>160</x>
+        <y>350</y>
         <width>71</width>
-        <height>21</height>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
@@ -352,14 +352,243 @@
      <widget class="QCheckBox" name="TuneDec">
       <property name="geometry">
        <rect>
-        <x>160</x>
-        <y>380</y>
+        <x>80</x>
+        <y>350</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Fix Dec</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Ra_1">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>240</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>-16777216</number>
+      </property>
+      <property name="maximum">
+       <number>16777216</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Ra_2">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>240</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>-16777216</number>
+      </property>
+      <property name="maximum">
+       <number>16777216</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Dec_1">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>260</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>-16777216</number>
+      </property>
+      <property name="maximum">
+       <number>16777216</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Dec_2">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>260</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>-16777216</number>
+      </property>
+      <property name="maximum">
+       <number>16777216</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="Halt">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>326</y>
+        <width>61</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Halt</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Lat_1">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>280</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>-16777216</number>
+      </property>
+      <property name="maximum">
+       <number>16777216</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Lon_0">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>300</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>-16777216</number>
+      </property>
+      <property name="maximum">
+       <number>16777216</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Lon_2">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>300</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>-16777216</number>
+      </property>
+      <property name="maximum">
+       <number>16777216</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Lat_0">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>280</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>-16777216</number>
+      </property>
+      <property name="maximum">
+       <number>16777216</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Lon_1">
+      <property name="geometry">
+       <rect>
+        <x>140</x>
+        <y>300</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>-16777216</number>
+      </property>
+      <property name="maximum">
+       <number>16777216</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Lat_2">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>280</y>
+        <width>41</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>-16777216</number>
+      </property>
+      <property name="maximum">
+       <number>16777216</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="Ra_Speed_label_4">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>280</y>
         <width>71</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>Fix Dec</string>
+       <string>Latitude</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="Ra_Speed_label_5">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>300</y>
+        <width>71</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Longitude</string>
       </property>
      </widget>
     </widget>
@@ -1677,19 +1906,6 @@
        <string>Stepping mode</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="Silent_0">
-      <property name="geometry">
-       <rect>
-        <x>110</x>
-        <y>239</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Half-Current</string>
-      </property>
-     </widget>
     </widget>
     <widget class="QGroupBox" name="DEC">
      <property name="enabled">
@@ -2041,19 +2257,6 @@
       </property>
       <property name="text">
        <string>Stepping mode</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="Silent_1">
-      <property name="geometry">
-       <rect>
-        <x>110</x>
-        <y>239</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Half-Current</string>
       </property>
      </widget>
     </widget>

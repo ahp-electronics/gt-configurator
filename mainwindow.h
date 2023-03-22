@@ -42,6 +42,15 @@ class MainWindow : public QMainWindow
         }
 
     private:
+        double Latitude, Longitude, Elevation;
+        double Ra {0.0};
+        double Dec {0.0};
+
+        double* toDms(double d);
+        QString toHMS(double hms);
+        QString toDMS(double dms);
+        double fromHMSorDMS(QString dms);
+
         bool axis_lospeed[2] { false, false };
         bool axisdirection[2] { false, false };
         double Speed[2];

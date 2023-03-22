@@ -133,15 +133,13 @@ void MainWindow::readIni(QString ini)
     features0 &= ~isAZEQ;
     features1 &= ~isAZEQ;
     flags &= ~isForkMount;
-    flags &= ~halfCurrentRA;
-    flags &= ~halfCurrentDec;
     flags &= ~bauds_115200;
     flags |= ((ui->MountStyle->currentIndex() == 1) ? isForkMount : 0);
-    flags |= (ui->Silent_0->isChecked() ? halfCurrentRA : 0);
-    flags |= (ui->Silent_1->isChecked() ? halfCurrentDec : 0);
     flags |= (ui->HighBauds->isChecked() ? bauds_115200 : 0);
-    ahp_gt_set_mount_type((MountType)mounttypes[ui->MountType->currentIndex()]);
+    flags |= halfCurrentRA;
+    flags |= halfCurrentDec;
     ahp_gt_set_mount_flags((GT1Flags)flags);
+    ahp_gt_set_mount_type((MountType)mounttypes[ui->MountType->currentIndex()]);
     ahp_gt_set_features(0, (SkywatcherFeature)(features0 | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0)));
     ahp_gt_set_features(1, (SkywatcherFeature)(features1 | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0)));
     ahp_gt_set_pwm_frequency(ui->PWMFreq->value());
@@ -155,7 +153,6 @@ void MainWindow::readIni(QString ini)
     ui->MaxSpeed_0->setValue(settings->value("MaxSpeed_0", ahp_gt_get_max_speed(0)).toInt());
     ui->Acceleration_0->setValue(settings->value("Acceleration_0",
                                  ui->Acceleration_0->maximum() - ahp_gt_get_acceleration_angle(0) * 1800.0 / M_PI).toInt());
-    ui->Silent_0->setChecked(settings->value("Silent_0", (ahp_gt_get_mount_flags() & halfCurrentRA) != 0).toBool());
     ui->Invert_0->setChecked(settings->value("Invert_0", ahp_gt_get_direction_invert(0) == 1).toBool());
     ui->Inductance_0->setValue(settings->value("Inductance_0", 10).toInt());
     ui->Resistance_0->setValue(settings->value("Resistance_0", 20000).toInt());
@@ -173,7 +170,6 @@ void MainWindow::readIni(QString ini)
     ui->MaxSpeed_1->setValue(settings->value("MaxSpeed_1", ahp_gt_get_max_speed(1)).toInt());
     ui->Acceleration_1->setValue(settings->value("Acceleration_1",
                                  ui->Acceleration_1->maximum() - ahp_gt_get_acceleration_angle(1) * 1800.0 / M_PI).toInt());
-    ui->Silent_1->setChecked(settings->value("Silent_1", (ahp_gt_get_mount_flags() & halfCurrentDec) != 0).toBool());
     ui->Invert_1->setChecked(settings->value("Invert_1", ahp_gt_get_direction_invert(1) == 1).toBool());
     ui->Inductance_1->setValue(settings->value("Inductance_1", 10).toInt());
     ui->Resistance_1->setValue(settings->value("Resistance_1", 20000).toInt());
@@ -229,8 +225,27 @@ void MainWindow::readIni(QString ini)
         default:
             break;
     }
-    ahp_gt_set_position(0, 0);
-    ahp_gt_set_position(1, 0);
+    Ra = settings->value("Ra", 0).toDouble();
+    Dec = settings->value("Dec", 0).toDouble();
+    Latitude = settings->value("Latitude", 0).toDouble();
+    Longitude = settings->value("Longitude", 0).toDouble();
+    double* ra = toDms(Ra);
+    double* dec = toDms(Dec);
+    double* lat = toDms(Latitude);
+    double* lon = toDms(Longitude);
+
+    ui->Ra_0->setValue(ra[0]);
+    ui->Dec_0->setValue(dec[0]);
+    ui->Lat_0->setValue(lat[0]);
+    ui->Lon_0->setValue(lon[0]);
+    ui->Ra_1->setValue(ra[1]);
+    ui->Dec_1->setValue(dec[1]);
+    ui->Lat_1->setValue(lat[1]);
+    ui->Lon_1->setValue(lon[1]);
+    ui->Ra_2->setValue(ra[2]);
+    ui->Dec_2->setValue(dec[2]);
+    ui->Lat_2->setValue(lat[2]);
+    ui->Lon_2->setValue(lon[2]);
 }
 
 void MainWindow::saveIni(QString ini)
@@ -267,7 +282,6 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Voltage_0", ui->Voltage_0->value());
     settings->setValue("TimingValue_0", ahp_gt_get_timing(0));
     settings->setValue("Mean_0", ui->Mean_0->value());
-    settings->setValue("Silent_0", ui->Silent_0->isChecked());
 
     settings->setValue("Invert_1", ui->Invert_1->isChecked());
     settings->setValue("SteppingMode_1", ui->SteppingMode_1->currentIndex());
@@ -285,7 +299,6 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Voltage_1", ui->Voltage_1->value());
     settings->setValue("TimingValue_1", ahp_gt_get_timing(1));
     settings->setValue("Mean_1", ui->Mean_1->value());
-    settings->setValue("Silent_1", ui->Silent_1->isChecked());
 
     settings->setValue("MountType", ui->MountType->currentIndex());
     settings->setValue("Address", ui->Address->value());
@@ -293,6 +306,12 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("MountStyle", ui->MountStyle->currentIndex());
     settings->setValue("HighBauds", ui->HighBauds->isChecked());
     settings->setValue("Notes", QString(ui->Notes->text().toUtf8().toBase64()));
+
+
+    settings->setValue("Ra", Ra);
+    settings->setValue("Dec", Dec);
+    settings->setValue("Latitude", Latitude);
+    settings->setValue("Longitude", Longitude);
     s->~QSettings();
     settings = oldsettings;
 }
@@ -370,8 +389,6 @@ MainWindow::MainWindow(QWidget *parent)
         {
             ahp_gt_write_values(0, &percent, &finished);
             ahp_gt_write_values(1, &percent, &finished);
-            ahp_gt_set_position(0, 0);
-            ahp_gt_set_position(1, 0);
             ui->Write->setEnabled(true);
             ui->WorkArea->setEnabled(true);
         }
@@ -424,6 +441,8 @@ MainWindow::MainWindow(QWidget *parent)
             portname.append(ui->ComPort->currentText());
             if(!ahp_gt_connect(portname.toUtf8())) {
                 failure = ahp_gt_detect_device();
+            } else {
+                ahp_gt_disconnect();
             }
         }
         if(!failure)
@@ -433,6 +452,10 @@ MainWindow::MainWindow(QWidget *parent)
             ui->Write->setEnabled(true);
             ahp_gt_read_values(0);
             ahp_gt_read_values(1);
+            int flags = ahp_gt_get_mount_flags();
+            flags |= halfCurrentRA;
+            flags |= halfCurrentDec;
+            ahp_gt_set_mount_flags((GT1Flags)flags);
             ui->LoadFW->setEnabled(false);
             ui->Connect->setEnabled(false);
             ui->Disconnect->setEnabled(true);
@@ -762,26 +785,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
         saveIni(ini);
     });
-    connect(ui->Silent_0, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            [ = ](bool checked)
-    {
-        int flags = (int)ahp_gt_get_mount_flags();
-        flags &= ~halfCurrentRA;
-        if(checked)
-            flags |= halfCurrentRA;
-        ahp_gt_set_mount_flags((GT1Flags)flags);
-        saveIni(ini);
-    });
-    connect(ui->Silent_1, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            [ = ](bool checked)
-    {
-        int flags = (int)ahp_gt_get_mount_flags();
-        flags &= ~halfCurrentDec;
-        if(checked)
-            flags |= halfCurrentDec;
-        ahp_gt_set_mount_flags((GT1Flags)flags);
-        saveIni(ini);
-    });
     connect(ui->Address, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
@@ -807,9 +810,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->MountStyle, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             [ = ](int index)
     {
+        int flags = (int)ahp_gt_get_mount_flags();
         ahp_gt_set_features(0, (SkywatcherFeature)((index == 2) ? isAZEQ : 0));
         ahp_gt_set_features(1, (SkywatcherFeature)((index == 2) ? isAZEQ : 0));
-        ahp_gt_set_mount_flags((GT1Flags)(index == 1));
+        flags &= ~isForkMount;
+        ahp_gt_set_mount_flags((GT1Flags)(flags | (index == 1 ? isForkMount : 0)));
         saveIni(ini);
     });
 
@@ -1077,14 +1082,129 @@ MainWindow::MainWindow(QWidget *parent)
     {
         saveIni(ini);
     });
-    connect(ui->Goto, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), [ = ]  (bool checked)
+    connect(ui->Ra_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+    {
+        if(value < 0)
+            ui->Ra_0->setValue(23);
+        if(value > 23)
+            ui->Ra_0->setValue(0);
+        Ra = fromHMSorDMS(QString::number(ui->Ra_0->value()) + ":" + QString::number(ui->Ra_1->value()) + ":" +
+                          QString::number(ui->Ra_2->value()));
+        saveIni(ini);
+    });
+    connect(ui->Ra_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+    {
+        if(value < 0)
+            ui->Ra_1->setValue(59);
+        if(value > 59)
+            ui->Ra_1->setValue(0);
+        Ra = fromHMSorDMS(QString::number(ui->Ra_0->value()) + ":" + QString::number(ui->Ra_1->value()) + ":" +
+                          QString::number(ui->Ra_2->value()));
+        saveIni(ini);
+    });
+    connect(ui->Ra_2, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+    {
+        if(value < 0)
+            ui->Ra_2->setValue(59);
+        if(value > 59)
+            ui->Ra_2->setValue(0);
+        Ra = fromHMSorDMS(QString::number(ui->Ra_0->value()) + ":" + QString::number(ui->Ra_1->value()) + ":" +
+                          QString::number(ui->Ra_2->value()));
+        saveIni(ini);
+    });
+    connect(ui->Dec_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+    {
+        Dec = fromHMSorDMS(QString::number(ui->Dec_0->value()) + ":" + QString::number(ui->Dec_1->value()) + ":" +
+                           QString::number(ui->Dec_2->value()));
+        saveIni(ini);
+    });
+    connect(ui->Dec_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+    {
+        if(value < 0)
+            ui->Dec_1->setValue(59);
+        if(value > 59)
+            ui->Dec_1->setValue(0);
+        Dec = fromHMSorDMS(QString::number(ui->Dec_0->value()) + ":" + QString::number(ui->Dec_1->value()) + ":" +
+                           QString::number(ui->Dec_2->value()));
+        saveIni(ini);
+    });
+    connect(ui->Dec_2, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+    {
+        if(value < 0)
+            ui->Dec_2->setValue(59);
+        if(value > 59)
+            ui->Dec_2->setValue(0);
+        Dec = fromHMSorDMS(QString::number(ui->Dec_0->value()) + ":" + QString::number(ui->Dec_1->value()) + ":" +
+                           QString::number(ui->Dec_2->value()));
+        saveIni(ini);
+    });
+    connect(ui->Lat_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+    {
+        Latitude = fromHMSorDMS(QString::number(ui->Lat_0->value()) + ":" + QString::number(
+                                    ui->Lat_1->value()) + ":" + QString::number(ui->Lat_2->value()));
+        saveIni(ini);
+    });
+    connect(ui->Lat_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+    {
+        if(value < 0)
+            ui->Lat_1->setValue(59);
+        if(value > 59)
+            ui->Lat_1->setValue(0);
+        Latitude = fromHMSorDMS(QString::number(ui->Lat_0->value()) + ":" + QString::number(
+                                    ui->Lat_1->value()) + ":" + QString::number(ui->Lat_2->value()));
+        saveIni(ini);
+    });
+    connect(ui->Lat_2, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+    {
+        if(value < 0)
+            ui->Lat_2->setValue(59);
+        if(value > 59)
+            ui->Lat_2->setValue(0);
+        Latitude = fromHMSorDMS(QString::number(ui->Lat_0->value()) + ":" + QString::number(
+                                    ui->Lat_1->value()) + ":" + QString::number(ui->Lat_2->value()));
+        saveIni(ini);
+    });
+    connect(ui->Lon_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+    {
+        if(value < 0)
+            ui->Lon_0->setValue(359);
+        if(value > 359)
+            ui->Lon_0->setValue(0);
+        Longitude = fromHMSorDMS(QString::number(ui->Lon_0->value()) + ":" + QString::number(
+                                     ui->Lon_1->value()) + ":" + QString::number(ui->Lon_2->value()));
+        saveIni(ini);
+    });
+    connect(ui->Lon_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+    {
+        if(value < 0)
+            ui->Lon_1->setValue(59);
+        if(value > 59)
+            ui->Lon_1->setValue(0);
+        Longitude = fromHMSorDMS(QString::number(ui->Lon_0->value()) + ":" + QString::number(
+                                     ui->Lon_1->value()) + ":" + QString::number(ui->Lon_2->value()));
+        saveIni(ini);
+    });
+    connect(ui->Lon_2, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+    {
+        if(value < 0)
+            ui->Lon_2->setValue(59);
+        if(value > 59)
+            ui->Lon_2->setValue(0);
+        Longitude = fromHMSorDMS(QString::number(ui->Lon_0->value()) + ":" + QString::number(
+                                     ui->Lon_1->value()) + ":" + QString::number(ui->Lon_2->value()));
+        saveIni(ini);
+    });
+    connect(ui->Goto, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), [ = ](bool checked)
     {
         isTracking[0] = false;
         isTracking[1] = false;
-        ahp_gt_goto_absolute(0, (double)ui->TargetSteps_0->value()*M_PI * 2.0 / (double)ahp_gt_get_totalsteps(0),
-                             ui->Ra_Speed->value());
-        ahp_gt_goto_absolute(1, (double)ui->TargetSteps_1->value()*M_PI * 2.0 / (double)ahp_gt_get_totalsteps(1),
-                             ui->Dec_Speed->value());
+        ahp_gt_set_location(Latitude, Longitude, 0);
+        ahp_gt_goto_radec(Ra, Dec);
+    });
+    connect(ui->Halt, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), [ = ](bool checked)
+    {
+        ahp_gt_stop_motion(0, 0);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->Server, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
     {
@@ -1269,7 +1389,6 @@ void MainWindow::disconnectControls(bool block)
     ui->MountStyle->blockSignals(block);
     ui->PWMFreq->blockSignals(block);
 
-    ui->Silent_0->blockSignals(block);
     ui->Invert_0->blockSignals(block);
     ui->MotorSteps_0->blockSignals(block);
     ui->Worm_0->blockSignals(block);
@@ -1281,7 +1400,6 @@ void MainWindow::disconnectControls(bool block)
     ui->Coil_0->blockSignals(block);
     ui->GPIO_0->blockSignals(block);
 
-    ui->Silent_1->blockSignals(block);
     ui->Invert_1->blockSignals(block);
     ui->MotorSteps_1->blockSignals(block);
     ui->Worm_1->blockSignals(block);
@@ -1327,7 +1445,6 @@ void MainWindow::UpdateValues(int axis)
         ui->Coil_0->setCurrentIndex(ahp_gt_get_stepping_conf(0));
         ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(0));
         ui->Invert_0->setChecked(ahp_gt_get_direction_invert(0));
-        ui->Silent_0->setChecked((ahp_gt_get_mount_flags() & halfCurrentRA) != 0);
     }
     else if (axis == 1)
     {
@@ -1359,7 +1476,6 @@ void MainWindow::UpdateValues(int axis)
         ui->Coil_1->setCurrentIndex(ahp_gt_get_stepping_conf(1));
         ui->SteppingMode_1->setCurrentIndex(ahp_gt_get_stepping_mode(1));
         ui->Invert_1->setChecked(ahp_gt_get_direction_invert(1));
-        ui->Silent_1->setChecked((ahp_gt_get_mount_flags() & halfCurrentDec) != 0);
     }
     switch(ahp_gt_get_feature(0))
     {
@@ -1402,4 +1518,57 @@ void MainWindow::UpdateValues(int axis)
     ui->MountStyle->setCurrentIndex(index);
     ui->HighBauds->setChecked((ahp_gt_get_mount_flags() & bauds_115200) != 0);
     disconnectControls(false);
+}
+
+QString MainWindow::toDMS(double dms)
+{
+    double d, m, s;
+    dms = fabs(dms);
+    d = floor(dms);
+    dms -= d;
+    dms *= 60.0;
+    m = floor(dms);
+    dms -= m;
+    dms *= 60000.0;
+    s = floor(dms) / 1000.0;
+    return QString::number(d) + QString(":") + QString::number(m) + QString(":") + QString::number(s);
+}
+
+double* MainWindow::toDms(double d)
+{
+    double* dms = (double*)malloc(sizeof(double) * 3);
+    dms[0] = floor(d);
+    d -= dms[0];
+    d *= 60.0;
+    dms[1] = floor(d);
+    d -= dms[1];
+    d *= 60.0;
+    dms[2] = d;
+    return dms;
+}
+
+QString MainWindow::toHMS(double hms)
+{
+    double h, m, s;
+    hms = fabs(hms);
+    h = floor(hms);
+    hms -= h;
+    hms *= 60.0;
+    m = floor(hms);
+    hms -= m;
+    hms *= 60000.0;
+    s = floor(hms) / 1000.0;
+    return QString::number(h) + QString(":") + QString::number(m) + QString(":") + QString::number(s);
+}
+
+double MainWindow::fromHMSorDMS(QString dms)
+{
+    double d;
+    double m;
+    double s;
+    QStringList deg = dms.split(":");
+    d = deg[0].toDouble();
+    m = deg[1].toDouble() / 60.0 * (d < 0 ? -1 : 1);
+    s = deg[2].toDouble() / 3600.0 * (d < 0 ? -1 : 1);
+    return d + m + s;
 }
