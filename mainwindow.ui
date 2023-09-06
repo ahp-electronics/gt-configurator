@@ -287,7 +287,7 @@
      <widget class="QCheckBox" name="TuneRa">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>170</x>
         <y>350</y>
         <width>71</width>
         <height>16</height>
@@ -352,7 +352,7 @@
      <widget class="QCheckBox" name="TuneDec">
       <property name="geometry">
        <rect>
-        <x>80</x>
+        <x>90</x>
         <y>350</y>
         <width>71</width>
         <height>16</height>
@@ -790,25 +790,38 @@
        <rect>
         <x>100</x>
         <y>30</y>
-        <width>161</width>
+        <width>101</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>Start Synscan server</string>
+       <string>Start server</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="HighBauds">
       <property name="geometry">
        <rect>
-        <x>270</x>
+        <x>200</x>
         <y>30</y>
-        <width>161</width>
+        <width>121</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
        <string>115200 Bauds</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="FullCurrent">
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>30</y>
+        <width>141</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Full-current track</string>
       </property>
      </widget>
     </widget>

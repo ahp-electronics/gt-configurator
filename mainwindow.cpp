@@ -127,11 +127,16 @@ void MainWindow::readIni(QString ini)
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
     ui->HighBauds->setChecked(settings->value("HighBauds", false).toBool());
+    ui->FullCurrent->setChecked(settings->value("FullCurrent", false).toBool());
     int flags = ahp_gt_get_mount_flags();
     int features0 = ahp_gt_get_features(0);
     int features1 = ahp_gt_get_features(0);
     features0 &= ~isAZEQ;
+    features0 |= hasCommonSlewStart;
+    features0 |= (ui->FullCurrent->isChecked() ? hasHalfCurrentTracking : 0);
     features1 &= ~isAZEQ;
+    features1 |= hasCommonSlewStart;
+    features1 |= (ui->FullCurrent->isChecked() ? hasHalfCurrentTracking : 0);
     flags &= ~isForkMount;
     flags &= ~bauds_115200;
     flags |= ((ui->MountStyle->currentIndex() == 1) ? isForkMount : 0);
@@ -304,9 +309,9 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Address", ui->Address->value());
     settings->setValue("PWMFreq", ui->PWMFreq->value());
     settings->setValue("MountStyle", ui->MountStyle->currentIndex());
+    settings->setValue("FullCurrent", ui->FullCurrent->isChecked());
     settings->setValue("HighBauds", ui->HighBauds->isChecked());
     settings->setValue("Notes", QString(ui->Notes->text().toUtf8().toBase64()));
-
 
     settings->setValue("Ra", Ra);
     settings->setValue("Dec", Dec);
@@ -453,8 +458,6 @@ MainWindow::MainWindow(QWidget *parent)
             ahp_gt_read_values(0);
             ahp_gt_read_values(1);
             int flags = ahp_gt_get_mount_flags();
-            flags |= halfCurrentRA;
-            flags |= halfCurrentDec;
             ahp_gt_set_mount_flags((GT1Flags)flags);
             ui->LoadFW->setEnabled(false);
             ui->Connect->setEnabled(false);
@@ -811,13 +814,19 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ](int index)
     {
         int flags = (int)ahp_gt_get_mount_flags();
-        ahp_gt_set_features(0, (SkywatcherFeature)((index == 2) ? isAZEQ : 0));
-        ahp_gt_set_features(1, (SkywatcherFeature)((index == 2) ? isAZEQ : 0));
+        ahp_gt_set_features(0, (SkywatcherFeature)(ahp_gt_get_features(0) | ((index == 2) ? isAZEQ : 0)));
+        ahp_gt_set_features(1, (SkywatcherFeature)(ahp_gt_get_features(1) | ((index == 2) ? isAZEQ : 0)));
         flags &= ~isForkMount;
         ahp_gt_set_mount_flags((GT1Flags)(flags | (index == 1 ? isForkMount : 0)));
         saveIni(ini);
     });
-
+    connect(ui->FullCurrent, static_cast<void (QCheckBox::*)()>(&QCheckBox::click),
+            [ = ]()
+    {
+        ahp_gt_set_features(0, (SkywatcherFeature)(ahp_gt_get_features(0) | (ui->FullCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
+        ahp_gt_set_features(1, (SkywatcherFeature)(ahp_gt_get_features(1) | (ui->FullCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
+        saveIni(ini);
+    });
     connect(ui->Ra_Speed, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
@@ -1509,6 +1518,7 @@ void MainWindow::UpdateValues(int axis)
     ui->PWMFreq_label->setText("PWM: " + QString::number(1500 + 700 * ui->PWMFreq->value()) + " Hz");
     ui->Address->setValue(ahp_gt_get_address());
     ui->MountType->setCurrentIndex(mounttypes.indexOf(ahp_gt_get_mount_type()));
+    ui->FullCurrent->setChecked((ahp_gt_get_features(0) & ahp_gt_get_features(1) & hasHalfCurrentTracking) == hasHalfCurrentTracking);
     int index = 0;
     index |= (ahp_gt_get_features(0) & isAZEQ ? 2 : 0);
     index |= (ahp_gt_get_features(1) & isAZEQ ? 2 : 0);
