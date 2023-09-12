@@ -1,8 +1,14 @@
+gt-configurator (1.1.3) stable; urgency=low
+
+  * New release
+
+ -- Ilia Platone <info@iliaplatone.com>  Tue, 12 Sep 2023 00:00:00 +0200
+
 gt-configurator (1.1.2) stable; urgency=low
 
   * New release
 
- -- Ilia Platone <info@iliaplatone.com>  Wed, 22 MAr 2023 00:00:00 +0200
+ -- Ilia Platone <info@iliaplatone.com>  Wed, 22 Mar 2023 00:00:00 +0200
 
 gt-configurator (1.1.1) stable; urgency=low
 
