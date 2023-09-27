@@ -132,11 +132,13 @@ void MainWindow::readIni(QString ini)
     int features0 = ahp_gt_get_features(0);
     int features1 = ahp_gt_get_features(0);
     features0 &= ~isAZEQ;
+    features0 &= ~hasHalfCurrentTracking;
     features0 |= hasCommonSlewStart;
-    features0 |= (ui->FullCurrent->isChecked() ? hasHalfCurrentTracking : 0);
+    features0 |= (ui->FullCurrent->isChecked() ? 0 : hasHalfCurrentTracking);
     features1 &= ~isAZEQ;
+    features1 &= ~hasHalfCurrentTracking;
     features1 |= hasCommonSlewStart;
-    features1 |= (ui->FullCurrent->isChecked() ? hasHalfCurrentTracking : 0);
+    features1 |= (ui->FullCurrent->isChecked() ? 0 : hasHalfCurrentTracking);
     flags &= ~isForkMount;
     flags &= ~bauds_115200;
     flags |= ((ui->MountStyle->currentIndex() == 1) ? isForkMount : 0);
@@ -823,8 +825,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->FullCurrent, static_cast<void (QCheckBox::*)()>(&QCheckBox::click),
             [ = ]()
     {
-        ahp_gt_set_features(0, (SkywatcherFeature)(ahp_gt_get_features(0) | (ui->FullCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
-        ahp_gt_set_features(1, (SkywatcherFeature)(ahp_gt_get_features(1) | (ui->FullCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
+        ahp_gt_set_features(0, (SkywatcherFeature)(ahp_gt_get_features(0) | (ui->FullCurrent->isChecked() ? 0 : hasHalfCurrentTracking)));
+        ahp_gt_set_features(1, (SkywatcherFeature)(ahp_gt_get_features(1) | (ui->FullCurrent->isChecked() ? 0 : hasHalfCurrentTracking)));
         saveIni(ini);
     });
     connect(ui->Ra_Speed, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
