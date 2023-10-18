@@ -127,18 +127,12 @@ void MainWindow::readIni(QString ini)
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
     ui->HighBauds->setChecked(settings->value("HighBauds", false).toBool());
-    ui->FullCurrent->setChecked(settings->value("FullCurrent", false).toBool());
     int flags = ahp_gt_get_mount_flags();
-    int features0 = ahp_gt_get_features(0);
-    int features1 = ahp_gt_get_features(0);
-    features0 &= ~isAZEQ;
-    features0 &= ~hasHalfCurrentTracking;
-    features0 |= hasCommonSlewStart;
-    features0 |= (ui->FullCurrent->isChecked() ? 0 : hasHalfCurrentTracking);
-    features1 &= ~isAZEQ;
-    features1 &= ~hasHalfCurrentTracking;
-    features1 |= hasCommonSlewStart;
-    features1 |= (ui->FullCurrent->isChecked() ? 0 : hasHalfCurrentTracking);
+    int features = ahp_gt_get_features(0);
+    features &= ~(isAZEQ | hasHalfCurrentTracking);
+    features |= hasCommonSlewStart;
+    features |= (settings->value("HalfCurrent", false).toBool() ? hasHalfCurrentTracking : 0);
+    ui->HalfCurrent->setChecked(settings->value("HalfCurrent", false).toBool());
     flags &= ~isForkMount;
     flags &= ~bauds_115200;
     flags |= ((ui->MountStyle->currentIndex() == 1) ? isForkMount : 0);
@@ -147,8 +141,8 @@ void MainWindow::readIni(QString ini)
     flags |= halfCurrentDec;
     ahp_gt_set_mount_flags((GT1Flags)flags);
     ahp_gt_set_mount_type((MountType)mounttypes[ui->MountType->currentIndex()]);
-    ahp_gt_set_features(0, (SkywatcherFeature)(features0 | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0)));
-    ahp_gt_set_features(1, (SkywatcherFeature)(features1 | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0)));
+    ahp_gt_set_features(0, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0) | (ui->HalfCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
+    ahp_gt_set_features(1, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0) | (ui->HalfCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
     ahp_gt_set_pwm_frequency(ui->PWMFreq->value());
     ahp_gt_set_address(ui->Address->value());
 
@@ -311,7 +305,7 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Address", ui->Address->value());
     settings->setValue("PWMFreq", ui->PWMFreq->value());
     settings->setValue("MountStyle", ui->MountStyle->currentIndex());
-    settings->setValue("FullCurrent", ui->FullCurrent->isChecked());
+    settings->setValue("HalfCurrent", ui->HalfCurrent->isChecked());
     settings->setValue("HighBauds", ui->HighBauds->isChecked());
     settings->setValue("Notes", QString(ui->Notes->text().toUtf8().toBase64()));
 
@@ -822,11 +816,10 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_set_mount_flags((GT1Flags)(flags | (index == 1 ? isForkMount : 0)));
         saveIni(ini);
     });
-    connect(ui->FullCurrent, static_cast<void (QCheckBox::*)()>(&QCheckBox::click),
-            [ = ]()
+    connect(ui->HalfCurrent, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
     {
-        ahp_gt_set_features(0, (SkywatcherFeature)(ahp_gt_get_features(0) | (ui->FullCurrent->isChecked() ? 0 : hasHalfCurrentTracking)));
-        ahp_gt_set_features(1, (SkywatcherFeature)(ahp_gt_get_features(1) | (ui->FullCurrent->isChecked() ? 0 : hasHalfCurrentTracking)));
+        ahp_gt_set_features(0, (SkywatcherFeature)((ahp_gt_get_features(0) & ahp_gt_get_features(1) & ~hasHalfCurrentTracking) | (checked ? hasHalfCurrentTracking : 0)));
+        ahp_gt_set_features(1, (SkywatcherFeature)((ahp_gt_get_features(0) & ahp_gt_get_features(1) & ~hasHalfCurrentTracking) | (checked ? hasHalfCurrentTracking : 0)));
         saveIni(ini);
     });
     connect(ui->Ra_Speed, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
@@ -1520,7 +1513,7 @@ void MainWindow::UpdateValues(int axis)
     ui->PWMFreq_label->setText("PWM: " + QString::number(1500 + 700 * ui->PWMFreq->value()) + " Hz");
     ui->Address->setValue(ahp_gt_get_address());
     ui->MountType->setCurrentIndex(mounttypes.indexOf(ahp_gt_get_mount_type()));
-    ui->FullCurrent->setChecked((ahp_gt_get_features(0) & ahp_gt_get_features(1) & hasHalfCurrentTracking) == hasHalfCurrentTracking);
+    ui->HalfCurrent->setChecked((ahp_gt_get_features(0) & ahp_gt_get_features(1) & hasHalfCurrentTracking) == hasHalfCurrentTracking);
     int index = 0;
     index |= (ahp_gt_get_features(0) & isAZEQ ? 2 : 0);
     index |= (ahp_gt_get_features(1) & isAZEQ ? 2 : 0);

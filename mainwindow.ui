@@ -811,7 +811,7 @@
        <string>115200 Bauds</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="FullCurrent">
+     <widget class="QCheckBox" name="HalfCurrent">
       <property name="geometry">
        <rect>
         <x>330</x>
@@ -821,7 +821,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Full-current track</string>
+       <string>Half-current track</string>
       </property>
      </widget>
     </widget>
