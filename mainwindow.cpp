@@ -810,8 +810,13 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ](int index)
     {
         int flags = (int)ahp_gt_get_mount_flags();
-        ahp_gt_set_features(0, (SkywatcherFeature)(ahp_gt_get_features(0) | ((index == 2) ? isAZEQ : 0)));
-        ahp_gt_set_features(1, (SkywatcherFeature)(ahp_gt_get_features(1) | ((index == 2) ? isAZEQ : 0)));
+        if(index == 2) {
+            ahp_gt_set_features(0, (SkywatcherFeature)(ahp_gt_get_features(0) | isAZEQ));
+            ahp_gt_set_features(1, (SkywatcherFeature)(ahp_gt_get_features(1) | isAZEQ));
+        } else {
+            ahp_gt_set_features(0, (SkywatcherFeature)(ahp_gt_get_features(0) & ~isAZEQ));
+            ahp_gt_set_features(1, (SkywatcherFeature)(ahp_gt_get_features(1) & ~isAZEQ));
+        }
         flags &= ~isForkMount;
         ahp_gt_set_mount_flags((GT1Flags)(flags | (index == 1 ? isForkMount : 0)));
         saveIni(ini);
@@ -1515,8 +1520,8 @@ void MainWindow::UpdateValues(int axis)
     ui->MountType->setCurrentIndex(mounttypes.indexOf(ahp_gt_get_mount_type()));
     ui->HalfCurrent->setChecked((ahp_gt_get_features(0) & ahp_gt_get_features(1) & hasHalfCurrentTracking) == hasHalfCurrentTracking);
     int index = 0;
-    index |= (ahp_gt_get_features(0) & isAZEQ ? 2 : 0);
-    index |= (ahp_gt_get_features(1) & isAZEQ ? 2 : 0);
+    index |= (((ahp_gt_get_features(0) & isAZEQ) != 0) ? 2 : 0);
+    index |= (((ahp_gt_get_features(1) & isAZEQ) != 0) ? 2 : 0);
     if(!index) {
         index |= (((ahp_gt_get_mount_flags() & isForkMount) != 0) ? 1 : 0);
     }
