@@ -31,13 +31,13 @@ set(AHP_GT_CONFIGURATOR_VERSION "${AHP_GT_CONFIGURATOR_VERSION_MAJOR}.${AHP_GT_C
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
 
 find_package(Qt5 COMPONENTS Widgets SerialPort Network REQUIRED)
-find_package(AHP_GT REQUIRED)
+find_package(AHPGT REQUIRED)
 find_package(DFU REQUIRED)
 find_package(Threads REQUIRED)
 find_package(M REQUIRED)
 
 include_directories(${CMAKE_INCLUDE_PATH})
-include_directories(${AHPAHP_GT_INCLUDE_DIR})
+include_directories(${AHP_GT_INCLUDE_DIR})
 include_directories(${DFU_INCLUDE_DIR})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/icon.ico ${CMAKE_CURRENT_BINARY_DIR}/icon.ico COPYONLY )
@@ -71,7 +71,7 @@ if(ANDROID)
     endif(WIN32)
 endif(ANDROID)
 
-target_link_libraries(ahp-gt-configurator PRIVATE ${DFU_LIBRARIES} ${AHPAHP_GT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIB} Qt5::Widgets Qt5::SerialPort Qt5::Network)
+target_link_libraries(ahp-gt-configurator PRIVATE ${DFU_LIBRARIES} ${AHP_GT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIB} Qt5::Widgets Qt5::SerialPort Qt5::Network)
 install(TARGETS ahp-gt-configurator RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install(FILES ahp-gt-configurator.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons)
 install(FILES ahp-gt-configurator.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
