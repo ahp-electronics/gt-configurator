@@ -1,5 +1,5 @@
 #define MyAppName "GT1 Configurator"
-#define TargetName "ahp-gt-configurator"
+#define TargetName "gt-configurator"
 
 [Setup]
 AppId={{9C18C97C-463A-42AD-B5D7-4154023BDE23}
