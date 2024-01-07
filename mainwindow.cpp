@@ -321,7 +321,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    ahp_set_app_name("GT Configurator");
+    ahp_set_app_name((char*)"GT Configurator");
     ahp_set_debug_level(AHP_DEBUG_DEBUG);
     IndicationThread = new Thread(this, 100, 500);
     ProgressThread = new Thread(this, 100, 10);
