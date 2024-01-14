@@ -155,6 +155,7 @@ void MainWindow::readIni(QString ini)
     ui->Acceleration_0->setValue(settings->value("Acceleration_0",
                                  ui->Acceleration_0->maximum() - ahp_gt_get_acceleration_angle(0) * 1800.0 / M_PI).toInt());
     ui->Invert_0->setChecked(settings->value("Invert_0", ahp_gt_get_direction_invert(0) == 1).toBool());
+    ui->HalfCurrent_0->setChecked(settings->value("HalfCurrent_0", ahp_gt_get_mount_flags() & halfCurrentRA).toBool());
     ui->Inductance_0->setValue(settings->value("Inductance_0", 10).toInt());
     ui->Resistance_0->setValue(settings->value("Resistance_0", 20000).toInt());
     ui->Current_0->setValue(settings->value("Current_0", 1000).toInt());
@@ -172,6 +173,7 @@ void MainWindow::readIni(QString ini)
     ui->Acceleration_1->setValue(settings->value("Acceleration_1",
                                  ui->Acceleration_1->maximum() - ahp_gt_get_acceleration_angle(1) * 1800.0 / M_PI).toInt());
     ui->Invert_1->setChecked(settings->value("Invert_1", ahp_gt_get_direction_invert(1) == 1).toBool());
+    ui->HalfCurrent_1->setChecked(settings->value("HalfCurrent_1", ahp_gt_get_mount_flags() & halfCurrentDec).toBool());
     ui->Inductance_1->setValue(settings->value("Inductance_1", 10).toInt());
     ui->Resistance_1->setValue(settings->value("Resistance_1", 20000).toInt());
     ui->Current_1->setValue(settings->value("Current_1", 1000).toInt());
@@ -267,6 +269,7 @@ void MainWindow::saveIni(QString ini)
     QSettings *s = new QSettings(ini, QSettings::Format::IniFormat);
     settings = s;
 
+    settings->setValue("HalfCurrent_0", ui->HalfCurrent_0->isChecked());
     settings->setValue("Invert_0", ui->Invert_0->isChecked());
     settings->setValue("SteppingMode_0", ui->SteppingMode_0->currentIndex());
     settings->setValue("MotorSteps_0", ui->MotorSteps_0->value());
@@ -284,6 +287,7 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("TimingValue_0", ahp_gt_get_timing(0));
     settings->setValue("Mean_0", ui->Mean_0->value());
 
+    settings->setValue("HalfCurrent_1", ui->HalfCurrent_1->isChecked());
     settings->setValue("Invert_1", ui->Invert_1->isChecked());
     settings->setValue("SteppingMode_1", ui->SteppingMode_1->currentIndex());
     settings->setValue("MotorSteps_1", ui->MotorSteps_1->value());
