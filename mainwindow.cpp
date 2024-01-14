@@ -827,6 +827,20 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_set_features(1, (SkywatcherFeature)((ahp_gt_get_features(0) & ahp_gt_get_features(1) & ~hasHalfCurrentTracking) | (checked ? hasHalfCurrentTracking : 0)));
         saveIni(ini);
     });
+    connect(ui->HalfCurrent_0, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
+    {
+        int flags = (int)ahp_gt_get_mount_flags();
+        flags &= ~halfCurrentRA;
+        ahp_gt_set_mount_flags((GT1Flags)(flags | (checked ? halfCurrentRA : 0)));
+        saveIni(ini);
+    });
+    connect(ui->HalfCurrent_1, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
+    {
+        int flags = (int)ahp_gt_get_mount_flags();
+        flags &= ~halfCurrentDec;
+        ahp_gt_set_mount_flags((GT1Flags)(flags | (checked ? halfCurrentDec : 0)));
+        saveIni(ini);
+    });
     connect(ui->Ra_Speed, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
