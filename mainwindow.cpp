@@ -107,6 +107,7 @@ dl_end:
 
 void MainWindow::readIni(QString ini)
 {
+    while(!IndicationThread->lock()) Thread::msleep(100);
     QString dir = QDir(ini).dirName();
     if(!QDir(dir).exists())
     {
@@ -127,6 +128,8 @@ void MainWindow::readIni(QString ini)
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
     ui->HighBauds->setChecked(settings->value("HighBauds", false).toBool());
+    ui->HalfCurrent_0->setChecked(settings->value("HalfCurrent_0", false).toBool());
+    ui->HalfCurrent_1->setChecked(settings->value("HalfCurrent_1", false).toBool());
     int flags = ahp_gt_get_mount_flags();
     int features = ahp_gt_get_features(0);
     features &= ~(isAZEQ | hasHalfCurrentTracking);
@@ -135,6 +138,8 @@ void MainWindow::readIni(QString ini)
     ui->HalfCurrent->setChecked(settings->value("HalfCurrent", false).toBool());
     flags &= ~isForkMount;
     flags &= ~bauds_115200;
+    flags &= ~halfCurrentRA;
+    flags &= ~halfCurrentDec;
     flags |= ((ui->MountStyle->currentIndex() == 1) ? isForkMount : 0);
     flags |= (ui->HighBauds->isChecked() ? bauds_115200 : 0);
     flags |= (ui->HalfCurrent_0->isChecked() ? halfCurrentRA : 0);
@@ -247,6 +252,7 @@ void MainWindow::readIni(QString ini)
     ui->Dec_2->setValue(dec[2]);
     ui->Lat_2->setValue(lat[2]);
     ui->Lon_2->setValue(lon[2]);
+    IndicationThread->unlock();
 }
 
 void MainWindow::saveIni(QString ini)
