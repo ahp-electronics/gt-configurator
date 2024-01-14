@@ -137,6 +137,8 @@ void MainWindow::readIni(QString ini)
     flags &= ~bauds_115200;
     flags |= ((ui->MountStyle->currentIndex() == 1) ? isForkMount : 0);
     flags |= (ui->HighBauds->isChecked() ? bauds_115200 : 0);
+    flags |= (ui->HalfCurrent_0->isChecked() ? halfCurrentRA : 0);
+    flags |= (ui->HalfCurrent_1->isChecked() ? halfCurrentDec : 0);
     ahp_gt_set_mount_flags((GT1Flags)flags);
     ahp_gt_set_mount_type((MountType)mounttypes[ui->MountType->currentIndex()]);
     ahp_gt_set_features(0, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0) | (ui->HalfCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
@@ -153,7 +155,6 @@ void MainWindow::readIni(QString ini)
     ui->Acceleration_0->setValue(settings->value("Acceleration_0",
                                  ui->Acceleration_0->maximum() - ahp_gt_get_acceleration_angle(0) * 1800.0 / M_PI).toInt());
     ui->Invert_0->setChecked(settings->value("Invert_0", ahp_gt_get_direction_invert(0) == 1).toBool());
-    ui->HalfCurrent_0->setChecked(settings->value("HalfCurrent_0", ahp_gt_get_mount_flags() & halfCurrentRA).toBool());
     ui->Inductance_0->setValue(settings->value("Inductance_0", 10).toInt());
     ui->Resistance_0->setValue(settings->value("Resistance_0", 20000).toInt());
     ui->Current_0->setValue(settings->value("Current_0", 1000).toInt());
@@ -171,7 +172,6 @@ void MainWindow::readIni(QString ini)
     ui->Acceleration_1->setValue(settings->value("Acceleration_1",
                                  ui->Acceleration_1->maximum() - ahp_gt_get_acceleration_angle(1) * 1800.0 / M_PI).toInt());
     ui->Invert_1->setChecked(settings->value("Invert_1", ahp_gt_get_direction_invert(1) == 1).toBool());
-    ui->HalfCurrent_1->setChecked(settings->value("HalfCurrent_1", ahp_gt_get_mount_flags() & halfCurrentDec).toBool());
     ui->Inductance_1->setValue(settings->value("Inductance_1", 10).toInt());
     ui->Resistance_1->setValue(settings->value("Resistance_1", 20000).toInt());
     ui->Current_1->setValue(settings->value("Current_1", 1000).toInt());
@@ -1413,7 +1413,10 @@ void MainWindow::disconnectControls(bool block)
     ui->Address->blockSignals(block);
     ui->MountStyle->blockSignals(block);
     ui->PWMFreq->blockSignals(block);
+    ui->HalfCurrent->blockSignals(block);
+    ui->HighBauds->blockSignals(block);
 
+    ui->HalfCurrent_0->blockSignals(block);
     ui->Invert_0->blockSignals(block);
     ui->MotorSteps_0->blockSignals(block);
     ui->Worm_0->blockSignals(block);
@@ -1425,6 +1428,7 @@ void MainWindow::disconnectControls(bool block)
     ui->Coil_0->blockSignals(block);
     ui->GPIO_0->blockSignals(block);
 
+    ui->HalfCurrent_1->blockSignals(block);
     ui->Invert_1->blockSignals(block);
     ui->MotorSteps_1->blockSignals(block);
     ui->Worm_1->blockSignals(block);
@@ -1470,6 +1474,7 @@ void MainWindow::UpdateValues(int axis)
         ui->Coil_0->setCurrentIndex(ahp_gt_get_stepping_conf(0));
         ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(0));
         ui->Invert_0->setChecked(ahp_gt_get_direction_invert(0));
+        ui->HalfCurrent_0->setChecked(ahp_gt_get_mount_flags() & halfCurrentRA);
     }
     else if (axis == 1)
     {
@@ -1501,6 +1506,7 @@ void MainWindow::UpdateValues(int axis)
         ui->Coil_1->setCurrentIndex(ahp_gt_get_stepping_conf(1));
         ui->SteppingMode_1->setCurrentIndex(ahp_gt_get_stepping_mode(1));
         ui->Invert_1->setChecked(ahp_gt_get_direction_invert(1));
+        ui->HalfCurrent_1->setChecked(ahp_gt_get_mount_flags() & halfCurrentDec);
     }
     switch(ahp_gt_get_feature(0))
     {
