@@ -77,7 +77,7 @@ bool MainWindow::DownloadFirmware(QString url, QString filename, QSettings *sett
     QByteArray bin;
     QFile file(filename);
     QNetworkAccessManager* manager = new QNetworkAccessManager();
-    QNetworkReply *response = manager->get(QNetworkRequest(QUrl(url)));
+    QNetworkReply *response = manager->get(QNetworkRequest(QUrl(url+"&download=on")));
     QTimer timer;
     timer.setSingleShot(true);
     QEventLoop loop;
@@ -85,7 +85,7 @@ bool MainWindow::DownloadFirmware(QString url, QString filename, QSettings *sett
     connect(response, SIGNAL(finished()), &loop, SLOT(quit()));
     timer.start(timeout_ms);
     loop.exec();
-    QString base64 = settings->value("firmware", "").toString();
+    QString base64 = settings->value("data", "").toString();
     if(response->error() == QNetworkReply::NetworkError::NoError) {
         QJsonDocument doc = QJsonDocument::fromJson(response->readAll());
         QJsonObject obj = doc.object();
