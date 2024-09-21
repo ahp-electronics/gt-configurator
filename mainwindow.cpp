@@ -166,6 +166,7 @@ void MainWindow::readIni(QString ini)
     ui->Voltage_0->setValue(settings->value("Voltage_0", 12).toInt());
     ui->GPIO_0->setCurrentIndex(settings->value("GPIO_0", ahp_gt_get_feature(0)).toInt());
     ui->Coil_0->setCurrentIndex(settings->value("Coil_0", ahp_gt_get_stepping_conf(0)).toInt());
+    ui->TrackRate_0->setValue(settings->value("TimingValue_0", ahp_gt_get_timing(0)).toInt()/AHP_GT_ONE_SECOND*10000.0-AHP_GT_ONE_SECOND);
     ui->SteppingMode_0->setCurrentIndex(settings->value("SteppingMode_0", ahp_gt_get_stepping_mode(0)).toInt());
     ui->Mean_0->setValue(settings->value("Mean_0", 1).toInt());
 
@@ -183,16 +184,17 @@ void MainWindow::readIni(QString ini)
     ui->Voltage_1->setValue(settings->value("Voltage_1", 12).toInt());
     ui->GPIO_1->setCurrentIndex(settings->value("GPIO_1", ahp_gt_get_feature(1)).toInt());
     ui->Coil_1->setCurrentIndex(settings->value("Coil_1", ahp_gt_get_stepping_conf(1)).toInt());
+    ui->TrackRate_1->setValue(settings->value("TimingValue_1", ahp_gt_get_timing(1)).toInt()/AHP_GT_ONE_SECOND*10000.0-AHP_GT_ONE_SECOND);
     ui->SteppingMode_1->setCurrentIndex(settings->value("SteppingMode_1", ahp_gt_get_stepping_mode(1)).toInt());
     ui->Mean_1->setValue(settings->value("Mean_1", 1).toInt());
 
-    ahp_gt_set_timing(0, settings->value("TimingValue_0", 1500000).toInt());
     ahp_gt_set_motor_steps(0, ui->MotorSteps_0->value());
     ahp_gt_set_motor_teeth(0, ui->Motor_0->value());
     ahp_gt_set_worm_teeth(0, ui->Worm_0->value());
     ahp_gt_set_crown_teeth(0, ui->Crown_0->value());
     ahp_gt_set_direction_invert(0, ui->Invert_0->isChecked());
     ahp_gt_set_stepping_conf(0, (GT1SteppingConfiguration)ui->Coil_0->currentIndex());
+    ahp_gt_set_timing(0, (GT1SteppingConfiguration)ui->TrackRate_0->value()*AHP_GT_ONE_SECOND/10000+AHP_GT_ONE_SECOND);
     ahp_gt_set_stepping_mode(0, (GT1SteppingMode)ui->SteppingMode_0->currentIndex());
     switch(ui->GPIO_0->currentIndex())
     {
@@ -209,13 +211,13 @@ void MainWindow::readIni(QString ini)
             break;
     }
 
-    ahp_gt_set_timing(1, settings->value("TimingValue_1", 1500000).toInt());
     ahp_gt_set_motor_steps(1, ui->MotorSteps_1->value());
     ahp_gt_set_motor_teeth(1, ui->Motor_1->value());
     ahp_gt_set_worm_teeth(1, ui->Worm_1->value());
     ahp_gt_set_crown_teeth(1, ui->Crown_1->value());
     ahp_gt_set_direction_invert(1, ui->Invert_1->isChecked());
     ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)ui->Coil_1->currentIndex());
+    ahp_gt_set_timing(1, (GT1SteppingConfiguration)ui->TrackRate_1->value()*AHP_GT_ONE_SECOND/10000+AHP_GT_ONE_SECOND);
     ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_1->currentIndex());
     switch(ui->GPIO_1->currentIndex())
     {
@@ -295,7 +297,7 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Resistance_0", ui->Resistance_0->value());
     settings->setValue("Current_0", ui->Current_0->value());
     settings->setValue("Voltage_0", ui->Voltage_0->value());
-    settings->setValue("TimingValue_0", ahp_gt_get_timing(0));
+    settings->setValue("TimingValue_0", ui->TrackRate_0->value()*AHP_GT_ONE_SECOND/10000+AHP_GT_ONE_SECOND);
     settings->setValue("Mean_0", ui->Mean_0->value());
 
     settings->setValue("HalfCurrent_1", ui->HalfCurrent_1->isChecked());
@@ -313,7 +315,7 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Resistance_1", ui->Resistance_1->value());
     settings->setValue("Current_1", ui->Current_1->value());
     settings->setValue("Voltage_1", ui->Voltage_1->value());
-    settings->setValue("TimingValue_1", ahp_gt_get_timing(1));
+    settings->setValue("TimingValue_1", ui->TrackRate_1->value()*AHP_GT_ONE_SECOND/10000+AHP_GT_ONE_SECOND);
     settings->setValue("Mean_1", ui->Mean_1->value());
 
     settings->setValue("MountType", ui->MountType->currentIndex());
@@ -765,14 +767,14 @@ MainWindow::MainWindow(QWidget *parent)
                 ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)index);
                 saveIni(ini);
             });
-    connect(ui->Coil_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
+    connect(ui->TrackRate_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
     {
-        ahp_gt_set_clock(0, AHP_GT_ONE_SECOND + AHP_GT_ONE_SECOND * value / 10000.0);
+        ahp_gt_set_timing(0, AHP_GT_ONE_SECOND + AHP_GT_ONE_SECOND * value / 10000.0);
         saveIni(ini);
     });
-    connect(ui->Coil_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
+    connect(ui->TrackRate_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
     {
-        ahp_gt_set_clock(1, AHP_GT_ONE_SECOND + AHP_GT_ONE_SECOND * value / 10000.0);
+        ahp_gt_set_timing(1, AHP_GT_ONE_SECOND + AHP_GT_ONE_SECOND * value / 10000.0);
         saveIni(ini);
     });
     connect(ui->GPIO_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
