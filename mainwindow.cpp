@@ -217,7 +217,7 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_crown_teeth(1, ui->Crown_1->value());
     ahp_gt_set_direction_invert(1, ui->Invert_1->isChecked());
     ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)ui->Coil_1->currentIndex());
-    ahp_gt_set_timing(1, (GT1SteppingConfiguration)-ui->_1->value()*AHP_GT_ONE_SECOND/10000+AHP_GT_ONE_SECOND);
+    ahp_gt_set_timing(1, (GT1SteppingConfiguration)-ui->TrackingRate_1->value()*AHP_GT_ONE_SECOND/10000+AHP_GT_ONE_SECOND);
     ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_1->currentIndex());
     switch(ui->GPIO_1->currentIndex())
     {
@@ -297,7 +297,7 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Resistance_0", ui->Resistance_0->value());
     settings->setValue("Current_0", ui->Current_0->value());
     settings->setValue("Voltage_0", ui->Voltage_0->value());
-    settings->setValue("TimingValue_0", ui->_0->value()*AHP_GT_ONE_SECOND/10000+AHP_GT_ONE_SECOND);
+    settings->setValue("TimingValue_0", ui->TrackingRate_0->value()*AHP_GT_ONE_SECOND/10000+AHP_GT_ONE_SECOND);
     settings->setValue("Mean_0", ui->Mean_0->value());
 
     settings->setValue("HalfCurrent_1", ui->HalfCurrent_1->isChecked());
@@ -315,7 +315,7 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Resistance_1", ui->Resistance_1->value());
     settings->setValue("Current_1", ui->Current_1->value());
     settings->setValue("Voltage_1", ui->Voltage_1->value());
-    settings->setValue("TimingValue_1", ui->_1->value()*AHP_GT_ONE_SECOND/10000+AHP_GT_ONE_SECOND);
+    settings->setValue("TimingValue_1", ui->TrackingRate_1->value()*AHP_GT_ONE_SECOND/10000+AHP_GT_ONE_SECOND);
     settings->setValue("Mean_1", ui->Mean_1->value());
 
     settings->setValue("MountType", ui->MountType->currentIndex());
@@ -767,12 +767,12 @@ MainWindow::MainWindow(QWidget *parent)
                 ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)index);
                 saveIni(ini);
             });
-    connect(ui->_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
+    connect(ui->TrackingRate_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
     {
         ahp_gt_set_timing(0, AHP_GT_ONE_SECOND + AHP_GT_ONE_SECOND * -value / 10000.0);
         saveIni(ini);
     });
-    connect(ui->_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
+    connect(ui->TrackingRate_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
     {
         ahp_gt_set_timing(1, AHP_GT_ONE_SECOND + AHP_GT_ONE_SECOND * -value / 10000.0);
         saveIni(ini);
@@ -1540,8 +1540,8 @@ void MainWindow::UpdateValues(int axis)
         ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(0));
         ui->Invert_0->setChecked(ahp_gt_get_direction_invert(0));
         ui->HalfCurrent_0->setChecked(ahp_gt_get_mount_flags() & halfCurrentRA);
-        ui->_0->setValue((ahp_gt_get_timing(0)-AHP_GT_ONE_SECOND)*10000/AHP_GT_ONE_SECOND);
-        ui->_label_0->setText("Track Rate offset: " + QString::number((double)ui->TrackRate_0->value()/100.0) + "%");
+        ui->TrackingRate_0->setValue((ahp_gt_get_timing(0)-AHP_GT_ONE_SECOND)*10000/AHP_GT_ONE_SECOND);
+        ui->TrackingRate_label_0->setText("Track Rate offset: " + QString::number((double)ui->TrackRate_0->value()/100.0) + "%");
     }
     else if (axis == 1)
     {
