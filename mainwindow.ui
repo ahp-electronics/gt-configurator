@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1100</width>
-    <height>693</height>
+    <height>700</height>
    </rect>
   </property>
   <widget class="QWidget" name="centralwidget">
