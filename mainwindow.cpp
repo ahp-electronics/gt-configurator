@@ -1540,7 +1540,7 @@ void MainWindow::UpdateValues(int axis)
         ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(0));
         ui->Invert_0->setChecked(ahp_gt_get_direction_invert(0));
         ui->HalfCurrent_0->setChecked(ahp_gt_get_mount_flags() & halfCurrentRA);
-        ui->TrackRate_0->setValue((ahp_gt_get_timing(0)-AHP_GT_ONE_SECOND)*10000/AHP_GT_ONE_SECOND);
+        ui->TrackRate_0->setValue(-(ahp_gt_get_timing(0)-AHP_GT_ONE_SECOND)*10000/AHP_GT_ONE_SECOND);
         ui->TrackRate_label_0->setText("Track Rate offset: " + QString::number((double)ui->TrackRate_0->value()/100.0) + "%");
     }
     else if (axis == 1)
@@ -1574,7 +1574,7 @@ void MainWindow::UpdateValues(int axis)
         ui->SteppingMode_1->setCurrentIndex(ahp_gt_get_stepping_mode(1));
         ui->Invert_1->setChecked(ahp_gt_get_direction_invert(1));
         ui->HalfCurrent_1->setChecked(ahp_gt_get_mount_flags() & halfCurrentDec);
-        ui->TrackRate_1->setValue((ahp_gt_get_timing(1)-AHP_GT_ONE_SECOND)*10000/AHP_GT_ONE_SECOND);
+        ui->TrackRate_1->setValue(-(ahp_gt_get_timing(1)-AHP_GT_ONE_SECOND)*10000/AHP_GT_ONE_SECOND);
         ui->TrackRate_label_1->setText("Track Rate offset: " + QString::number((double)ui->TrackRate_1->value()/100.0) + "%");
     }
     switch(ahp_gt_get_feature(0))
