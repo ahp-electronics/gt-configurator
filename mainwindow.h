@@ -42,7 +42,7 @@ class MainWindow : public QMainWindow
         }
 
     private:
-        double Latitude, Longitude, Elevation;
+        double Altitude, Latitude, Longitude, Elevation;
         double Ra {0.0};
         double Dec {0.0};
 

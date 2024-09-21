@@ -235,23 +235,30 @@ void MainWindow::readIni(QString ini)
     Dec = settings->value("Dec", 0).toDouble();
     Latitude = settings->value("Latitude", 0).toDouble();
     Longitude = settings->value("Longitude", 0).toDouble();
+    Altitude = settings->value("Altitude", 0).toDouble();
+    Elevation = settings->value("Elevation", 0).toDouble();
     double* ra = toDms(Ra);
     double* dec = toDms(Dec);
     double* lat = toDms(Latitude);
     double* lon = toDms(Longitude);
+    double* alt = toDms(Altitude);
 
     ui->Ra_0->setValue(ra[0]);
     ui->Dec_0->setValue(dec[0]);
     ui->Lat_0->setValue(lat[0]);
     ui->Lon_0->setValue(lon[0]);
+    ui->Alt_0->setValue(alt[0]);
     ui->Ra_1->setValue(ra[1]);
     ui->Dec_1->setValue(dec[1]);
     ui->Lat_1->setValue(lat[1]);
     ui->Lon_1->setValue(lon[1]);
+    ui->Alt_1->setValue(alt[1]);
     ui->Ra_2->setValue(ra[2]);
     ui->Dec_2->setValue(dec[2]);
     ui->Lat_2->setValue(lat[2]);
     ui->Lon_2->setValue(lon[2]);
+    ui->Alt_2->setValue(alt[2]);
+    ui->Elevation->setValue(Elevation);
     IndicationThread->unlock();
 }
 
@@ -321,6 +328,8 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Dec", Dec);
     settings->setValue("Latitude", Latitude);
     settings->setValue("Longitude", Longitude);
+    settings->setValue("Altitude", Altitude);
+    settings->setValue("Elevation", Elevation);
     s->~QSettings();
     settings = oldsettings;
 }
@@ -752,8 +761,18 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(ini);
     });
     connect(ui->Coil_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
+            {
+                ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)index);
+                saveIni(ini);
+            });
+    connect(ui->Coil_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
     {
-        ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)index);
+        ahp_gt_set_clock(0, AHP_GT_ONE_SECOND + AHP_GT_ONE_SECOND * value / 10000.0);
+        saveIni(ini);
+    });
+    connect(ui->Coil_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
+    {
+        ahp_gt_set_clock(1, AHP_GT_ONE_SECOND + AHP_GT_ONE_SECOND * value / 10000.0);
         saveIni(ini);
     });
     connect(ui->GPIO_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
@@ -1196,41 +1215,79 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(ini);
     });
     connect(ui->Lon_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
-    {
-        if(value < 0)
-            ui->Lon_0->setValue(359);
-        if(value > 359)
-            ui->Lon_0->setValue(0);
-        Longitude = fromHMSorDMS(QString::number(ui->Lon_0->value()) + ":" + QString::number(
-                                     ui->Lon_1->value()) + ":" + QString::number(ui->Lon_2->value()));
-        saveIni(ini);
-    });
+            {
+                if(value < 0)
+                    ui->Lon_0->setValue(359);
+                if(value > 359)
+                    ui->Lon_0->setValue(0);
+                Longitude = fromHMSorDMS(QString::number(ui->Lon_0->value()) + ":" + QString::number(
+                                             ui->Lon_1->value()) + ":" + QString::number(ui->Lon_2->value()));
+                saveIni(ini);
+            });
     connect(ui->Lon_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
-    {
-        if(value < 0)
-            ui->Lon_1->setValue(59);
-        if(value > 59)
-            ui->Lon_1->setValue(0);
-        Longitude = fromHMSorDMS(QString::number(ui->Lon_0->value()) + ":" + QString::number(
-                                     ui->Lon_1->value()) + ":" + QString::number(ui->Lon_2->value()));
-        saveIni(ini);
-    });
+            {
+                if(value < 0)
+                    ui->Lon_1->setValue(59);
+                if(value > 59)
+                    ui->Lon_1->setValue(0);
+                Longitude = fromHMSorDMS(QString::number(ui->Lon_0->value()) + ":" + QString::number(
+                                             ui->Lon_1->value()) + ":" + QString::number(ui->Lon_2->value()));
+                saveIni(ini);
+            });
     connect(ui->Lon_2, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
-    {
-        if(value < 0)
-            ui->Lon_2->setValue(59);
-        if(value > 59)
-            ui->Lon_2->setValue(0);
-        Longitude = fromHMSorDMS(QString::number(ui->Lon_0->value()) + ":" + QString::number(
-                                     ui->Lon_1->value()) + ":" + QString::number(ui->Lon_2->value()));
-        saveIni(ini);
-    });
+            {
+                if(value < 0)
+                    ui->Lon_2->setValue(59);
+                if(value > 59)
+                    ui->Lon_2->setValue(0);
+                Longitude = fromHMSorDMS(QString::number(ui->Lon_0->value()) + ":" + QString::number(
+                                             ui->Lon_1->value()) + ":" + QString::number(ui->Lon_2->value()));
+                saveIni(ini);
+            });
+    connect(ui->Alt_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+            {
+                if(value < 0)
+                    ui->Alt_0->setValue(359);
+                if(value > 359)
+                    ui->Alt_0->setValue(0);
+                Altitude = fromHMSorDMS(QString::number(ui->Alt_0->value()) + ":" + QString::number(
+                                             ui->Alt_1->value()) + ":" + QString::number(ui->Alt_2->value()));
+                saveIni(ini);
+            });
+    connect(ui->Alt_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+            {
+                if(value < 0)
+                    ui->Alt_1->setValue(59);
+                if(value > 59)
+                    ui->Alt_1->setValue(0);
+                Altitude = fromHMSorDMS(QString::number(ui->Alt_0->value()) + ":" + QString::number(
+                                             ui->Alt_1->value()) + ":" + QString::number(ui->Alt_2->value()));
+                saveIni(ini);
+            });
+    connect(ui->Alt_2, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+            {
+                if(value < 0)
+                    ui->Alt_2->setValue(59);
+                if(value > 59)
+                    ui->Alt_2->setValue(0);
+                Altitude = fromHMSorDMS(QString::number(ui->Alt_0->value()) + ":" + QString::number(
+                                            ui->Alt_1->value()) + ":" + QString::number(ui->Alt_2->value()));
+                saveIni(ini);
+            });
+    connect(ui->Elevation, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+            {
+                Elevation = value;
+                saveIni(ini);
+            });
     connect(ui->Goto, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), [ = ](bool checked)
     {
         isTracking[0] = false;
         isTracking[1] = false;
         ahp_gt_set_location(Latitude, Longitude, 0);
-        ahp_gt_goto_radec(Ra, Dec);
+        double alt, az;
+        ahp_gt_get_alt_az_coordinates(Ra, Dec, &alt, &az);
+        if(alt > (Altitude * M_PI / 180) - acos(1/((Elevation / 6378137.0 + 1.0))))
+            ahp_gt_goto_radec(Ra, Dec);
     });
     connect(ui->Halt, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), [ = ](bool checked)
     {
