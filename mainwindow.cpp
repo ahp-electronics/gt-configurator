@@ -772,7 +772,7 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_set_timing(0, AHP_GT_ONE_SECOND + AHP_GT_ONE_SECOND * -value / 10000.0);
         saveIni(ini);
     });
-    connect(ui->TrackRate_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
+    connect(ui->TrackRate_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
     {
         ahp_gt_set_timing(1, AHP_GT_ONE_SECOND + AHP_GT_ONE_SECOND * -value / 10000.0);
         saveIni(ini);
