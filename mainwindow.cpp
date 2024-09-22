@@ -344,7 +344,7 @@ MainWindow::MainWindow(QWidget *parent)
     ahp_set_debug_level(AHP_DEBUG_DEBUG);
     IndicationThread = new Thread(this, 100, 500);
     ProgressThread = new Thread(this, 100, 10);
-    RaThread = new Thread(this, 500, 1000);
+    RaThread = new Thread(this, 1000, 1000);
     DecThread = new Thread(this, 1000, 1000);
     ServerThread = new Thread(this);
     setAccessibleName("GT Configurator");
