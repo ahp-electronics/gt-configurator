@@ -18,6 +18,9 @@
 #include <errno.h>
 #include <libdfu.h>
 #include "./ui_mainwindow.h"
+
+#define POSITION_THREAD_LOOP 1000
+
 static const double SIDEREAL_DAY = 86164.0916000;
 static MountType mounttype[] =
 {
@@ -344,8 +347,8 @@ MainWindow::MainWindow(QWidget *parent)
     ahp_set_debug_level(AHP_DEBUG_DEBUG);
     IndicationThread = new Thread(this, 100, 500);
     ProgressThread = new Thread(this, 100, 10);
-    RaThread = new Thread(this, 1000, 1000);
-    DecThread = new Thread(this, 1000, 1000);
+    RaThread = new Thread(this, 1000, POSITION_THREAD_LOOP);
+    DecThread = new Thread(this, 1000, POSITION_THREAD_LOOP);
     ServerThread = new Thread(this);
     setAccessibleName("GT Configurator");
     firmwareFilename = QStandardPaths::standardLocations(QStandardPaths::TempLocation).at(0) + "/" + strrand(32);
@@ -886,6 +889,7 @@ MainWindow::MainWindow(QWidget *parent)
         isTracking[0] = false;
         ahp_gt_stop_motion(0, axisdirection[0] != true || axis_lospeed[0] != (fabs(ui->Ra_Speed->value()) < 128.0));
         ahp_gt_start_motion(0, ui->Ra_Speed->value());
+        RaThread->setLoop(abs(POSITION_THREAD_LOOP/ui->Ra_Speed->value()));
         axisdirection[0] = true;
         axis_lospeed[0] = (fabs(ui->Ra_Speed->value()) < 128.0);
     });
@@ -895,6 +899,7 @@ MainWindow::MainWindow(QWidget *parent)
         isTracking[0] = false;
         ahp_gt_stop_motion(0, axisdirection[0] != false || axis_lospeed[0] != (fabs(ui->Ra_Speed->value()) < 128.0));
         ahp_gt_start_motion(0, -ui->Ra_Speed->value());
+        RaThread->setLoop(abs(POSITION_THREAD_LOOP/ui->Ra_Speed->value()));
         axisdirection[0] = false;
         axis_lospeed[0] = (fabs(ui->Ra_Speed->value()) < 128.0);
     });
@@ -904,6 +909,7 @@ MainWindow::MainWindow(QWidget *parent)
         isTracking[1] = false;
         ahp_gt_stop_motion(1, axisdirection[1] != true || axis_lospeed[1] != (fabs(ui->Dec_Speed->value()) < 128.0));
         ahp_gt_start_motion(1, ui->Dec_Speed->value());
+        DecThread->setLoop(abs(POSITION_THREAD_LOOP/ui->Dec_Speed->value()));
         axisdirection[1] = true;
         axis_lospeed[1] = (fabs(ui->Dec_Speed->value()) < 128.0);
     });
@@ -913,6 +919,7 @@ MainWindow::MainWindow(QWidget *parent)
         isTracking[1] = false;
         ahp_gt_stop_motion(1, axisdirection[1] != false || axis_lospeed[1] != (fabs(ui->Dec_Speed->value()) < 128.0));
         ahp_gt_start_motion(1, -ui->Dec_Speed->value());
+        DecThread->setLoop(abs(POSITION_THREAD_LOOP/ui->Dec_Speed->value()));
         axisdirection[1] = false;
         axis_lospeed[1] = (fabs(ui->Dec_Speed->value()) < 128.0);
     });
@@ -1384,6 +1391,7 @@ MainWindow::MainWindow(QWidget *parent)
             if(oldTracking[a] && !isTracking[a]) {
                 status[a] = ahp_gt_get_status(a);
                 if(status[a].Running == 0) {
+                    RaThread->setLoop(POSITION_THREAD_LOOP);
                     ahp_gt_start_tracking(a);
                     axis_lospeed[a] = true;
                     isTracking[a] = true;
