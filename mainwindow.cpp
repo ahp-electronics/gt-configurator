@@ -1025,9 +1025,49 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_stop_motion(1, 0);
     });
     connect(ui->Tracking, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            [ = ](bool checked)
+    [ = ](bool checked)
     {
         oldTracking[0] = checked;
+    });
+    connect(ui->TotalSteps0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    [ = ](int value)
+    {
+        ahp_gt_set_totalsteps(0, value);
+    });
+    connect(ui->WormSteps0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    [ = ](int value)
+    {
+        ahp_gt_set_wormsteps(0, value);
+    });
+    connect(ui->Multiplier0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    [ = ](int value)
+    {
+        ahp_gt_set_multiplier(0, value);
+    });
+    connect(ui->Divider0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    [ = ](int value)
+    {
+        ahp_gt_set_divider(0, value);
+    });
+    connect(ui->TotalSteps1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    [ = ](int value)
+    {
+        ahp_gt_set_totalsteps(1, value);
+    });
+    connect(ui->WormSteps1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    [ = ](int value)
+    {
+        ahp_gt_set_wormsteps(1, value);
+    });
+    connect(ui->Multiplier1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    [ = ](int value)
+    {
+        ahp_gt_set_multiplier(1, value);
+    });
+    connect(ui->Divider1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    [ = ](int value)
+    {
+        ahp_gt_set_divider(1, value);
     });
     connect(ui->TuneRa, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), this,
             [ = ](bool checked)
@@ -1512,10 +1552,10 @@ void MainWindow::UpdateValues(int axis)
     if(axis == 0)
     {
         double totalsteps = ahp_gt_get_totalsteps(0) * ahp_gt_get_divider(0) / ahp_gt_get_multiplier(0);
-        ui->Divider0->setText(QString::number(ahp_gt_get_divider(0)));
-        ui->Multiplier0->setText(QString::number(ahp_gt_get_multiplier(0)));
-        ui->WormSteps0->setText(QString::number(ahp_gt_get_wormsteps(0)));
-        ui->TotalSteps0->setText(QString::number(ahp_gt_get_totalsteps(0)));
+        ui->Divider0->setValue(ahp_gt_get_divider(0));
+        ui->Multiplier0->setValue(ahp_gt_get_multiplier(0));
+        ui->WormSteps0->setValue(ahp_gt_get_wormsteps(0));
+        ui->TotalSteps0->setValue(ahp_gt_get_totalsteps(0));
         ui->TrackingFrequency_0->setText("Steps/s: " + QString::number(totalsteps / SIDEREAL_DAY));
         ui->SPT_0->setText("sec/turn: " + QString::number(SIDEREAL_DAY / (ahp_gt_get_crown_teeth(0)*ahp_gt_get_worm_teeth(
                                0) / ahp_gt_get_motor_teeth(0))));
@@ -1546,10 +1586,10 @@ void MainWindow::UpdateValues(int axis)
     else if (axis == 1)
     {
         double totalsteps = ahp_gt_get_totalsteps(1) * ahp_gt_get_divider(1) / ahp_gt_get_multiplier(1);
-        ui->Divider1->setText(QString::number(ahp_gt_get_divider(1)));
-        ui->Multiplier1->setText(QString::number(ahp_gt_get_multiplier(1)));
-        ui->WormSteps1->setText(QString::number(ahp_gt_get_wormsteps(1)));
-        ui->TotalSteps1->setText(QString::number(ahp_gt_get_totalsteps(1)));
+        ui->Divider1->setValue(ahp_gt_get_divider(1));
+        ui->Multiplier1->setValue(ahp_gt_get_multiplier(1));
+        ui->WormSteps1->setValue(ahp_gt_get_wormsteps(1));
+        ui->TotalSteps1->setValue(ahp_gt_get_totalsteps(1));
         ui->TrackingFrequency_1->setText("Steps/s: " + QString::number(totalsteps / SIDEREAL_DAY));
         ui->SPT_1->setText("sec/turn: " + QString::number(SIDEREAL_DAY / (ahp_gt_get_crown_teeth(1)*ahp_gt_get_worm_teeth(
                                1) / ahp_gt_get_motor_teeth(1))));
