@@ -395,6 +395,7 @@ MainWindow::MainWindow(QWidget *parent)
         ui->WorkArea->setEnabled(false);
         ui->Write->setEnabled(false);
         ui->Connection->setEnabled(false);
+        ui->commonSettings->setEnabled(false);
         finished = 0;
         if(ui->Write->text() == "Flash")
         {
@@ -412,9 +413,10 @@ MainWindow::MainWindow(QWidget *parent)
         {
             ahp_gt_write_values(0, &percent, &finished);
             ahp_gt_write_values(1, &percent, &finished);
-            ui->Write->setEnabled(true);
-            ui->WorkArea->setEnabled(true);
         }
+        ui->Write->setEnabled(true);
+        ui->WorkArea->setEnabled(true);
+        ui->commonSettings->setEnabled(true);
         ui->Connection->setEnabled(true);
         percent = 0;
         thread->requestInterruption();
