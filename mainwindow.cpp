@@ -197,7 +197,7 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_crown_teeth(0, ui->Crown_0->value());
     ahp_gt_set_direction_invert(0, ui->Invert_0->isChecked());
     ahp_gt_set_stepping_conf(0, (GT1SteppingConfiguration)ui->Coil_0->currentIndex());
-    ahp_gt_set_timing(0, AHP_GT_ONE_SECOND-(double)ui->TrackRate_0->value()*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum());
+    ahp_gt_set_timing(0, AHP_GT_ONE_SECOND-(double)ui->TrackRate_0->value()*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum()/10.0);
     ahp_gt_set_stepping_mode(0, (GT1SteppingMode)ui->SteppingMode_0->currentIndex());
     switch(ui->GPIO_0->currentIndex())
     {
@@ -220,7 +220,7 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_crown_teeth(1, ui->Crown_1->value());
     ahp_gt_set_direction_invert(1, ui->Invert_1->isChecked());
     ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)ui->Coil_1->currentIndex());
-    ahp_gt_set_timing(1, AHP_GT_ONE_SECOND-(double)ui->TrackRate_1->value()*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum());
+    ahp_gt_set_timing(1, AHP_GT_ONE_SECOND-(double)ui->TrackRate_1->value()*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum()/10.0);
     ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_1->currentIndex());
     switch(ui->GPIO_1->currentIndex())
     {
@@ -772,12 +772,12 @@ MainWindow::MainWindow(QWidget *parent)
             });
     connect(ui->TrackRate_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
     {
-        ahp_gt_set_timing(0, AHP_GT_ONE_SECOND-(double)value*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum());
+        ahp_gt_set_timing(0, AHP_GT_ONE_SECOND-(double)value*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum()/10.0);
         saveIni(ini);
     });
     connect(ui->TrackRate_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
     {
-        ahp_gt_set_timing(1, AHP_GT_ONE_SECOND-(double)value*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum());
+        ahp_gt_set_timing(1, AHP_GT_ONE_SECOND-(double)value*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum()/10.0);
         saveIni(ini);
     });
     connect(ui->GPIO_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
@@ -1588,8 +1588,8 @@ void MainWindow::UpdateValues(int axis)
         ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(0));
         ui->Invert_0->setChecked(ahp_gt_get_direction_invert(0));
         ui->HalfCurrent_0->setChecked(ahp_gt_get_mount_flags() & halfCurrentRA);
-        ui->TrackRate_0->setValue(-((double)ahp_gt_get_timing(0)-AHP_GT_ONE_SECOND)*(double)ui->TrackRate_0->maximum()/AHP_GT_ONE_SECOND);
-        ui->TrackRate_label_0->setText("Track Rate offset: " + QString::number((double)ui->TrackRate_0->value()/(double)ui->TrackRate_0->maximum()) + "%");
+        ui->TrackRate_0->setValue(-((double)ahp_gt_get_timing(0)-AHP_GT_ONE_SECOND)*(double)ui->TrackRate_0->maximum()*10.0/AHP_GT_ONE_SECOND);
+        ui->TrackRate_label_0->setText("Track Rate offset: " + QString::number((double)ui->TrackRate_0->value()/(double)ui->TrackRate_0->maximum()/10.0) + "%");
     }
     else if (axis == 1)
     {
@@ -1622,8 +1622,8 @@ void MainWindow::UpdateValues(int axis)
         ui->SteppingMode_1->setCurrentIndex(ahp_gt_get_stepping_mode(1));
         ui->Invert_1->setChecked(ahp_gt_get_direction_invert(1));
         ui->HalfCurrent_1->setChecked(ahp_gt_get_mount_flags() & halfCurrentDec);
-        ui->TrackRate_1->setValue(-((double)ahp_gt_get_timing(1)-AHP_GT_ONE_SECOND)*(double)ui->TrackRate_0->maximum()/AHP_GT_ONE_SECOND);
-        ui->TrackRate_label_1->setText("Track Rate offset: " + QString::number((double)ui->TrackRate_1->value()/(double)ui->TrackRate_0->maximum()) + "%");
+        ui->TrackRate_1->setValue(-((double)ahp_gt_get_timing(1)-AHP_GT_ONE_SECOND)*(double)ui->TrackRate_0->maximum()*10.0/AHP_GT_ONE_SECOND);
+        ui->TrackRate_label_1->setText("Track Rate offset: " + QString::number((double)ui->TrackRate_1->value()/(double)ui->TrackRate_0->maximum()/10.0) + "%");
     }
     switch(ahp_gt_get_feature(0))
     {
