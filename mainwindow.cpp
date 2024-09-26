@@ -1577,13 +1577,13 @@ void MainWindow::UpdateValues(int axis)
         double maxf = (2.0 * M_PI * Z);
         double minf = 1.0/(mI/2.0/M_PI*L*(R+mV));
         if(minf > totalsteps * ahp_gt_get_multiplier(0) / SIDEREAL_DAY)
-            ui->TrackingFrequency_0->setStyleSheet("background-color: red;");
+            ui->TrackingFrequency_0->setStyleSheet("font-size: 12px; background-color: red;");
         else
-            ui->TrackingFrequency_0->setStyleSheet("background-color: transparent;");
-        if(maxf / 16 < totalsteps * ahp_gt_get_max_speed(0) / SIDEREAL_DAY)
-            ui->GotoFrequency_0->setStyleSheet("background-color: red;");
+            ui->TrackingFrequency_0->setStyleSheet("font-size: 12px; background-color: transparent;");
+        if((maxf / (14 + (double)ahp_gt_get_pwm_frequency() / 4.0) < totalsteps * ahp_gt_get_max_speed(0) / SIDEREAL_DAY) || (maxf / 4 < totalsteps * ahp_gt_get_max_speed(0) / SIDEREAL_DAY))
+            ui->GotoFrequency_0->setStyleSheet("font-size: 12px; background-color: red;");
         else
-            ui->GotoFrequency_0->setStyleSheet("background-color: transparent;");
+            ui->GotoFrequency_0->setStyleSheet("font-size: 12px; background-color: transparent;");
         ui->PWMFrequency_0->setText("PWM Hz: " + QString::number(maxf));
         ui->MinFrequency_0->setText("Min Hz: " + QString::number(minf));
         ui->GotoFrequency_0->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(0) / SIDEREAL_DAY));
@@ -1621,13 +1621,13 @@ void MainWindow::UpdateValues(int axis)
         double maxf = (2.0 * M_PI * Z);
         double minf = 1.0/(mI/2.0/M_PI*L*(R+mV));
         if(minf > totalsteps * ahp_gt_get_multiplier(1) / SIDEREAL_DAY)
-            ui->TrackingFrequency_1->setStyleSheet("background-color: red;");
+            ui->TrackingFrequency_1->setStyleSheet("font-size: 12px; background-color: red;");
         else
-            ui->TrackingFrequency_1->setStyleSheet("background-color: transparent;");
-        if(maxf / 16 < totalsteps * ahp_gt_get_max_speed(1) / SIDEREAL_DAY)
-            ui->GotoFrequency_1->setStyleSheet("background-color: red;");
+            ui->TrackingFrequency_1->setStyleSheet("font-size: 12px; background-color: transparent;");
+        if((maxf / (14 + (double)ahp_gt_get_pwm_frequency() / 4.0) < totalsteps * ahp_gt_get_max_speed(1) / SIDEREAL_DAY) || (maxf / 4 < totalsteps * ahp_gt_get_max_speed(1) / SIDEREAL_DAY))
+            ui->GotoFrequency_1->setStyleSheet("font-size: 12px; background-color: red;");
         else
-            ui->GotoFrequency_1->setStyleSheet("background-color: transparent;");
+            ui->GotoFrequency_1->setStyleSheet("font-size: 12px; background-color: transparent;");
         ui->PWMFrequency_1->setText("PWM Hz: " + QString::number(maxf));
         ui->MinFrequency_1->setText("Min Hz: " + QString::number(minf));
         ui->GotoFrequency_1->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(1) / SIDEREAL_DAY));
