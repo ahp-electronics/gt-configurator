@@ -1566,16 +1566,26 @@ void MainWindow::UpdateValues(int axis)
         ui->Multiplier0->setValue(ahp_gt_get_multiplier(0));
         ui->WormSteps0->setValue(ahp_gt_get_wormsteps(0));
         ui->TotalSteps0->setValue(ahp_gt_get_totalsteps(0));
-        ui->TrackingFrequency_0->setText("Steps/s: " + QString::number(totalsteps / SIDEREAL_DAY));
+        ui->TrackingFrequency_0->setText("Steps/s: " + QString::number(totalsteps * ahp_gt_get_multiplier(0) * ahp_gt_get_divider(0) / SIDEREAL_DAY));
         ui->SPT_0->setText("sec/turn: " + QString::number(SIDEREAL_DAY / (ahp_gt_get_crown_teeth(0)*ahp_gt_get_worm_teeth(
                                0) / ahp_gt_get_motor_teeth(0))));
         double L = (double)ui->Inductance_0->value() / 1000000.0;
         double R = (double)ui->Resistance_0->value() / 1000.0;
         double mI = (double)ui->Current_0->value() / 1000.0;
         double mV = (double)ui->Voltage_0->value();
-        double Z = sqrt(fmax(0, pow(mV / mI, 2.0) - pow(R, 2.0)));
-        double f = (2.0 * M_PI * Z / L);
-        ui->PWMFrequency_0->setText("PWM Hz: " + QString::number(f));
+        double Z = fmax(R, mV / mI - R) / L;
+        double maxf = (2.0 * M_PI * Z);
+        double minf = 1.0/(mI/2.0/M_PI*L*(R+mV));
+        if(minf > totalsteps * ahp_gt_get_multiplier(0) * ahp_gt_get_divider(0) / SIDEREAL_DAY)
+            ui->TrackingFrequency_0->setStyleSheet("background-color: red;");
+        else
+            ui->TrackingFrequency_0->setStyleSheet("background-color: transparent;");
+        if(maxf / 16 < totalsteps * ahp_gt_get_max_speed(0) / SIDEREAL_DAY)
+            ui->GotoFrequency_0->setStyleSheet("background-color: red;");
+        else
+            ui->GotoFrequency_0->setStyleSheet("background-color: transparent;");
+        ui->PWMFrequency_0->setText("PWM Hz: " + QString::number(maxf));
+        ui->MinFrequency_0->setText("Min Hz: " + QString::number(minf));
         ui->GotoFrequency_0->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(0) / SIDEREAL_DAY));
         ui->MotorSteps_0->setValue(ahp_gt_get_motor_steps(0));
         ui->Motor_0->setValue(ahp_gt_get_motor_teeth(0));
@@ -1600,16 +1610,26 @@ void MainWindow::UpdateValues(int axis)
         ui->Multiplier1->setValue(ahp_gt_get_multiplier(1));
         ui->WormSteps1->setValue(ahp_gt_get_wormsteps(1));
         ui->TotalSteps1->setValue(ahp_gt_get_totalsteps(1));
-        ui->TrackingFrequency_1->setText("Steps/s: " + QString::number(totalsteps / SIDEREAL_DAY));
+        ui->TrackingFrequency_1->setText("Steps/s: " + QString::number(totalsteps * ahp_gt_get_multiplier(1) * ahp_gt_get_divider(1) / SIDEREAL_DAY));
         ui->SPT_1->setText("sec/turn: " + QString::number(SIDEREAL_DAY / (ahp_gt_get_crown_teeth(1)*ahp_gt_get_worm_teeth(
                                1) / ahp_gt_get_motor_teeth(1))));
         double L = (double)ui->Inductance_1->value() / 1000000.0;
         double R = (double)ui->Resistance_1->value() / 1000.0;
         double mI = (double)ui->Current_1->value() / 1000.0;
         double mV = (double)ui->Voltage_1->value();
-        double Z = sqrt(fmax(0, pow(mV / mI, 2.0) - pow(R, 2.0)));
-        double f = (2.0 * M_PI * Z / L);
-        ui->PWMFrequency_1->setText("PWM Hz: " + QString::number(f));
+        double Z = fmax(R, mV / mI - R) / L;
+        double maxf = (2.0 * M_PI * Z);
+        double minf = 1.0/(mI/2.0/M_PI*L*(R+mV));
+        if(minf > totalsteps * ahp_gt_get_multiplier(1) * ahp_gt_get_divider(1) / SIDEREAL_DAY)
+            ui->TrackingFrequency_1->setStyleSheet("background-color: red;");
+        else
+            ui->TrackingFrequency_1->setStyleSheet("background-color: transparent;");
+        if(maxf / 16 < totalsteps * ahp_gt_get_max_speed(1) / SIDEREAL_DAY)
+            ui->GotoFrequency_1->setStyleSheet("background-color: red;");
+        else
+            ui->GotoFrequency_1->setStyleSheet("background-color: transparent;");
+        ui->PWMFrequency_1->setText("PWM Hz: " + QString::number(maxf));
+        ui->MinFrequency_1->setText("Min Hz: " + QString::number(minf));
         ui->GotoFrequency_1->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(1) / SIDEREAL_DAY));
         ui->MotorSteps_1->setValue(ahp_gt_get_motor_steps(1));
         ui->Motor_1->setValue(ahp_gt_get_motor_teeth(1));
