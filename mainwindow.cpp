@@ -1566,7 +1566,7 @@ void MainWindow::UpdateValues(int axis)
         ui->Multiplier0->setValue(ahp_gt_get_multiplier(0));
         ui->WormSteps0->setValue(ahp_gt_get_wormsteps(0));
         ui->TotalSteps0->setValue(ahp_gt_get_totalsteps(0));
-        ui->TrackingFrequency_0->setText("Steps/s: " + QString::number(totalsteps * ahp_gt_get_multiplier(0) * ahp_gt_get_divider(0) / SIDEREAL_DAY));
+        ui->TrackingFrequency_0->setText("Steps/s: " + QString::number(totalsteps * ahp_gt_get_multiplier(0) / SIDEREAL_DAY));
         ui->SPT_0->setText("sec/turn: " + QString::number(SIDEREAL_DAY / (ahp_gt_get_crown_teeth(0)*ahp_gt_get_worm_teeth(
                                0) / ahp_gt_get_motor_teeth(0))));
         double L = (double)ui->Inductance_0->value() / 1000000.0;
@@ -1576,7 +1576,7 @@ void MainWindow::UpdateValues(int axis)
         double Z = fmax(R, mV / mI - R) / L;
         double maxf = (2.0 * M_PI * Z);
         double minf = 1.0/(mI/2.0/M_PI*L*(R+mV));
-        if(minf > totalsteps * ahp_gt_get_multiplier(0) * ahp_gt_get_divider(0) / SIDEREAL_DAY)
+        if(minf > totalsteps * ahp_gt_get_multiplier(0) / SIDEREAL_DAY)
             ui->TrackingFrequency_0->setStyleSheet("background-color: red;");
         else
             ui->TrackingFrequency_0->setStyleSheet("background-color: transparent;");
@@ -1610,7 +1610,7 @@ void MainWindow::UpdateValues(int axis)
         ui->Multiplier1->setValue(ahp_gt_get_multiplier(1));
         ui->WormSteps1->setValue(ahp_gt_get_wormsteps(1));
         ui->TotalSteps1->setValue(ahp_gt_get_totalsteps(1));
-        ui->TrackingFrequency_1->setText("Steps/s: " + QString::number(totalsteps * ahp_gt_get_multiplier(1) * ahp_gt_get_divider(1) / SIDEREAL_DAY));
+        ui->TrackingFrequency_1->setText("Steps/s: " + QString::number(totalsteps * ahp_gt_get_multiplier(1) / SIDEREAL_DAY));
         ui->SPT_1->setText("sec/turn: " + QString::number(SIDEREAL_DAY / (ahp_gt_get_crown_teeth(1)*ahp_gt_get_worm_teeth(
                                1) / ahp_gt_get_motor_teeth(1))));
         double L = (double)ui->Inductance_1->value() / 1000000.0;
@@ -1620,7 +1620,7 @@ void MainWindow::UpdateValues(int axis)
         double Z = fmax(R, mV / mI - R) / L;
         double maxf = (2.0 * M_PI * Z);
         double minf = 1.0/(mI/2.0/M_PI*L*(R+mV));
-        if(minf > totalsteps * ahp_gt_get_multiplier(1) * ahp_gt_get_divider(1) / SIDEREAL_DAY)
+        if(minf > totalsteps * ahp_gt_get_multiplier(1) / SIDEREAL_DAY)
             ui->TrackingFrequency_1->setStyleSheet("background-color: red;");
         else
             ui->TrackingFrequency_1->setStyleSheet("background-color: transparent;");
