@@ -159,7 +159,7 @@ void MainWindow::readIni(QString ini)
     ui->Motor_0->setValue(settings->value("Motor_0", ahp_gt_get_motor_teeth(0)).toInt());
     ui->Worm_0->setValue(settings->value("Worm_0", ahp_gt_get_worm_teeth(0)).toInt());
     ui->Crown_0->setValue(settings->value("Crown_0", ahp_gt_get_crown_teeth(0)).toInt());
-    ui->MaxSpeed_0->setValue(settings->value("MaxSpeed_0", ahp_gt_get_max_speed(0)).toInt());
+    ui->MaxSpeed_0->setValue(settings->value("MaxSpeed_0", ahp_gt_get_max_speed(0) * SIDEREAL_DAY / M_PI / 2).toInt());
     ui->Acceleration_0->setValue(settings->value("Acceleration_0",
                                  ui->Acceleration_0->maximum() - ahp_gt_get_acceleration_angle(0) * 1800.0 / M_PI).toInt());
     ui->Invert_0->setChecked(settings->value("Invert_0", ahp_gt_get_direction_invert(0) == 1).toBool());
@@ -177,7 +177,7 @@ void MainWindow::readIni(QString ini)
     ui->Motor_1->setValue(settings->value("Motor_1", ahp_gt_get_motor_teeth(1)).toInt());
     ui->Worm_1->setValue(settings->value("Worm_1", ahp_gt_get_worm_teeth(1)).toInt());
     ui->Crown_1->setValue(settings->value("Crown_1", ahp_gt_get_crown_teeth(1)).toInt());
-    ui->MaxSpeed_1->setValue(settings->value("MaxSpeed_1", ahp_gt_get_max_speed(1)).toInt());
+    ui->MaxSpeed_1->setValue(settings->value("MaxSpeed_1", ahp_gt_get_max_speed(1) * SIDEREAL_DAY / M_PI / 2).toInt());
     ui->Acceleration_1->setValue(settings->value("Acceleration_1",
                                  ui->Acceleration_1->maximum() - ahp_gt_get_acceleration_angle(1) * 1800.0 / M_PI).toInt());
     ui->Invert_1->setChecked(settings->value("Invert_1", ahp_gt_get_direction_invert(1) == 1).toBool());
@@ -743,13 +743,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->MaxSpeed_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_set_max_speed(0, ui->MaxSpeed_0->value());
+        ahp_gt_set_max_speed(0, ui->MaxSpeed_0->value() * M_PI * 2 / SIDEREAL_DAY);
         saveIni(ini);
     });
     connect(ui->MaxSpeed_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_set_max_speed(1, ui->MaxSpeed_1->value());
+        ahp_gt_set_max_speed(1, ui->MaxSpeed_1->value() * M_PI * 2 / SIDEREAL_DAY);
         saveIni(ini);
     });
     connect(ui->SteppingMode_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
@@ -1573,20 +1573,16 @@ void MainWindow::UpdateValues(int axis)
         double R = (double)ui->Resistance_0->value() / 1000.0;
         double mI = (double)ui->Current_0->value() / 1000.0;
         double mV = (double)ui->Voltage_0->value();
-        double Z = fmax(R, mV / mI - R) / L;
-        double maxf = (2.0 * M_PI * Z);
-        double minf = 1.0/(mI/2.0/M_PI*L*(R+mV));
+        double maxf = (2.0 * M_PI * pow(mV*mI/(pow(R, 2)*pow(L, 2)), 0.5));
+        double minf = (2.0 * M_PI * pow(mV*mI*(pow(R, 2)), 0.5));
         if(minf > totalsteps * ahp_gt_get_multiplier(0) / SIDEREAL_DAY)
             ui->TrackingFrequency_0->setStyleSheet("font-size: 12px; background-color: red;");
         else
             ui->TrackingFrequency_0->setStyleSheet("font-size: 12px; background-color: transparent;");
-        if((maxf / (14 + (double)ahp_gt_get_pwm_frequency() / 4.0) < totalsteps * ahp_gt_get_max_speed(0) / SIDEREAL_DAY) || (maxf / 4 < totalsteps * ahp_gt_get_max_speed(0) / SIDEREAL_DAY))
-            ui->GotoFrequency_0->setStyleSheet("font-size: 12px; background-color: red;");
-        else
-            ui->GotoFrequency_0->setStyleSheet("font-size: 12px; background-color: transparent;");
+        //ahp_gt_set_max_speed(0, maxf);
         ui->PWMFrequency_0->setText("PWM Hz: " + QString::number(maxf));
         ui->MinFrequency_0->setText("Min Hz: " + QString::number(minf));
-        ui->GotoFrequency_0->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(0) / SIDEREAL_DAY));
+        ui->GotoFrequency_0->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(0) / M_PI / 2));
         ui->MotorSteps_0->setValue(ahp_gt_get_motor_steps(0));
         ui->Motor_0->setValue(ahp_gt_get_motor_teeth(0));
         ui->Worm_0->setValue(ahp_gt_get_worm_teeth(0));
@@ -1594,8 +1590,8 @@ void MainWindow::UpdateValues(int axis)
         ui->Acceleration_0->setValue(ui->Acceleration_0->maximum() - ahp_gt_get_acceleration_angle(0) * 1800.0 / M_PI);
         ui->MaxSpeed_0->setMaximum(2000);
         ui->Ra_Speed->setMaximum(2000);
-        ui->MaxSpeed_0->setValue(ahp_gt_get_max_speed(0));
-        ui->MaxSpeed_label_0->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(0)) + "x");
+        ui->MaxSpeed_0->setValue(ahp_gt_get_max_speed(0) * SIDEREAL_DAY / M_PI / 2);
+        ui->MaxSpeed_label_0->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(0) * SIDEREAL_DAY / M_PI / 2) + "x");
         ui->Coil_0->setCurrentIndex(ahp_gt_get_stepping_conf(0));
         ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(0));
         ui->Invert_0->setChecked(ahp_gt_get_direction_invert(0));
@@ -1618,19 +1614,16 @@ void MainWindow::UpdateValues(int axis)
         double mI = (double)ui->Current_1->value() / 1000.0;
         double mV = (double)ui->Voltage_1->value();
         double Z = fmax(R, mV / mI - R) / L;
-        double maxf = (2.0 * M_PI * Z);
-        double minf = 1.0/(mI/2.0/M_PI*L*(R+mV));
+        double maxf = (2.0 * M_PI * pow(mV*mI/(pow(R, 2)*pow(L, 2)), 0.5));
+        double minf = (2.0 * M_PI * pow(mV*mI*(pow(R, 2)), 0.5));
         if(minf > totalsteps * ahp_gt_get_multiplier(1) / SIDEREAL_DAY)
             ui->TrackingFrequency_1->setStyleSheet("font-size: 12px; background-color: red;");
         else
             ui->TrackingFrequency_1->setStyleSheet("font-size: 12px; background-color: transparent;");
-        if((maxf / (14 + (double)ahp_gt_get_pwm_frequency() / 4.0) < totalsteps * ahp_gt_get_max_speed(1) / SIDEREAL_DAY) || (maxf / 4 < totalsteps * ahp_gt_get_max_speed(1) / SIDEREAL_DAY))
-            ui->GotoFrequency_1->setStyleSheet("font-size: 12px; background-color: red;");
-        else
-            ui->GotoFrequency_1->setStyleSheet("font-size: 12px; background-color: transparent;");
+        //ahp_gt_set_max_speed(1, maxf);
         ui->PWMFrequency_1->setText("PWM Hz: " + QString::number(maxf));
         ui->MinFrequency_1->setText("Min Hz: " + QString::number(minf));
-        ui->GotoFrequency_1->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(1) / SIDEREAL_DAY));
+        ui->GotoFrequency_1->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(1) / M_PI / 2));
         ui->MotorSteps_1->setValue(ahp_gt_get_motor_steps(1));
         ui->Motor_1->setValue(ahp_gt_get_motor_teeth(1));
         ui->Worm_1->setValue(ahp_gt_get_worm_teeth(1));
@@ -1638,8 +1631,8 @@ void MainWindow::UpdateValues(int axis)
         ui->Acceleration_1->setValue(ui->Acceleration_1->maximum() - ahp_gt_get_acceleration_angle(1) * 1800.0 / M_PI);
         ui->MaxSpeed_1->setMaximum(2000);
         ui->Dec_Speed->setMaximum(2000);
-        ui->MaxSpeed_1->setValue(ahp_gt_get_max_speed(1));
-        ui->MaxSpeed_label_1->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(1)) + "x");
+        ui->MaxSpeed_1->setValue(ahp_gt_get_max_speed(1) * SIDEREAL_DAY / M_PI / 2);
+        ui->MaxSpeed_label_1->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(1) * SIDEREAL_DAY / M_PI / 2) + "x");
         ui->Coil_1->setCurrentIndex(ahp_gt_get_stepping_conf(1));
         ui->SteppingMode_1->setCurrentIndex(ahp_gt_get_stepping_mode(1));
         ui->Invert_1->setChecked(ahp_gt_get_direction_invert(1));
