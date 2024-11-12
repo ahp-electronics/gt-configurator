@@ -434,9 +434,10 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ](bool checked)
     {
         QString url = "https://www.iliaplatone.com/firmware.php?product=gt1";
-        if(DownloadFirmware(url, firmwareFilename, settings))
+        if(DownloadFirmware(url, firmwareFilename, settings)) {
             ui->Write->setText("Flash");
-        ui->Write->setEnabled(true);
+            ui->Write->setEnabled(true);
+        }
         ui->Connection->setEnabled(false);
         ui->RA->setEnabled(false);
         ui->DEC->setEnabled(false);
