@@ -132,7 +132,8 @@ void MainWindow::readIni(QString ini)
     QSettings *settings = new QSettings(ini, QSettings::Format::IniFormat);
     ui->Notes->setText(QByteArray::fromBase64(settings->value("Notes").toString().toUtf8()));
 
-    ui->Address->setValue(settings->value("Address", ahp_gt_get_address()).toInt());
+    ui->Index->setValue(settings->value("Index", ahp_gt_get_current_device()).toInt());
+    ui->BusIndex->setValue(settings->value("BusIndex", ahp_gt_get_address()).toInt());
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency()).toInt());
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
@@ -158,7 +159,7 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_features(0, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0) | (ui->HalfCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
     ahp_gt_set_features(1, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0) | (ui->HalfCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
     ahp_gt_set_pwm_frequency(ui->PWMFreq->value());
-    ahp_gt_set_address(ui->Address->value());
+    ahp_gt_set_address(ui->BusIndex->value());
 
 
     ui->MotorSteps_0->setValue(settings->value("MotorSteps_0", ahp_gt_get_motor_steps(0)).toInt());
@@ -328,12 +329,13 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Mean_1", ui->Mean_1->value());
 
     settings->setValue("MountType", ui->MountType->currentIndex());
-    settings->setValue("Address", ui->Address->value());
+    settings->setValue("BusIndex", ui->BusIndex->value());
     settings->setValue("PWMFreq", ui->PWMFreq->value());
     settings->setValue("MountStyle", ui->MountStyle->currentIndex());
     settings->setValue("HalfCurrent", ui->HalfCurrent->isChecked());
     settings->setValue("HighBauds", ui->HighBauds->isChecked());
     settings->setValue("Notes", QString(ui->Notes->text().toUtf8().toBase64()));
+    settings->setValue("Index", ui->Index->value());
 
     settings->setValue("Ra", Ra);
     settings->setValue("Dec", Dec);
@@ -341,6 +343,8 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Longitude", Longitude);
     settings->setValue("Altitude", Altitude);
     settings->setValue("Elevation", Elevation);
+
+
     s->~QSettings();
     settings = oldsettings;
 }
@@ -679,6 +683,16 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_set_mount_type(mounttype[index]);
         saveIni(ini);
     });
+    connect(ui->Index, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    [ = ](int value)
+    {
+        ahp_gt_select_device(value);
+        if(isConnected) {
+            ui->Disconnect->click();
+            ui->Connect->click();
+        }
+        saveIni(ini);
+    });
     connect(ui->Invert_0, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             [ = ](bool checked)
     {
@@ -831,7 +845,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
         saveIni(ini);
     });
-    connect(ui->Address, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui->BusIndex, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
         ahp_gt_set_address(value);
@@ -1538,7 +1552,7 @@ MainWindow::~MainWindow()
 void MainWindow::disconnectControls(bool block)
 {
     ui->MountType->blockSignals(block);
-    ui->Address->blockSignals(block);
+    ui->BusIndex->blockSignals(block);
     ui->MountStyle->blockSignals(block);
     ui->PWMFreq->blockSignals(block);
     ui->HalfCurrent->blockSignals(block);
@@ -1683,7 +1697,7 @@ void MainWindow::UpdateValues(int axis)
     }
     ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency());
     ui->PWMFreq_label->setText("PWM: " + QString::number(1500 + 700 * ui->PWMFreq->value()) + " Hz");
-    ui->Address->setValue(ahp_gt_get_address());
+    ui->BusIndex->setValue(ahp_gt_get_address());
     ui->MountType->setCurrentIndex(mounttypes.indexOf(ahp_gt_get_mount_type()));
     ui->HalfCurrent->setChecked((ahp_gt_get_features(0) & ahp_gt_get_features(1) & hasHalfCurrentTracking) == hasHalfCurrentTracking);
     int index = 0;
