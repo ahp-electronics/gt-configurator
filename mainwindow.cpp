@@ -75,12 +75,13 @@ char *strrand(int len)
     return ret;
 }
 
-bool MainWindow::DownloadFirmware(QString url, QString filename, QSettings *settings, int timeout_ms)
+bool MainWindow::DownloadFirmware(QString url, QString jsonfile, QString filename, QSettings *settings, int timeout_ms)
 {
     QByteArray bin;
     QFile file(filename);
+    QFile f(jsonfile);
     QNetworkAccessManager* manager = new QNetworkAccessManager();
-    QNetworkReply *response = manager->get(QNetworkRequest(QUrl(url+"&download=on")));
+    QNetworkReply *response = manager->get(QNetworkRequest(QUrl(url)));
     QTimer timer;
     timer.setSingleShot(true);
     QEventLoop loop;
@@ -88,19 +89,24 @@ bool MainWindow::DownloadFirmware(QString url, QString filename, QSettings *sett
     connect(response, SIGNAL(finished()), &loop, SLOT(quit()));
     timer.start(timeout_ms);
     loop.exec();
-    QString base64 = settings->value("data", "").toString();
     if(response->error() == QNetworkReply::NetworkError::NoError) {
-        QJsonDocument doc = QJsonDocument::fromJson(response->readAll());
+        QByteArray json = response->readAll();
+        if(json.length() == 0) goto dl_end;
+        QJsonDocument doc = QJsonDocument::fromJson(json);
+        if(doc.isEmpty()) goto dl_end;
         QJsonObject obj = doc.object();
-        base64 = obj["data"].toString();
+        QString base64 = obj["data"].toString();
+        if(base64.isNull() || base64.isEmpty()) {
+            goto dl_end;
+        }
+        bin = QByteArray::fromBase64(base64.toUtf8());
+        file.open(QIODevice::WriteOnly);
+        file.write(bin, bin.length());
+        file.close();
+        f.open(QIODevice::WriteOnly);
+        f.write(json, json.length());
+        f.close();
     }
-    if(base64.isNull() || base64.isEmpty()) {
-        goto dl_end;
-    }
-    bin = QByteArray::fromBase64(base64.toUtf8());
-    file.open(QIODevice::WriteOnly);
-    file.write(bin, bin.length());
-    file.close();
 dl_end:
     response->deleteLater();
     response->manager()->deleteLater();
@@ -433,8 +439,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->LoadFW, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked)
     {
-        QString url = "https://www.iliaplatone.com/firmware.php?product=gt1";
-        if(DownloadFirmware(url, firmwareFilename, settings)) {
+        QString jsonfile = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).at(0)+"/gt1.json";
+        if(DownloadFirmware("https://www.iliaplatone.com/firmware.php?product=gt1&download=on", jsonfile, firmwareFilename, settings)) {
+            ui->Write->setText("Flash");
+            ui->Write->setEnabled(true);
+        } else if(DownloadFirmware(jsonfile, jsonfile, firmwareFilename, settings)) {
+            ui->Write->setText("Flash");
+            ui->Write->setEnabled(true);
+        } else if(DownloadFirmware("qrc:///data/gt1.json", jsonfile, firmwareFilename, settings)) {
             ui->Write->setText("Flash");
             ui->Write->setEnabled(true);
         }

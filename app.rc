@@ -1,1 +1,2 @@
 IDI_ICON1               ICON        DISCARDABLE            "icon.ico"
+IDI_DATA1               TEXT        DISCARDABLE            "gt1.json"
