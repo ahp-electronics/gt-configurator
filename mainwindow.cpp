@@ -75,6 +75,39 @@ char *strrand(int len)
     return ret;
 }
 
+QStringList MainWindow::CheckFirmware(QString url, int timeout_ms)
+{
+    QByteArray list;
+    QJsonDocument doc;
+    QNetworkAccessManager* manager = new QNetworkAccessManager();
+    QNetworkReply *response = manager->get(QNetworkRequest(QUrl(url)));
+    QTimer timer;
+    timer.setSingleShot(true);
+    QEventLoop loop;
+    connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+    connect(response, SIGNAL(finished()), &loop, SLOT(quit()));
+    timer.start(timeout_ms);
+    loop.exec();
+    QString base64 = "";
+    if(response->error() == QNetworkReply::NetworkError::NoError) {
+        QJsonDocument doc = QJsonDocument::fromJson(response->readAll());
+        QJsonObject obj = doc.object();
+        base64 = obj["data"].toString();
+    }
+    if(base64.isNull() || base64.isEmpty()) {
+        goto ck_end;
+    }
+    list = QByteArray::fromBase64(base64.toUtf8());
+    doc = QJsonDocument::fromJson(list.toStdString().c_str());
+    response->deleteLater();
+    response->manager()->deleteLater();
+    return doc.toVariant().toStringList();
+ck_end:
+    response->deleteLater();
+    response->manager()->deleteLater();
+    return QStringList();
+}
+
 bool MainWindow::DownloadFirmware(QString url, QString jsonfile, QString filename, QSettings *settings, int timeout_ms)
 {
     QByteArray bin;
@@ -443,8 +476,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->LoadFW, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked)
     {
-        QString jsonfile = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).at(0)+"/gt1.json";
-        if(DownloadFirmware("https://www.iliaplatone.com/firmware.php?product=gt1&download=on", jsonfile, firmwareFilename, settings)) {
+        QStringList firmwarelist = CheckFirmware("https://www.iliaplatone.com/firmware.php?product=gt*");
+        QString selectedfirmware = firmwarelist[0];
+        QString url = "https://www.iliaplatone.com/firmware.php?download=on&product="+selectedfirmware;
+        QString jsonfile = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).at(0)+"/"+selectedfirmware+".json";
+        if(DownloadFirmware(url, jsonfile, firmwareFilename, settings)) {
             ui->Write->setText("Flash");
             ui->Write->setEnabled(true);
         } else if(DownloadFirmware(jsonfile, jsonfile, firmwareFilename, settings)) {
@@ -1588,12 +1624,12 @@ void MainWindow::UpdateValues(int axis)
     disconnectControls(true);
     if(axis == 0)
     {
-        double totalsteps = ahp_gt_get_totalsteps(0) * ahp_gt_get_divider(0) / ahp_gt_get_multiplier(0);
+        double totalsteps = ahp_gt_get_totalsteps(0) * ahp_gt_get_divider(0) * ahp_gt_get_multiplier(0);
         ui->Divider0->setValue(ahp_gt_get_divider(0));
         ui->Multiplier0->setValue(ahp_gt_get_multiplier(0));
         ui->WormSteps0->setValue(ahp_gt_get_wormsteps(0));
         ui->TotalSteps0->setValue(ahp_gt_get_totalsteps(0));
-        ui->TrackingFrequency_0->setText("Steps/s: " + QString::number(totalsteps * ahp_gt_get_multiplier(0) / SIDEREAL_DAY));
+        ui->TrackingFrequency_0->setText("Steps/s: " + QString::number(totalsteps / ahp_gt_get_divider(0) / ahp_gt_get_multiplier(0) / SIDEREAL_DAY));
         ui->SPT_0->setText("sec/turn: " + QString::number(SIDEREAL_DAY / (ahp_gt_get_crown_teeth(0)*ahp_gt_get_worm_teeth(
                                0) / ahp_gt_get_motor_teeth(0))));
         double L = (double)ui->Inductance_0->value() / 1000000.0;
@@ -1602,7 +1638,7 @@ void MainWindow::UpdateValues(int axis)
         double mV = (double)ui->Voltage_0->value();
         double maxf = (2.0 * M_PI * pow(mV*mI/(pow(R, 2)*pow(L, 2)), 0.5));
         double minf = (2.0 * M_PI * pow(mV*mI*(pow(R, 2)), 0.5));
-        if(minf > totalsteps * ahp_gt_get_multiplier(0) / SIDEREAL_DAY)
+        if(minf > totalsteps /  ahp_gt_get_divider(0) / ahp_gt_get_multiplier(0) / SIDEREAL_DAY)
             ui->TrackingFrequency_0->setStyleSheet("font-size: 12px; background-color: red;");
         else
             ui->TrackingFrequency_0->setStyleSheet("font-size: 12px; background-color: transparent;");
@@ -1628,12 +1664,12 @@ void MainWindow::UpdateValues(int axis)
     }
     else if (axis == 1)
     {
-        double totalsteps = ahp_gt_get_totalsteps(1) * ahp_gt_get_divider(1) / ahp_gt_get_multiplier(1);
+        double totalsteps = ahp_gt_get_totalsteps(1) * ahp_gt_get_divider(1) * ahp_gt_get_multiplier(1);
         ui->Divider1->setValue(ahp_gt_get_divider(1));
         ui->Multiplier1->setValue(ahp_gt_get_multiplier(1));
         ui->WormSteps1->setValue(ahp_gt_get_wormsteps(1));
         ui->TotalSteps1->setValue(ahp_gt_get_totalsteps(1));
-        ui->TrackingFrequency_1->setText("Steps/s: " + QString::number(totalsteps * ahp_gt_get_multiplier(1) / SIDEREAL_DAY));
+        ui->TrackingFrequency_1->setText("Steps/s: " + QString::number(totalsteps /  ahp_gt_get_divider(1) / ahp_gt_get_multiplier(1) / SIDEREAL_DAY));
         ui->SPT_1->setText("sec/turn: " + QString::number(SIDEREAL_DAY / (ahp_gt_get_crown_teeth(1)*ahp_gt_get_worm_teeth(
                                1) / ahp_gt_get_motor_teeth(1))));
         double L = (double)ui->Inductance_1->value() / 1000000.0;
@@ -1643,7 +1679,7 @@ void MainWindow::UpdateValues(int axis)
         double Z = fmax(R, mV / mI - R) / L;
         double maxf = (2.0 * M_PI * pow(mV*mI/(pow(R, 2)*pow(L, 2)), 0.5));
         double minf = (2.0 * M_PI * pow(mV*mI*(pow(R, 2)), 0.5));
-        if(minf > totalsteps * ahp_gt_get_multiplier(1) / SIDEREAL_DAY)
+        if(minf > totalsteps /  ahp_gt_get_divider(1) / ahp_gt_get_multiplier(1) / SIDEREAL_DAY)
             ui->TrackingFrequency_1->setStyleSheet("font-size: 12px; background-color: red;");
         else
             ui->TrackingFrequency_1->setStyleSheet("font-size: 12px; background-color: transparent;");
