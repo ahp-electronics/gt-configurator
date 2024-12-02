@@ -4,5 +4,16 @@
     </qresource>
     <qresource prefix="/data">
         <file>gt1.json</file>
+        <file>gt2ra.json</file>
+        <file>gt2dec.json</file>
+        <file>gt2axis1.json</file>
+        <file>gt2axis2.json</file>
+        <file>gt2axis3.json</file>
+        <file>gt2axis4.json</file>
+        <file>gt2axis5.json</file>
+        <file>gt2axis6.json</file>
+        <file>gt2axis7.json</file>
+        <file>gt2axis8.json</file>
+        <file>gt2axis9.json</file>
     </qresource>
 </RCC>
