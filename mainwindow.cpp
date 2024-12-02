@@ -77,6 +77,7 @@ char *strrand(int len)
 
 QStringList MainWindow::CheckFirmware(QString url, int timeout_ms)
 {
+    QStringList firmware = QStringList();
     QByteArray list;
     QJsonDocument doc;
     QNetworkAccessManager* manager = new QNetworkAccessManager();
@@ -101,11 +102,14 @@ QStringList MainWindow::CheckFirmware(QString url, int timeout_ms)
     doc = QJsonDocument::fromJson(list.toStdString().c_str());
     response->deleteLater();
     response->manager()->deleteLater();
-    return doc.toVariant().toStringList();
+    firmware = doc.toVariant().toStringList();
+    for(int i = 0; i < firmware.length(); i++)
+        firmware[i] = firmware[i].replace("firmware/", "").replace("-firmware.bin", "");
+    return firmware;
 ck_end:
     response->deleteLater();
     response->manager()->deleteLater();
-    return QStringList();
+    return firmware;
 }
 
 bool MainWindow::DownloadFirmware(QString url, QString jsonfile, QString filename, QSettings *settings, int timeout_ms)
@@ -435,10 +439,8 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(getDefaultIni());
         percent = 0;
         finished = 0;
-        ui->WorkArea->setEnabled(false);
         ui->Write->setEnabled(false);
         ui->Connection->setEnabled(false);
-        ui->commonSettings->setEnabled(false);
         finished = 0;
         if(ui->Write->text() == "Flash")
         {
@@ -454,12 +456,16 @@ MainWindow::MainWindow(QWidget *parent)
         }
         else
         {
-            ahp_gt_write_values(0, &percent, &finished);
-            ahp_gt_write_values(1, &percent, &finished);
+            if(isConnected) {
+                ui->WorkArea->setEnabled(false);
+                ui->commonSettings->setEnabled(false);
+                ahp_gt_write_values(0, &percent, &finished);
+                ahp_gt_write_values(1, &percent, &finished);
+                ui->WorkArea->setEnabled(true);
+                ui->commonSettings->setEnabled(true);
+            }
         }
         ui->Write->setEnabled(true);
-        ui->WorkArea->setEnabled(true);
-        ui->commonSettings->setEnabled(true);
         ui->Connection->setEnabled(true);
         percent = 0;
         thread->requestInterruption();
@@ -477,7 +483,17 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ](bool checked)
     {
         QStringList firmwarelist = CheckFirmware("https://www.iliaplatone.com/firmware.php?product=gt*");
-        QString selectedfirmware = firmwarelist[0];
+        ui->Firmware->clear();
+        if(firmwarelist.length() > 0)
+            ui->Firmware->addItems(firmwarelist);
+        else {
+            ui->Firmware->addItem("Firmware");
+        }
+    });
+    connect(ui->Firmware, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+    [ = ](bool checked)
+    {
+        QString selectedfirmware = ui->Firmware->currentText();
         QString url = "https://www.iliaplatone.com/firmware.php?download=on&product="+selectedfirmware;
         QString jsonfile = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).at(0)+"/"+selectedfirmware+".json";
         if(DownloadFirmware(url, jsonfile, firmwareFilename, settings)) {

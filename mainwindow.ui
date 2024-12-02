@@ -2732,9 +2732,9 @@
     <widget class="QProgressBar" name="progress">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>300</x>
        <y>30</y>
-       <width>871</width>
+       <width>771</width>
        <height>23</height>
       </rect>
      </property>
@@ -2753,6 +2753,22 @@
      </property>
      <property name="text">
       <string>Check FW..</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="Firmware">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>30</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>false</bool>
+     </property>
+     <property name="currentText">
+      <string/>
      </property>
     </widget>
    </widget>
