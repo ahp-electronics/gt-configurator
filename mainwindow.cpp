@@ -191,7 +191,7 @@ void MainWindow::readIni(QString ini)
     flags |= (ui->HighBauds->isChecked() ? bauds_115200 : 0);
     flags |= (ui->HalfCurrent_0->isChecked() ? halfCurrentRA : 0);
     flags |= (ui->HalfCurrent_1->isChecked() ? halfCurrentDec : 0);
-    ahp_gt_set_mount_flags((GT1Flags)flags);
+    ahp_gt_set_mount_flags((GTFlags)flags);
     ahp_gt_set_mount_type((MountType)mounttypes[ui->MountType->currentIndex()]);
     ahp_gt_set_features(0, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0) | (ui->HalfCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
     ahp_gt_set_features(1, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0) | (ui->HalfCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
@@ -240,9 +240,9 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_worm_teeth(0, ui->Worm_0->value());
     ahp_gt_set_crown_teeth(0, ui->Crown_0->value());
     ahp_gt_set_direction_invert(0, ui->Invert_0->isChecked());
-    ahp_gt_set_stepping_conf(0, (GT1SteppingConfiguration)ui->Coil_0->currentIndex());
+    ahp_gt_set_stepping_conf(0, (GTSteppingConfiguration)ui->Coil_0->currentIndex());
     ahp_gt_set_timing(0, AHP_GT_ONE_SECOND-(double)ui->TrackRate_0->value()*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum()/10.0);
-    ahp_gt_set_stepping_mode(0, (GT1SteppingMode)ui->SteppingMode_0->currentIndex());
+    ahp_gt_set_stepping_mode(0, (GTSteppingMode)ui->SteppingMode_0->currentIndex());
     switch(ui->GPIO_0->currentIndex())
     {
         case 0:
@@ -263,9 +263,9 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_worm_teeth(1, ui->Worm_1->value());
     ahp_gt_set_crown_teeth(1, ui->Crown_1->value());
     ahp_gt_set_direction_invert(1, ui->Invert_1->isChecked());
-    ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)ui->Coil_1->currentIndex());
+    ahp_gt_set_stepping_conf(1, (GTSteppingConfiguration)ui->Coil_1->currentIndex());
     ahp_gt_set_timing(1, AHP_GT_ONE_SECOND-(double)ui->TrackRate_1->value()*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum()/10.0);
-    ahp_gt_set_stepping_mode(1, (GT1SteppingMode)ui->SteppingMode_1->currentIndex());
+    ahp_gt_set_stepping_mode(1, (GTSteppingMode)ui->SteppingMode_1->currentIndex());
     switch(ui->GPIO_1->currentIndex())
     {
         case 0:
@@ -502,7 +502,7 @@ MainWindow::MainWindow(QWidget *parent)
         } else if(DownloadFirmware(jsonfile, jsonfile, firmwareFilename, settings)) {
             ui->Write->setText("Flash");
             ui->Write->setEnabled(true);
-        } else if(DownloadFirmware("qrc:///data/gt1.json", jsonfile, firmwareFilename, settings)) {
+        } else if(DownloadFirmware("qrc:///data/"+selectedfirmware+".json", jsonfile, firmwareFilename, settings)) {
             ui->Write->setText("Flash");
             ui->Write->setEnabled(true);
         }
@@ -547,7 +547,7 @@ MainWindow::MainWindow(QWidget *parent)
             ahp_gt_read_values(0);
             ahp_gt_read_values(1);
             int flags = ahp_gt_get_mount_flags();
-            ahp_gt_set_mount_flags((GT1Flags)flags);
+            ahp_gt_set_mount_flags((GTFlags)flags);
             ui->LoadFW->setEnabled(false);
             ui->Connect->setEnabled(false);
             ui->Disconnect->setEnabled(true);
@@ -833,22 +833,22 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ui->SteppingMode_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
     {
-        ahp_gt_set_stepping_mode(0, (GT1SteppingMode)index);
+        ahp_gt_set_stepping_mode(0, (GTSteppingMode)index);
         saveIni(ini);
     });
     connect(ui->SteppingMode_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
     {
-        ahp_gt_set_stepping_mode(1, (GT1SteppingMode)index);
+        ahp_gt_set_stepping_mode(1, (GTSteppingMode)index);
         saveIni(ini);
     });
     connect(ui->Coil_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
     {
-        ahp_gt_set_stepping_conf(0, (GT1SteppingConfiguration)index);
+        ahp_gt_set_stepping_conf(0, (GTSteppingConfiguration)index);
         saveIni(ini);
     });
     connect(ui->Coil_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
             {
-                ahp_gt_set_stepping_conf(1, (GT1SteppingConfiguration)index);
+                ahp_gt_set_stepping_conf(1, (GTSteppingConfiguration)index);
                 saveIni(ini);
             });
     connect(ui->TrackRate_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
@@ -909,7 +909,7 @@ MainWindow::MainWindow(QWidget *parent)
         flags &= ~bauds_115200;
         if(checked)
             flags |= bauds_115200;
-        ahp_gt_set_mount_flags((GT1Flags)flags);
+        ahp_gt_set_mount_flags((GTFlags)flags);
         saveIni(ini);
     });
     connect(ui->PWMFreq, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
@@ -931,7 +931,7 @@ MainWindow::MainWindow(QWidget *parent)
             ahp_gt_set_features(1, (SkywatcherFeature)(ahp_gt_get_features(1) & ~isAZEQ));
         }
         flags &= ~isForkMount;
-        ahp_gt_set_mount_flags((GT1Flags)(flags | (index == 1 ? isForkMount : 0)));
+        ahp_gt_set_mount_flags((GTFlags)(flags | (index == 1 ? isForkMount : 0)));
         saveIni(ini);
     });
     connect(ui->HalfCurrent, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
@@ -944,14 +944,14 @@ MainWindow::MainWindow(QWidget *parent)
     {
         int flags = (int)ahp_gt_get_mount_flags();
         flags &= ~halfCurrentRA;
-        ahp_gt_set_mount_flags((GT1Flags)(flags | (checked ? halfCurrentRA : 0)));
+        ahp_gt_set_mount_flags((GTFlags)(flags | (checked ? halfCurrentRA : 0)));
         saveIni(ini);
     });
     connect(ui->HalfCurrent_1, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
     {
         int flags = (int)ahp_gt_get_mount_flags();
         flags &= ~halfCurrentDec;
-        ahp_gt_set_mount_flags((GT1Flags)(flags | (checked ? halfCurrentDec : 0)));
+        ahp_gt_set_mount_flags((GTFlags)(flags | (checked ? halfCurrentDec : 0)));
         saveIni(ini);
     });
     connect(ui->Ra_Speed, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),

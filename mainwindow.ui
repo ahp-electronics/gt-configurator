@@ -2768,8 +2768,28 @@
       <bool>false</bool>
      </property>
      <property name="currentText">
-      <string/>
+      <string>gt1</string>
      </property>
+     <item>
+      <property name="text">
+       <string>gt1</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>gt2dec</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>gt2ra</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>gt5</string>
+      </property>
+     </item>
     </widget>
    </widget>
   </widget>

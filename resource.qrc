@@ -6,14 +6,6 @@
         <file>gt1.json</file>
         <file>gt2ra.json</file>
         <file>gt2dec.json</file>
-        <file>gt5axis1.json</file>
-        <file>gt5axis2.json</file>
-        <file>gt5axis3.json</file>
-        <file>gt5axis4.json</file>
-        <file>gt5axis5.json</file>
-        <file>gt5axis6.json</file>
-        <file>gt5axis7.json</file>
-        <file>gt5axis8.json</file>
-        <file>gt5axis9.json</file>
+        <file>gt5.json</file>
     </qresource>
 </RCC>
