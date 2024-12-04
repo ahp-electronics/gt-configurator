@@ -1006,7 +1006,7 @@ MainWindow::MainWindow(QWidget *parent)
     {
         isTracking[1] = false;
         double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
-        double derate = derate * M_PI * 2 / SIDEREAL_DAY;
+        double derate = ui->Dec_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
         ahp_gt_stop_motion(1, axisdirection[1] != false || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
         ahp_gt_start_motion(1, -derate);
         DecThread->setLoop(abs(POSITION_THREAD_LOOP/derate));
