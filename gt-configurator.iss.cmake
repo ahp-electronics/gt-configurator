@@ -1,4 +1,4 @@
-#define MyAppName "GT1 Configurator"
+#define MyAppName "GT Configurator"
 #define TargetName "gt-configurator"
 
 [Setup]

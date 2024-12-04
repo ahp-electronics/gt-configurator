@@ -739,6 +739,7 @@ MainWindow::MainWindow(QWidget *parent)
     [ = ](int value)
     {
         ahp_gt_select_device(value);
+        ahp_gt_detect_device();
         if(isConnected) {
             ui->Disconnect->click();
             ui->Connect->click();
@@ -968,97 +969,115 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ]()
     {
         isTracking[0] = false;
-        ahp_gt_stop_motion(0, axisdirection[0] != true || axis_lospeed[0] != (fabs(ui->Ra_Speed->value()) < 128.0));
-        ahp_gt_start_motion(0, ui->Ra_Speed->value());
-        RaThread->setLoop(abs(POSITION_THREAD_LOOP/ui->Ra_Speed->value()));
+        double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
+        ahp_gt_stop_motion(0, axisdirection[0] != true || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
+        ahp_gt_start_motion(0, rarate);
+        RaThread->setLoop(abs(POSITION_THREAD_LOOP/rarate));
         axisdirection[0] = true;
-        axis_lospeed[0] = (fabs(ui->Ra_Speed->value()) < 128.0);
+        axis_lospeed[0] = (fabs(rarate) < lowspeed_treshold);
     });
     connect(ui->E, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
         isTracking[0] = false;
-        ahp_gt_stop_motion(0, axisdirection[0] != false || axis_lospeed[0] != (fabs(ui->Ra_Speed->value()) < 128.0));
-        ahp_gt_start_motion(0, -ui->Ra_Speed->value());
-        RaThread->setLoop(abs(POSITION_THREAD_LOOP/ui->Ra_Speed->value()));
+        double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
+        ahp_gt_stop_motion(0, axisdirection[0] != false || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
+        ahp_gt_start_motion(0, -rarate);
+        RaThread->setLoop(abs(POSITION_THREAD_LOOP/rarate));
         axisdirection[0] = false;
-        axis_lospeed[0] = (fabs(ui->Ra_Speed->value()) < 128.0);
+        axis_lospeed[0] = (fabs(rarate) < lowspeed_treshold);
     });
     connect(ui->N, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
         isTracking[1] = false;
-        ahp_gt_stop_motion(1, axisdirection[1] != true || axis_lospeed[1] != (fabs(ui->Dec_Speed->value()) < 128.0));
-        ahp_gt_start_motion(1, ui->Dec_Speed->value());
-        DecThread->setLoop(abs(POSITION_THREAD_LOOP/ui->Dec_Speed->value()));
+        double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
+        double derate = ui->Dec_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
+        ahp_gt_stop_motion(1, axisdirection[1] != true || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
+        ahp_gt_start_motion(1, derate);
+        DecThread->setLoop(abs(POSITION_THREAD_LOOP/derate));
         axisdirection[1] = true;
-        axis_lospeed[1] = (fabs(ui->Dec_Speed->value()) < 128.0);
+        axis_lospeed[1] = (fabs(derate) < lowspeed_treshold);
     });
     connect(ui->S, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
         isTracking[1] = false;
-        ahp_gt_stop_motion(1, axisdirection[1] != false || axis_lospeed[1] != (fabs(ui->Dec_Speed->value()) < 128.0));
-        ahp_gt_start_motion(1, -ui->Dec_Speed->value());
-        DecThread->setLoop(abs(POSITION_THREAD_LOOP/ui->Dec_Speed->value()));
+        double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
+        double derate = derate * M_PI * 2 / SIDEREAL_DAY;
+        ahp_gt_stop_motion(1, axisdirection[1] != false || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
+        ahp_gt_start_motion(1, -derate);
+        DecThread->setLoop(abs(POSITION_THREAD_LOOP/derate));
         axisdirection[1] = false;
-        axis_lospeed[1] = (fabs(ui->Dec_Speed->value()) < 128.0);
+        axis_lospeed[1] = (fabs(derate) < lowspeed_treshold);
     });
     connect(ui->NW, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
         isTracking[0] = false;
         isTracking[1] = false;
-        ahp_gt_stop_motion(0, axisdirection[0] != true || axis_lospeed[0] != (fabs(ui->Ra_Speed->value()) < 128.0));
-        ahp_gt_start_motion(0, ui->Ra_Speed->value());
-        ahp_gt_stop_motion(1, axisdirection[1] != true || axis_lospeed[1] != (fabs(ui->Dec_Speed->value()) < 128.0));
-        ahp_gt_start_motion(1, ui->Dec_Speed->value());
+        double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
+        double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
+        double derate = ui->Dec_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
+        ahp_gt_stop_motion(0, axisdirection[0] != true || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
+        ahp_gt_start_motion(0, rarate);
+        ahp_gt_stop_motion(1, axisdirection[1] != true || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
+        ahp_gt_start_motion(1, derate);
         axisdirection[0] = true;
-        axis_lospeed[0] = (fabs(ui->Ra_Speed->value()) < 128.0);
+        axis_lospeed[0] = (fabs(rarate) < lowspeed_treshold);
         axisdirection[1] = true;
-        axis_lospeed[1] = (fabs(ui->Dec_Speed->value()) < 128.0);
+        axis_lospeed[1] = (fabs(derate) < lowspeed_treshold);
     });
     connect(ui->NE, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
         isTracking[0] = false;
         isTracking[1] = false;
-        ahp_gt_stop_motion(0, axisdirection[0] != false || axis_lospeed[0] != (fabs(ui->Ra_Speed->value()) < 128.0));
-        ahp_gt_start_motion(0, -ui->Ra_Speed->value());
-        ahp_gt_stop_motion(1, axisdirection[1] != true || axis_lospeed[1] != (fabs(ui->Dec_Speed->value()) < 128.0));
-        ahp_gt_start_motion(1, ui->Dec_Speed->value());
+        double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
+        double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
+        double derate = ui->Dec_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
+        ahp_gt_stop_motion(0, axisdirection[0] != false || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
+        ahp_gt_start_motion(0, -rarate);
+        ahp_gt_stop_motion(1, axisdirection[1] != true || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
+        ahp_gt_start_motion(1, derate);
         axisdirection[0] = false;
-        axis_lospeed[0] = (fabs(ui->Ra_Speed->value()) < 128.0);
+        axis_lospeed[0] = (fabs(rarate) < lowspeed_treshold);
         axisdirection[1] = true;
-        axis_lospeed[1] = (fabs(ui->Dec_Speed->value()) < 128.0);
+        axis_lospeed[1] = (fabs(derate) < lowspeed_treshold);
     });
     connect(ui->SW, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
         isTracking[0] = false;
         isTracking[1] = false;
-        ahp_gt_stop_motion(0, axisdirection[0] != true || axis_lospeed[0] != (fabs(ui->Ra_Speed->value()) < 128.0));
-        ahp_gt_start_motion(0, ui->Ra_Speed->value());
-        ahp_gt_stop_motion(1, axisdirection[1] != false || axis_lospeed[1] != (fabs(ui->Dec_Speed->value()) < 128.0));
-        ahp_gt_start_motion(1, -ui->Dec_Speed->value());
+        double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
+        double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
+        double derate = ui->Dec_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
+        ahp_gt_stop_motion(0, axisdirection[0] != true || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
+        ahp_gt_start_motion(0, rarate);
+        ahp_gt_stop_motion(1, axisdirection[1] != false || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
+        ahp_gt_start_motion(1, -derate);
         axisdirection[0] = true;
-        axis_lospeed[0] = (fabs(ui->Ra_Speed->value()) < 128.0);
+        axis_lospeed[0] = (fabs(rarate) < lowspeed_treshold);
         axisdirection[1] = false;
-        axis_lospeed[1] = (fabs(ui->Dec_Speed->value()) < 128.0);
+        axis_lospeed[1] = (fabs(derate) < lowspeed_treshold);
     });
     connect(ui->SE, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
         isTracking[0] = false;
         isTracking[1] = false;
-        ahp_gt_stop_motion(0, axisdirection[0] != false || axis_lospeed[0] != (fabs(ui->Ra_Speed->value()) < 128.0));
-        ahp_gt_start_motion(0, -ui->Ra_Speed->value());
-        ahp_gt_stop_motion(1, axisdirection[1] != false || axis_lospeed[1] != (fabs(ui->Dec_Speed->value()) < 128.0));
-        ahp_gt_start_motion(1, -ui->Dec_Speed->value());
+        double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
+        double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
+        double derate = ui->Dec_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
+        ahp_gt_stop_motion(0, axisdirection[0] != false || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
+        ahp_gt_start_motion(0, -rarate);
+        ahp_gt_stop_motion(1, axisdirection[1] != false || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
+        ahp_gt_start_motion(1, -derate);
         axisdirection[0] = false;
-        axis_lospeed[0] = (fabs(ui->Ra_Speed->value()) < 128.0);
+        axis_lospeed[0] = (fabs(rarate) < lowspeed_treshold);
         axisdirection[1] = false;
-        axis_lospeed[1] = (fabs(ui->Dec_Speed->value()) < 128.0);
+        axis_lospeed[1] = (fabs(derate) < lowspeed_treshold);
     });
     connect(ui->Stop, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
