@@ -969,6 +969,7 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ]()
     {
         isTracking[0] = false;
+        double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
         double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
         ahp_gt_stop_motion(0, axisdirection[0] != true || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
         ahp_gt_start_motion(0, rarate);
@@ -980,6 +981,7 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ]()
     {
         isTracking[0] = false;
+        double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
         double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
         ahp_gt_stop_motion(0, axisdirection[0] != false || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
         ahp_gt_start_motion(0, -rarate);
