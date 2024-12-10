@@ -2715,7 +2715,7 @@
     </property>
     <widget class="QPushButton" name="Write">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -2726,7 +2726,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Write</string>
+      <string>Flash</string>
      </property>
     </widget>
     <widget class="QProgressBar" name="progress">
