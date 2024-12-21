@@ -42,7 +42,7 @@ class MainWindow : public QMainWindow
         }
 
     private:
-        int motor_axis[2] { 1, 2 };
+        int axis_index[2] { 0, 1 };
         double Altitude, Latitude, Longitude, Elevation;
         double Ra {0.0};
         double Dec {0.0};

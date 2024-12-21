@@ -169,8 +169,6 @@ void MainWindow::readIni(QString ini)
     QSettings *settings = new QSettings(ini, QSettings::Format::IniFormat);
     ui->Notes->setText(QByteArray::fromBase64(settings->value("Notes").toString().toUtf8()));
 
-    ui->AxisIndex_0->setValue(settings->value("AxisIndex_0", motor_axis[0]).toInt());
-    ui->AxisIndex_1->setValue(settings->value("AxisIndex_1", motor_axis[1]).toInt());
     ui->Index->setValue(settings->value("Index", ahp_gt_get_current_device()).toInt());
     ui->BusIndex->setValue(settings->value("BusIndex", ahp_gt_get_address()).toInt());
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency()).toInt());
@@ -180,7 +178,7 @@ void MainWindow::readIni(QString ini)
     ui->HalfCurrent_0->setChecked(settings->value("HalfCurrent_0", false).toBool());
     ui->HalfCurrent_1->setChecked(settings->value("HalfCurrent_1", false).toBool());
     int flags = ahp_gt_get_mount_flags();
-    int features = ahp_gt_get_features(motor_axis[0]);
+    int features = ahp_gt_get_features(0);
     features &= ~(isAZEQ | hasHalfCurrentTracking);
     features |= hasCommonSlewStart;
     features |= (settings->value("HalfCurrent", false).toBool() ? hasHalfCurrentTracking : 0);
@@ -195,89 +193,90 @@ void MainWindow::readIni(QString ini)
     flags |= (ui->HalfCurrent_1->isChecked() ? halfCurrentDec : 0);
     ahp_gt_set_mount_flags((GTFlags)flags);
     ahp_gt_set_mount_type((MountType)mounttypes[ui->MountType->currentIndex()]);
-    ahp_gt_set_features(motor_axis[0], (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0) | (ui->HalfCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
-    ahp_gt_set_features(motor_axis[1], (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0) | (ui->HalfCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
+    ahp_gt_set_features(0, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0) | (ui->HalfCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
+    ahp_gt_set_features(1, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0) | (ui->HalfCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
     ahp_gt_set_pwm_frequency(ui->PWMFreq->value());
     ahp_gt_set_address(ui->BusIndex->value());
 
-
-    ui->MotorSteps_0->setValue(settings->value("MotorSteps_0", ahp_gt_get_motor_steps(motor_axis[0])).toInt());
-    ui->Motor_0->setValue(settings->value("Motor_0", ahp_gt_get_motor_teeth(motor_axis[0])).toInt());
-    ui->Worm_0->setValue(settings->value("Worm_0", ahp_gt_get_worm_teeth(motor_axis[0])).toInt());
-    ui->Crown_0->setValue(settings->value("Crown_0", ahp_gt_get_crown_teeth(motor_axis[0])).toInt());
-    ui->MaxSpeed_0->setValue(settings->value("MaxSpeed_0", ahp_gt_get_max_speed(motor_axis[0]) * SIDEREAL_DAY / M_PI / 2).toInt());
+    ui->AxisIndex_0->setValue(settings->value("AxisIndex_0", axis_index[0]).toInt());
+    ui->MotorSteps_0->setValue(settings->value("MotorSteps_0", ahp_gt_get_motor_steps(0)).toInt());
+    ui->Motor_0->setValue(settings->value("Motor_0", ahp_gt_get_motor_teeth(0)).toInt());
+    ui->Worm_0->setValue(settings->value("Worm_0", ahp_gt_get_worm_teeth(0)).toInt());
+    ui->Crown_0->setValue(settings->value("Crown_0", ahp_gt_get_crown_teeth(0)).toInt());
+    ui->MaxSpeed_0->setValue(settings->value("MaxSpeed_0", ahp_gt_get_max_speed(0) * SIDEREAL_DAY / M_PI / 2).toInt());
     ui->Acceleration_0->setValue(settings->value("Acceleration_0",
-                                 ui->Acceleration_0->maximum() - ahp_gt_get_acceleration_angle(motor_axis[0]) * 1800.0 / M_PI).toInt());
-    ui->Invert_0->setChecked(settings->value("Invert_0", ahp_gt_get_direction_invert(motor_axis[0]) == 1).toBool());
+                                 ui->Acceleration_0->maximum() - ahp_gt_get_acceleration_angle(0) * 1800.0 / M_PI).toInt());
+    ui->Invert_0->setChecked(settings->value("Invert_0", ahp_gt_get_direction_invert(0) == 1).toBool());
     ui->Inductance_0->setValue(settings->value("Inductance_0", 10).toInt());
     ui->Resistance_0->setValue(settings->value("Resistance_0", 20000).toInt());
     ui->Current_0->setValue(settings->value("Current_0", 1000).toInt());
     ui->Voltage_0->setValue(settings->value("Voltage_0", 12).toInt());
-    ui->GPIO_0->setCurrentIndex(settings->value("GPIO_0", ahp_gt_get_feature(motor_axis[0])).toInt());
-    ui->Coil_0->setCurrentIndex(settings->value("Coil_0", ahp_gt_get_stepping_conf(motor_axis[0])).toInt());
+    ui->GPIO_0->setCurrentIndex(settings->value("GPIO_0", ahp_gt_get_feature(0)).toInt());
+    ui->Coil_0->setCurrentIndex(settings->value("Coil_0", ahp_gt_get_stepping_conf(0)).toInt());
     ui->TrackRate_0->setValue(settings->value("TimingValue_0", 0).toInt());
-    ui->SteppingMode_0->setCurrentIndex(settings->value("SteppingMode_0", ahp_gt_get_stepping_mode(motor_axis[0])).toInt());
+    ui->SteppingMode_0->setCurrentIndex(settings->value("SteppingMode_0", ahp_gt_get_stepping_mode(0)).toInt());
     ui->Mean_0->setValue(settings->value("Mean_0", 1).toInt());
 
-    ui->MotorSteps_1->setValue(settings->value("MotorSteps_1", ahp_gt_get_motor_steps(motor_axis[1])).toInt());
-    ui->Motor_1->setValue(settings->value("Motor_1", ahp_gt_get_motor_teeth(motor_axis[1])).toInt());
-    ui->Worm_1->setValue(settings->value("Worm_1", ahp_gt_get_worm_teeth(motor_axis[1])).toInt());
-    ui->Crown_1->setValue(settings->value("Crown_1", ahp_gt_get_crown_teeth(motor_axis[1])).toInt());
-    ui->MaxSpeed_1->setValue(settings->value("MaxSpeed_1", ahp_gt_get_max_speed(motor_axis[1]) * SIDEREAL_DAY / M_PI / 2).toInt());
+    ui->AxisIndex_1->setValue(settings->value("AxisIndex_1", axis_index[1]).toInt());
+    ui->MotorSteps_1->setValue(settings->value("MotorSteps_1", ahp_gt_get_motor_steps(1)).toInt());
+    ui->Motor_1->setValue(settings->value("Motor_1", ahp_gt_get_motor_teeth(1)).toInt());
+    ui->Worm_1->setValue(settings->value("Worm_1", ahp_gt_get_worm_teeth(1)).toInt());
+    ui->Crown_1->setValue(settings->value("Crown_1", ahp_gt_get_crown_teeth(1)).toInt());
+    ui->MaxSpeed_1->setValue(settings->value("MaxSpeed_1", ahp_gt_get_max_speed(1) * SIDEREAL_DAY / M_PI / 2).toInt());
     ui->Acceleration_1->setValue(settings->value("Acceleration_1",
-                                 ui->Acceleration_1->maximum() - ahp_gt_get_acceleration_angle(motor_axis[1]) * 1800.0 / M_PI).toInt());
-    ui->Invert_1->setChecked(settings->value("Invert_1", ahp_gt_get_direction_invert(motor_axis[1]) == 1).toBool());
+                                 ui->Acceleration_1->maximum() - ahp_gt_get_acceleration_angle(1) * 1800.0 / M_PI).toInt());
+    ui->Invert_1->setChecked(settings->value("Invert_1", ahp_gt_get_direction_invert(1) == 1).toBool());
     ui->Inductance_1->setValue(settings->value("Inductance_1", 10).toInt());
     ui->Resistance_1->setValue(settings->value("Resistance_1", 20000).toInt());
     ui->Current_1->setValue(settings->value("Current_1", 1000).toInt());
     ui->Voltage_1->setValue(settings->value("Voltage_1", 12).toInt());
-    ui->GPIO_1->setCurrentIndex(settings->value("GPIO_1", ahp_gt_get_feature(motor_axis[1])).toInt());
-    ui->Coil_1->setCurrentIndex(settings->value("Coil_1", ahp_gt_get_stepping_conf(motor_axis[1])).toInt());
+    ui->GPIO_1->setCurrentIndex(settings->value("GPIO_1", ahp_gt_get_feature(1)).toInt());
+    ui->Coil_1->setCurrentIndex(settings->value("Coil_1", ahp_gt_get_stepping_conf(1)).toInt());
     ui->TrackRate_1->setValue(settings->value("TimingValue_1", 0).toInt());
-    ui->SteppingMode_1->setCurrentIndex(settings->value("SteppingMode_1", ahp_gt_get_stepping_mode(motor_axis[1])).toInt());
+    ui->SteppingMode_1->setCurrentIndex(settings->value("SteppingMode_1", ahp_gt_get_stepping_mode(1)).toInt());
     ui->Mean_1->setValue(settings->value("Mean_1", 1).toInt());
 
-    ahp_gt_set_motor_steps(motor_axis[0], ui->MotorSteps_0->value());
-    ahp_gt_set_motor_teeth(motor_axis[0], ui->Motor_0->value());
-    ahp_gt_set_worm_teeth(motor_axis[0], ui->Worm_0->value());
-    ahp_gt_set_crown_teeth(motor_axis[0], ui->Crown_0->value());
-    ahp_gt_set_direction_invert(motor_axis[0], ui->Invert_0->isChecked());
-    ahp_gt_set_stepping_conf(motor_axis[0], (GTSteppingConfiguration)ui->Coil_0->currentIndex());
-    ahp_gt_set_timing(motor_axis[0], AHP_GT_ONE_SECOND-(double)ui->TrackRate_0->value()*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum()/10.0);
-    ahp_gt_set_stepping_mode(motor_axis[0], (GTSteppingMode)ui->SteppingMode_0->currentIndex());
+    ahp_gt_set_motor_steps(0, ui->MotorSteps_0->value());
+    ahp_gt_set_motor_teeth(0, ui->Motor_0->value());
+    ahp_gt_set_worm_teeth(0, ui->Worm_0->value());
+    ahp_gt_set_crown_teeth(0, ui->Crown_0->value());
+    ahp_gt_set_direction_invert(0, ui->Invert_0->isChecked());
+    ahp_gt_set_stepping_conf(0, (GTSteppingConfiguration)ui->Coil_0->currentIndex());
+    ahp_gt_set_timing(0, AHP_GT_ONE_SECOND-(double)ui->TrackRate_0->value()*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum()/10.0);
+    ahp_gt_set_stepping_mode(0, (GTSteppingMode)ui->SteppingMode_0->currentIndex());
     switch(ui->GPIO_0->currentIndex())
     {
         case 0:
-            ahp_gt_set_feature(motor_axis[0], GpioUnused);
+            ahp_gt_set_feature(0, GpioUnused);
             break;
         case 1:
-            ahp_gt_set_feature(motor_axis[0], GpioAsST4);
+            ahp_gt_set_feature(0, GpioAsST4);
             break;
         case 2:
-            ahp_gt_set_feature(motor_axis[0], GpioAsPulseDrive);
+            ahp_gt_set_feature(0, GpioAsPulseDrive);
             break;
         default:
             break;
     }
 
-    ahp_gt_set_motor_steps(motor_axis[1], ui->MotorSteps_1->value());
-    ahp_gt_set_motor_teeth(motor_axis[1], ui->Motor_1->value());
-    ahp_gt_set_worm_teeth(motor_axis[1], ui->Worm_1->value());
-    ahp_gt_set_crown_teeth(motor_axis[1], ui->Crown_1->value());
-    ahp_gt_set_direction_invert(motor_axis[1], ui->Invert_1->isChecked());
-    ahp_gt_set_stepping_conf(motor_axis[1], (GTSteppingConfiguration)ui->Coil_1->currentIndex());
-    ahp_gt_set_timing(motor_axis[1], AHP_GT_ONE_SECOND-(double)ui->TrackRate_1->value()*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum()/10.0);
-    ahp_gt_set_stepping_mode(motor_axis[1], (GTSteppingMode)ui->SteppingMode_1->currentIndex());
+    ahp_gt_set_motor_steps(1, ui->MotorSteps_1->value());
+    ahp_gt_set_motor_teeth(1, ui->Motor_1->value());
+    ahp_gt_set_worm_teeth(1, ui->Worm_1->value());
+    ahp_gt_set_crown_teeth(1, ui->Crown_1->value());
+    ahp_gt_set_direction_invert(1, ui->Invert_1->isChecked());
+    ahp_gt_set_stepping_conf(1, (GTSteppingConfiguration)ui->Coil_1->currentIndex());
+    ahp_gt_set_timing(1, AHP_GT_ONE_SECOND-(double)ui->TrackRate_1->value()*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum()/10.0);
+    ahp_gt_set_stepping_mode(1, (GTSteppingMode)ui->SteppingMode_1->currentIndex());
     switch(ui->GPIO_1->currentIndex())
     {
         case 0:
-            ahp_gt_set_feature(motor_axis[1], GpioUnused);
+            ahp_gt_set_feature(1, GpioUnused);
             break;
         case 1:
-            ahp_gt_set_feature(motor_axis[1], GpioAsST4);
+            ahp_gt_set_feature(1, GpioAsST4);
             break;
         case 2:
-            ahp_gt_set_feature(motor_axis[1], GpioAsPulseDrive);
+            ahp_gt_set_feature(1, GpioAsPulseDrive);
             break;
         default:
             break;
@@ -463,8 +462,8 @@ MainWindow::MainWindow(QWidget *parent)
             if(isConnected) {
                 ui->WorkArea->setEnabled(false);
                 ui->commonSettings->setEnabled(false);
-                ahp_gt_write_values(motor_axis[0], &percent, &finished);
-                ahp_gt_write_values(motor_axis[1], &percent, &finished);
+                ahp_gt_write_values(0, &percent, &finished);
+                ahp_gt_write_values(1, &percent, &finished);
                 ui->WorkArea->setEnabled(true);
                 ui->commonSettings->setEnabled(true);
             }
@@ -476,7 +475,7 @@ MainWindow::MainWindow(QWidget *parent)
         thread->unlock();
     });
     connect(ServerThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * thread) {
-        ahp_gt_set_aligned(motor_axis[1]);
+        ahp_gt_set_aligned(1);
         threadsStopped = false;
         ahp_gt_start_synscan_server(11882, &threadsStopped);
         threadsStopped = true;
@@ -548,8 +547,8 @@ MainWindow::MainWindow(QWidget *parent)
             settings->setValue("LastPort", ui->ComPort->currentText());
             ui->Write->setText("Write");
             ui->Write->setEnabled(true);
-            ahp_gt_read_values(motor_axis[0]);
-            ahp_gt_read_values(motor_axis[1]);
+            ahp_gt_read_values(0);
+            ahp_gt_read_values(1);
             int flags = ahp_gt_get_mount_flags();
             ahp_gt_set_mount_flags((GTFlags)flags);
             ui->LoadFW->setEnabled(false);
@@ -571,6 +570,8 @@ MainWindow::MainWindow(QWidget *parent)
             isConnected = true;
             finished = true;
             ui->ComPort->setEnabled(false);
+            ui->AxisIndex_0->setEnabled(ahp_gt_get_mc_version(0)&0xff == 0x38);
+            ui->AxisIndex_1->setEnabled(ahp_gt_get_mc_version(1)&0xff == 0x38);
             IndicationThread->start();
         }
     });
@@ -598,8 +599,8 @@ MainWindow::MainWindow(QWidget *parent)
         ui->AdvancedDec->setEnabled(false);
         ui->loadConfig->setEnabled(false);
         ui->saveConfig->setEnabled(false);
-        ahp_gt_stop_motion(motor_axis[0], 0);
-        ahp_gt_stop_motion(motor_axis[1], 0);
+        ahp_gt_stop_motion(0, 0);
+        ahp_gt_stop_motion(1, 0);
         ahp_gt_disconnect();
     });
     connect(ui->loadConfig, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
@@ -753,117 +754,133 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Invert_0, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             [ = ](bool checked)
     {
-        ahp_gt_set_direction_invert(motor_axis[0], checked);
+        ahp_gt_set_direction_invert(0, checked);
         saveIni(ini);
     });
     connect(ui->Invert_1, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             [ = ](bool checked)
     {
-        ahp_gt_set_direction_invert(motor_axis[1], checked);
+        ahp_gt_set_direction_invert(1, checked);
         saveIni(ini);
     });
     connect(ui->MotorSteps_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
+            {
+                ahp_gt_set_motor_steps(0, value);
+                saveIni(ini);
+            });
+    connect(ui->AxisIndex_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            [ = ](int value)
     {
-        ahp_gt_set_motor_steps(motor_axis[0], value);
+        value--;
+        ahp_gt_set_axis_number(axis_index[0], value);
+        axis_index[0] = value;
         saveIni(ini);
     });
     connect(ui->Worm_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_set_worm_teeth(motor_axis[0], value);
+        ahp_gt_set_worm_teeth(0, value);
         saveIni(ini);
     });
     connect(ui->Motor_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_set_motor_teeth(motor_axis[0], value);
+        ahp_gt_set_motor_teeth(0, value);
         saveIni(ini);
     });
     connect(ui->Crown_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_set_crown_teeth(motor_axis[0], value);
+        ahp_gt_set_crown_teeth(0, value);
         saveIni(ini);
     });
     connect(ui->MotorSteps_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_set_motor_steps(motor_axis[1], value);
+        ahp_gt_set_motor_steps(1, value);
+        saveIni(ini);
+    });
+    connect(ui->AxisIndex_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            [ = ](int value)
+    {
+        value--;
+        ahp_gt_set_axis_number(axis_index[1], value);
+        axis_index[1] = value;
         saveIni(ini);
     });
     connect(ui->Worm_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_set_worm_teeth(motor_axis[1], value);
+        ahp_gt_set_worm_teeth(1, value);
         saveIni(ini);
     });
     connect(ui->Motor_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_set_motor_teeth(motor_axis[1], value);
+        ahp_gt_set_motor_teeth(1, value);
         saveIni(ini);
     });
     connect(ui->Crown_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_set_crown_teeth(motor_axis[1], value);
+        ahp_gt_set_crown_teeth(1, value);
         saveIni(ini);
     });
     connect(ui->Acceleration_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_set_acceleration_angle(motor_axis[0], (ui->Acceleration_0->maximum() - ui->Acceleration_0->value()) * M_PI / 1800.0);
+        ahp_gt_set_acceleration_angle(0, (ui->Acceleration_0->maximum() - ui->Acceleration_0->value()) * M_PI / 1800.0);
         ui->Acceleration_label_0->setText("Acceleration: " + QString::number((double)ui->Acceleration_0->maximum() / 10.0 - (double)value / 10.0) + "°");
         saveIni(ini);
     });
     connect(ui->Acceleration_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_set_acceleration_angle(motor_axis[1],  (ui->Acceleration_1->maximum() - ui->Acceleration_1->value()) * M_PI / 1800.0);
+        ahp_gt_set_acceleration_angle(1,  (ui->Acceleration_1->maximum() - ui->Acceleration_1->value()) * M_PI / 1800.0);
         ui->Acceleration_label_1->setText("Acceleration: " + QString::number((double)ui->Acceleration_1->maximum() / 10.0 - (double)value / 10.0) + "°");
         saveIni(ini);
     });
     connect(ui->MaxSpeed_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_set_max_speed(motor_axis[0], ui->MaxSpeed_0->value() * M_PI * 2 / SIDEREAL_DAY);
+        ahp_gt_set_max_speed(0, ui->MaxSpeed_0->value() * M_PI * 2 / SIDEREAL_DAY);
         saveIni(ini);
     });
     connect(ui->MaxSpeed_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_set_max_speed(motor_axis[1], ui->MaxSpeed_1->value() * M_PI * 2 / SIDEREAL_DAY);
+        ahp_gt_set_max_speed(1, ui->MaxSpeed_1->value() * M_PI * 2 / SIDEREAL_DAY);
         saveIni(ini);
     });
     connect(ui->SteppingMode_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
     {
-        ahp_gt_set_stepping_mode(motor_axis[0], (GTSteppingMode)index);
+        ahp_gt_set_stepping_mode(0, (GTSteppingMode)index);
         saveIni(ini);
     });
     connect(ui->SteppingMode_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
     {
-        ahp_gt_set_stepping_mode(motor_axis[1], (GTSteppingMode)index);
+        ahp_gt_set_stepping_mode(1, (GTSteppingMode)index);
         saveIni(ini);
     });
     connect(ui->Coil_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
     {
-        ahp_gt_set_stepping_conf(motor_axis[0], (GTSteppingConfiguration)index);
+        ahp_gt_set_stepping_conf(0, (GTSteppingConfiguration)index);
         saveIni(ini);
     });
     connect(ui->Coil_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
             {
-                ahp_gt_set_stepping_conf(motor_axis[1], (GTSteppingConfiguration)index);
+                ahp_gt_set_stepping_conf(1, (GTSteppingConfiguration)index);
                 saveIni(ini);
             });
     connect(ui->TrackRate_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
     {
-        ahp_gt_set_timing(motor_axis[0], AHP_GT_ONE_SECOND-(double)value*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum()/10.0);
+        ahp_gt_set_timing(0, AHP_GT_ONE_SECOND-(double)value*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum()/10.0);
         saveIni(ini);
     });
     connect(ui->TrackRate_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ] (int value)
     {
-        ahp_gt_set_timing(motor_axis[1], AHP_GT_ONE_SECOND-(double)value*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum()/10.0);
+        ahp_gt_set_timing(1, AHP_GT_ONE_SECOND-(double)value*AHP_GT_ONE_SECOND/(double)ui->TrackRate_0->maximum()/10.0);
         saveIni(ini);
     });
     connect(ui->GPIO_0, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [ = ] (int index)
@@ -871,13 +888,13 @@ MainWindow::MainWindow(QWidget *parent)
         switch(index)
         {
             case 0:
-                ahp_gt_set_feature(motor_axis[0], GpioUnused);
+                ahp_gt_set_feature(0, GpioUnused);
                 break;
             case 1:
-                ahp_gt_set_feature(motor_axis[0], GpioAsST4);
+                ahp_gt_set_feature(0, GpioAsST4);
                 break;
             case 2:
-                ahp_gt_set_feature(motor_axis[0], GpioAsPulseDrive);
+                ahp_gt_set_feature(0, GpioAsPulseDrive);
                 break;
             default:
                 break;
@@ -889,13 +906,13 @@ MainWindow::MainWindow(QWidget *parent)
         switch(index)
         {
             case 0:
-                ahp_gt_set_feature(motor_axis[1], GpioUnused);
+                ahp_gt_set_feature(1, GpioUnused);
                 break;
             case 1:
-                ahp_gt_set_feature(motor_axis[1], GpioAsST4);
+                ahp_gt_set_feature(1, GpioAsST4);
                 break;
             case 2:
-                ahp_gt_set_feature(motor_axis[1], GpioAsPulseDrive);
+                ahp_gt_set_feature(1, GpioAsPulseDrive);
                 break;
             default:
                 break;
@@ -929,11 +946,11 @@ MainWindow::MainWindow(QWidget *parent)
     {
         int flags = (int)ahp_gt_get_mount_flags();
         if(index == 2) {
-            ahp_gt_set_features(motor_axis[0], (SkywatcherFeature)(ahp_gt_get_features(motor_axis[0]) | isAZEQ));
-            ahp_gt_set_features(motor_axis[1], (SkywatcherFeature)(ahp_gt_get_features(motor_axis[1]) | isAZEQ));
+            ahp_gt_set_features(0, (SkywatcherFeature)(ahp_gt_get_features(0) | isAZEQ));
+            ahp_gt_set_features(1, (SkywatcherFeature)(ahp_gt_get_features(1) | isAZEQ));
         } else {
-            ahp_gt_set_features(motor_axis[0], (SkywatcherFeature)(ahp_gt_get_features(motor_axis[0]) & ~isAZEQ));
-            ahp_gt_set_features(motor_axis[1], (SkywatcherFeature)(ahp_gt_get_features(motor_axis[1]) & ~isAZEQ));
+            ahp_gt_set_features(0, (SkywatcherFeature)(ahp_gt_get_features(0) & ~isAZEQ));
+            ahp_gt_set_features(1, (SkywatcherFeature)(ahp_gt_get_features(1) & ~isAZEQ));
         }
         flags &= ~isForkMount;
         ahp_gt_set_mount_flags((GTFlags)(flags | (index == 1 ? isForkMount : 0)));
@@ -941,19 +958,9 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ui->HalfCurrent, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
     {
-        ahp_gt_set_features(motor_axis[0], (SkywatcherFeature)((ahp_gt_get_features(motor_axis[0]) & ahp_gt_get_features(motor_axis[1]) & ~hasHalfCurrentTracking) | (checked ? hasHalfCurrentTracking : 0)));
-        ahp_gt_set_features(motor_axis[1], (SkywatcherFeature)((ahp_gt_get_features(motor_axis[0]) & ahp_gt_get_features(motor_axis[1]) & ~hasHalfCurrentTracking) | (checked ? hasHalfCurrentTracking : 0)));
+        ahp_gt_set_features(0, (SkywatcherFeature)((ahp_gt_get_features(0) & ahp_gt_get_features(1) & ~hasHalfCurrentTracking) | (checked ? hasHalfCurrentTracking : 0)));
+        ahp_gt_set_features(1, (SkywatcherFeature)((ahp_gt_get_features(0) & ahp_gt_get_features(1) & ~hasHalfCurrentTracking) | (checked ? hasHalfCurrentTracking : 0)));
         saveIni(ini);
-    });
-    connect(ui->AxisIndex_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ] (int value)
-    {
-        ahp_gt_set_axis_number(motor_axis[0], value);
-        motor_axis[0] = value;
-    });
-    connect(ui->AxisIndex_1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ] (int value)
-    {
-        ahp_gt_set_axis_number(motor_axis[1], value);
-        motor_axis[1] = value;
     });
     connect(ui->HalfCurrent_0, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
     {
@@ -985,8 +992,8 @@ MainWindow::MainWindow(QWidget *parent)
         isTracking[0] = false;
         double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
         double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
-        ahp_gt_stop_motion(motor_axis[0], axisdirection[0] != true || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
-        ahp_gt_start_motion(motor_axis[0], rarate);
+        ahp_gt_stop_motion(0, axisdirection[0] != true || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
+        ahp_gt_start_motion(0, rarate);
         RaThread->setLoop(abs(POSITION_THREAD_LOOP/rarate));
         axisdirection[0] = true;
         axis_lospeed[0] = (fabs(rarate) < lowspeed_treshold);
@@ -997,8 +1004,8 @@ MainWindow::MainWindow(QWidget *parent)
         isTracking[0] = false;
         double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
         double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
-        ahp_gt_stop_motion(motor_axis[0], axisdirection[0] != false || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
-        ahp_gt_start_motion(motor_axis[0], -rarate);
+        ahp_gt_stop_motion(0, axisdirection[0] != false || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
+        ahp_gt_start_motion(0, -rarate);
         RaThread->setLoop(abs(POSITION_THREAD_LOOP/rarate));
         axisdirection[0] = false;
         axis_lospeed[0] = (fabs(rarate) < lowspeed_treshold);
@@ -1009,8 +1016,8 @@ MainWindow::MainWindow(QWidget *parent)
         isTracking[1] = false;
         double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
         double derate = ui->Dec_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
-        ahp_gt_stop_motion(motor_axis[1], axisdirection[1] != true || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
-        ahp_gt_start_motion(motor_axis[1], derate);
+        ahp_gt_stop_motion(1, axisdirection[1] != true || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
+        ahp_gt_start_motion(1, derate);
         DecThread->setLoop(abs(POSITION_THREAD_LOOP/derate));
         axisdirection[1] = true;
         axis_lospeed[1] = (fabs(derate) < lowspeed_treshold);
@@ -1021,8 +1028,8 @@ MainWindow::MainWindow(QWidget *parent)
         isTracking[1] = false;
         double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
         double derate = ui->Dec_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
-        ahp_gt_stop_motion(motor_axis[1], axisdirection[1] != false || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
-        ahp_gt_start_motion(motor_axis[1], -derate);
+        ahp_gt_stop_motion(1, axisdirection[1] != false || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
+        ahp_gt_start_motion(1, -derate);
         DecThread->setLoop(abs(POSITION_THREAD_LOOP/derate));
         axisdirection[1] = false;
         axis_lospeed[1] = (fabs(derate) < lowspeed_treshold);
@@ -1035,10 +1042,10 @@ MainWindow::MainWindow(QWidget *parent)
         double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
         double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
         double derate = ui->Dec_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
-        ahp_gt_stop_motion(motor_axis[0], axisdirection[0] != true || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
-        ahp_gt_start_motion(motor_axis[0], rarate);
-        ahp_gt_stop_motion(motor_axis[1], axisdirection[1] != true || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
-        ahp_gt_start_motion(motor_axis[1], derate);
+        ahp_gt_stop_motion(0, axisdirection[0] != true || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
+        ahp_gt_start_motion(0, rarate);
+        ahp_gt_stop_motion(1, axisdirection[1] != true || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
+        ahp_gt_start_motion(1, derate);
         axisdirection[0] = true;
         axis_lospeed[0] = (fabs(rarate) < lowspeed_treshold);
         axisdirection[1] = true;
@@ -1052,10 +1059,10 @@ MainWindow::MainWindow(QWidget *parent)
         double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
         double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
         double derate = ui->Dec_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
-        ahp_gt_stop_motion(motor_axis[0], axisdirection[0] != false || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
-        ahp_gt_start_motion(motor_axis[0], -rarate);
-        ahp_gt_stop_motion(motor_axis[1], axisdirection[1] != true || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
-        ahp_gt_start_motion(motor_axis[1], derate);
+        ahp_gt_stop_motion(0, axisdirection[0] != false || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
+        ahp_gt_start_motion(0, -rarate);
+        ahp_gt_stop_motion(1, axisdirection[1] != true || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
+        ahp_gt_start_motion(1, derate);
         axisdirection[0] = false;
         axis_lospeed[0] = (fabs(rarate) < lowspeed_treshold);
         axisdirection[1] = true;
@@ -1069,10 +1076,10 @@ MainWindow::MainWindow(QWidget *parent)
         double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
         double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
         double derate = ui->Dec_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
-        ahp_gt_stop_motion(motor_axis[0], axisdirection[0] != true || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
-        ahp_gt_start_motion(motor_axis[0], rarate);
-        ahp_gt_stop_motion(motor_axis[1], axisdirection[1] != false || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
-        ahp_gt_start_motion(motor_axis[1], -derate);
+        ahp_gt_stop_motion(0, axisdirection[0] != true || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
+        ahp_gt_start_motion(0, rarate);
+        ahp_gt_stop_motion(1, axisdirection[1] != false || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
+        ahp_gt_start_motion(1, -derate);
         axisdirection[0] = true;
         axis_lospeed[0] = (fabs(rarate) < lowspeed_treshold);
         axisdirection[1] = false;
@@ -1086,10 +1093,10 @@ MainWindow::MainWindow(QWidget *parent)
         double lowspeed_treshold = 128.0 * M_PI * 2 / SIDEREAL_DAY;
         double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
         double derate = ui->Dec_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
-        ahp_gt_stop_motion(motor_axis[0], axisdirection[0] != false || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
-        ahp_gt_start_motion(motor_axis[0], -rarate);
-        ahp_gt_stop_motion(motor_axis[1], axisdirection[1] != false || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
-        ahp_gt_start_motion(motor_axis[1], -derate);
+        ahp_gt_stop_motion(0, axisdirection[0] != false || axis_lospeed[0] != (fabs(rarate) < lowspeed_treshold));
+        ahp_gt_start_motion(0, -rarate);
+        ahp_gt_stop_motion(1, axisdirection[1] != false || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
+        ahp_gt_start_motion(1, -derate);
         axisdirection[0] = false;
         axis_lospeed[0] = (fabs(rarate) < lowspeed_treshold);
         axisdirection[1] = false;
@@ -1100,52 +1107,52 @@ MainWindow::MainWindow(QWidget *parent)
     {
         oldTracking[0] = false;
         oldTracking[1] = false;
-        ahp_gt_stop_motion(motor_axis[0], 0);
-        ahp_gt_stop_motion(motor_axis[1], 0);
+        ahp_gt_stop_motion(0, 0);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->W, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(motor_axis[0], 0);
+        ahp_gt_stop_motion(0, 0);
     });
     connect(ui->E, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(motor_axis[0], 0);
+        ahp_gt_stop_motion(0, 0);
     });
     connect(ui->N, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(motor_axis[1], 0);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->S, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(motor_axis[1], 0);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->NW, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(motor_axis[0], 0);
-        ahp_gt_stop_motion(motor_axis[1], 0);
+        ahp_gt_stop_motion(0, 0);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->NE, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(motor_axis[0], 0);
-        ahp_gt_stop_motion(motor_axis[1], 0);
+        ahp_gt_stop_motion(0, 0);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->SW, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(motor_axis[0], 0);
-        ahp_gt_stop_motion(motor_axis[1], 0);
+        ahp_gt_stop_motion(0, 0);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->SE, static_cast<void (QPushButton::*)()>(&QPushButton::released),
             [ = ]()
     {
-        ahp_gt_stop_motion(motor_axis[0], 0);
-        ahp_gt_stop_motion(motor_axis[1], 0);
+        ahp_gt_stop_motion(0, 0);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->Tracking, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
     [ = ](bool checked)
@@ -1155,42 +1162,42 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->TotalSteps0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
     [ = ](int value)
     {
-        ahp_gt_set_totalsteps(motor_axis[0], value);
+        ahp_gt_set_totalsteps(0, value);
     });
     connect(ui->WormSteps0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
     [ = ](int value)
     {
-        ahp_gt_set_wormsteps(motor_axis[0], value);
+        ahp_gt_set_wormsteps(0, value);
     });
     connect(ui->Multiplier0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
     [ = ](int value)
     {
-        ahp_gt_set_multiplier(motor_axis[0], value);
+        ahp_gt_set_multiplier(0, value);
     });
     connect(ui->Divider0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
     [ = ](int value)
     {
-        ahp_gt_set_divider(motor_axis[0], value);
+        ahp_gt_set_divider(0, value);
     });
     connect(ui->TotalSteps1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
     [ = ](int value)
     {
-        ahp_gt_set_totalsteps(motor_axis[1], value);
+        ahp_gt_set_totalsteps(1, value);
     });
     connect(ui->WormSteps1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
     [ = ](int value)
     {
-        ahp_gt_set_wormsteps(motor_axis[1], value);
+        ahp_gt_set_wormsteps(1, value);
     });
     connect(ui->Multiplier1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
     [ = ](int value)
     {
-        ahp_gt_set_multiplier(motor_axis[1], value);
+        ahp_gt_set_multiplier(1, value);
     });
     connect(ui->Divider1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
     [ = ](int value)
     {
-        ahp_gt_set_divider(motor_axis[1], value);
+        ahp_gt_set_divider(1, value);
     });
     connect(ui->TuneRa, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), this,
             [ = ](bool checked)
@@ -1456,8 +1463,8 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ui->Halt, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), [ = ](bool checked)
     {
-        ahp_gt_stop_motion(motor_axis[0], 0);
-        ahp_gt_stop_motion(motor_axis[1], 0);
+        ahp_gt_stop_motion(0, 0);
+        ahp_gt_stop_motion(1, 0);
     });
     connect(ui->Server, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
     {
@@ -1645,7 +1652,6 @@ void MainWindow::disconnectControls(bool block)
     ui->HalfCurrent->blockSignals(block);
     ui->HighBauds->blockSignals(block);
 
-    ui->AxisIndex_0->blockSignals(block);
     ui->HalfCurrent_0->blockSignals(block);
     ui->Invert_0->blockSignals(block);
     ui->MotorSteps_0->blockSignals(block);
@@ -1658,7 +1664,6 @@ void MainWindow::disconnectControls(bool block)
     ui->Coil_0->blockSignals(block);
     ui->GPIO_0->blockSignals(block);
 
-    ui->AxisIndex_1->blockSignals(block);
     ui->HalfCurrent_1->blockSignals(block);
     ui->Invert_1->blockSignals(block);
     ui->MotorSteps_1->blockSignals(block);
@@ -1677,54 +1682,54 @@ void MainWindow::UpdateValues(int axis)
     disconnectControls(true);
     if(axis == 0)
     {
-        double totalsteps = ahp_gt_get_totalsteps(motor_axis[0]) * ahp_gt_get_divider(motor_axis[0]) * ahp_gt_get_multiplier(motor_axis[0]);
-        ui->Divider0->setValue(ahp_gt_get_divider(motor_axis[0]));
-        ui->Multiplier0->setValue(ahp_gt_get_multiplier(motor_axis[0]));
-        ui->WormSteps0->setValue(ahp_gt_get_wormsteps(motor_axis[0]));
-        ui->TotalSteps0->setValue(ahp_gt_get_totalsteps(motor_axis[0]));
-        ui->TrackingFrequency_0->setText("Steps/s: " + QString::number(totalsteps / ahp_gt_get_divider(motor_axis[0]) / ahp_gt_get_multiplier(motor_axis[0]) / SIDEREAL_DAY));
-        ui->SPT_0->setText("sec/turn: " + QString::number(SIDEREAL_DAY / (ahp_gt_get_crown_teeth(motor_axis[0])*ahp_gt_get_worm_teeth(
-                               0) / ahp_gt_get_motor_teeth(motor_axis[0]))));
+        double totalsteps = ahp_gt_get_totalsteps(0) * ahp_gt_get_divider(0) * ahp_gt_get_multiplier(0);
+        ui->Divider0->setValue(ahp_gt_get_divider(0));
+        ui->Multiplier0->setValue(ahp_gt_get_multiplier(0));
+        ui->WormSteps0->setValue(ahp_gt_get_wormsteps(0));
+        ui->TotalSteps0->setValue(ahp_gt_get_totalsteps(0));
+        ui->TrackingFrequency_0->setText("Steps/s: " + QString::number(totalsteps / ahp_gt_get_divider(0) / ahp_gt_get_multiplier(0) / SIDEREAL_DAY));
+        ui->SPT_0->setText("sec/turn: " + QString::number(SIDEREAL_DAY / (ahp_gt_get_crown_teeth(0)*ahp_gt_get_worm_teeth(
+                               0) / ahp_gt_get_motor_teeth(0))));
         double L = (double)ui->Inductance_0->value() / 1000000.0;
         double R = (double)ui->Resistance_0->value() / 1000.0;
         double mI = (double)ui->Current_0->value() / 1000.0;
         double mV = (double)ui->Voltage_0->value();
         double maxf = (2.0 * M_PI * pow(mV*mI/(pow(R, 2)*pow(L, 2)), 0.5));
         double minf = (2.0 * M_PI * pow(mV*mI*(pow(R, 2)), 0.5));
-        if(minf > totalsteps /  ahp_gt_get_divider(motor_axis[0]) / ahp_gt_get_multiplier(motor_axis[0]) / SIDEREAL_DAY)
+        if(minf > totalsteps /  ahp_gt_get_divider(0) / ahp_gt_get_multiplier(0) / SIDEREAL_DAY)
             ui->TrackingFrequency_0->setStyleSheet("font-size: 12px; background-color: red;");
         else
             ui->TrackingFrequency_0->setStyleSheet("font-size: 12px; background-color: transparent;");
-        //ahp_gt_set_max_speed(motor_axis[0], maxf);
+        //ahp_gt_set_max_speed(0, maxf);
         ui->PWMFrequency_0->setText("PWM Hz: " + QString::number(maxf));
         ui->MinFrequency_0->setText("Min Hz: " + QString::number(minf));
-        ui->GotoFrequency_0->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(motor_axis[0]) / M_PI / 2));
-        ui->MotorSteps_0->setValue(ahp_gt_get_motor_steps(motor_axis[0]));
-        ui->Motor_0->setValue(ahp_gt_get_motor_teeth(motor_axis[0]));
-        ui->Worm_0->setValue(ahp_gt_get_worm_teeth(motor_axis[0]));
-        ui->Crown_0->setValue(ahp_gt_get_crown_teeth(motor_axis[0]));
-        ui->Acceleration_0->setValue(ui->Acceleration_0->maximum() - ahp_gt_get_acceleration_angle(motor_axis[0]) * 1800.0 / M_PI);
+        ui->GotoFrequency_0->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(0) / M_PI / 2));
+        ui->MotorSteps_0->setValue(ahp_gt_get_motor_steps(0));
+        ui->Motor_0->setValue(ahp_gt_get_motor_teeth(0));
+        ui->Worm_0->setValue(ahp_gt_get_worm_teeth(0));
+        ui->Crown_0->setValue(ahp_gt_get_crown_teeth(0));
+        ui->Acceleration_0->setValue(ui->Acceleration_0->maximum() - ahp_gt_get_acceleration_angle(0) * 1800.0 / M_PI);
         ui->MaxSpeed_0->setMaximum(2000);
         ui->Ra_Speed->setMaximum(2000);
-        ui->MaxSpeed_0->setValue(ahp_gt_get_max_speed(motor_axis[0]) * SIDEREAL_DAY / M_PI / 2);
-        ui->MaxSpeed_label_0->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(motor_axis[0]) * SIDEREAL_DAY / M_PI / 2) + "x");
-        ui->Coil_0->setCurrentIndex(ahp_gt_get_stepping_conf(motor_axis[0]));
-        ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(motor_axis[0]));
-        ui->Invert_0->setChecked(ahp_gt_get_direction_invert(motor_axis[0]));
+        ui->MaxSpeed_0->setValue(ahp_gt_get_max_speed(0) * SIDEREAL_DAY / M_PI / 2);
+        ui->MaxSpeed_label_0->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(0) * SIDEREAL_DAY / M_PI / 2) + "x");
+        ui->Coil_0->setCurrentIndex(ahp_gt_get_stepping_conf(0));
+        ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(0));
+        ui->Invert_0->setChecked(ahp_gt_get_direction_invert(0));
         ui->HalfCurrent_0->setChecked(ahp_gt_get_mount_flags() & halfCurrentRA);
-        ui->TrackRate_0->setValue(-((double)ahp_gt_get_timing(motor_axis[0])-AHP_GT_ONE_SECOND)*(double)ui->TrackRate_0->maximum()*10.0/AHP_GT_ONE_SECOND);
+        ui->TrackRate_0->setValue(-((double)ahp_gt_get_timing(0)-AHP_GT_ONE_SECOND)*(double)ui->TrackRate_0->maximum()*10.0/AHP_GT_ONE_SECOND);
         ui->TrackRate_label_0->setText("Track Rate offset: " + QString::number((double)ui->TrackRate_0->value()/(double)ui->TrackRate_0->maximum()/10.0) + "%");
     }
     else if (axis == 1)
     {
-        double totalsteps = ahp_gt_get_totalsteps(motor_axis[1]) * ahp_gt_get_divider(motor_axis[1]) * ahp_gt_get_multiplier(motor_axis[1]);
-        ui->Divider1->setValue(ahp_gt_get_divider(motor_axis[1]));
-        ui->Multiplier1->setValue(ahp_gt_get_multiplier(motor_axis[1]));
-        ui->WormSteps1->setValue(ahp_gt_get_wormsteps(motor_axis[1]));
-        ui->TotalSteps1->setValue(ahp_gt_get_totalsteps(motor_axis[1]));
-        ui->TrackingFrequency_1->setText("Steps/s: " + QString::number(totalsteps /  ahp_gt_get_divider(motor_axis[1]) / ahp_gt_get_multiplier(motor_axis[1]) / SIDEREAL_DAY));
-        ui->SPT_1->setText("sec/turn: " + QString::number(SIDEREAL_DAY / (ahp_gt_get_crown_teeth(motor_axis[1])*ahp_gt_get_worm_teeth(
-                               1) / ahp_gt_get_motor_teeth(motor_axis[1]))));
+        double totalsteps = ahp_gt_get_totalsteps(1) * ahp_gt_get_divider(1) * ahp_gt_get_multiplier(1);
+        ui->Divider1->setValue(ahp_gt_get_divider(1));
+        ui->Multiplier1->setValue(ahp_gt_get_multiplier(1));
+        ui->WormSteps1->setValue(ahp_gt_get_wormsteps(1));
+        ui->TotalSteps1->setValue(ahp_gt_get_totalsteps(1));
+        ui->TrackingFrequency_1->setText("Steps/s: " + QString::number(totalsteps /  ahp_gt_get_divider(1) / ahp_gt_get_multiplier(1) / SIDEREAL_DAY));
+        ui->SPT_1->setText("sec/turn: " + QString::number(SIDEREAL_DAY / (ahp_gt_get_crown_teeth(1)*ahp_gt_get_worm_teeth(
+                               1) / ahp_gt_get_motor_teeth(1))));
         double L = (double)ui->Inductance_1->value() / 1000000.0;
         double R = (double)ui->Resistance_1->value() / 1000.0;
         double mI = (double)ui->Current_1->value() / 1000.0;
@@ -1732,31 +1737,31 @@ void MainWindow::UpdateValues(int axis)
         double Z = fmax(R, mV / mI - R) / L;
         double maxf = (2.0 * M_PI * pow(mV*mI/(pow(R, 2)*pow(L, 2)), 0.5));
         double minf = (2.0 * M_PI * pow(mV*mI*(pow(R, 2)), 0.5));
-        if(minf > totalsteps /  ahp_gt_get_divider(motor_axis[1]) / ahp_gt_get_multiplier(motor_axis[1]) / SIDEREAL_DAY)
+        if(minf > totalsteps /  ahp_gt_get_divider(1) / ahp_gt_get_multiplier(1) / SIDEREAL_DAY)
             ui->TrackingFrequency_1->setStyleSheet("font-size: 12px; background-color: red;");
         else
             ui->TrackingFrequency_1->setStyleSheet("font-size: 12px; background-color: transparent;");
-        //ahp_gt_set_max_speed(motor_axis[1], maxf);
+        //ahp_gt_set_max_speed(1, maxf);
         ui->PWMFrequency_1->setText("PWM Hz: " + QString::number(maxf));
         ui->MinFrequency_1->setText("Min Hz: " + QString::number(minf));
-        ui->GotoFrequency_1->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(motor_axis[1]) / M_PI / 2));
-        ui->MotorSteps_1->setValue(ahp_gt_get_motor_steps(motor_axis[1]));
-        ui->Motor_1->setValue(ahp_gt_get_motor_teeth(motor_axis[1]));
-        ui->Worm_1->setValue(ahp_gt_get_worm_teeth(motor_axis[1]));
-        ui->Crown_1->setValue(ahp_gt_get_crown_teeth(motor_axis[1]));
-        ui->Acceleration_1->setValue(ui->Acceleration_1->maximum() - ahp_gt_get_acceleration_angle(motor_axis[1]) * 1800.0 / M_PI);
+        ui->GotoFrequency_1->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(1) / M_PI / 2));
+        ui->MotorSteps_1->setValue(ahp_gt_get_motor_steps(1));
+        ui->Motor_1->setValue(ahp_gt_get_motor_teeth(1));
+        ui->Worm_1->setValue(ahp_gt_get_worm_teeth(1));
+        ui->Crown_1->setValue(ahp_gt_get_crown_teeth(1));
+        ui->Acceleration_1->setValue(ui->Acceleration_1->maximum() - ahp_gt_get_acceleration_angle(1) * 1800.0 / M_PI);
         ui->MaxSpeed_1->setMaximum(2000);
         ui->Dec_Speed->setMaximum(2000);
-        ui->MaxSpeed_1->setValue(ahp_gt_get_max_speed(motor_axis[1]) * SIDEREAL_DAY / M_PI / 2);
-        ui->MaxSpeed_label_1->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(motor_axis[1]) * SIDEREAL_DAY / M_PI / 2) + "x");
-        ui->Coil_1->setCurrentIndex(ahp_gt_get_stepping_conf(motor_axis[1]));
-        ui->SteppingMode_1->setCurrentIndex(ahp_gt_get_stepping_mode(motor_axis[1]));
-        ui->Invert_1->setChecked(ahp_gt_get_direction_invert(motor_axis[1]));
+        ui->MaxSpeed_1->setValue(ahp_gt_get_max_speed(1) * SIDEREAL_DAY / M_PI / 2);
+        ui->MaxSpeed_label_1->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(1) * SIDEREAL_DAY / M_PI / 2) + "x");
+        ui->Coil_1->setCurrentIndex(ahp_gt_get_stepping_conf(1));
+        ui->SteppingMode_1->setCurrentIndex(ahp_gt_get_stepping_mode(1));
+        ui->Invert_1->setChecked(ahp_gt_get_direction_invert(1));
         ui->HalfCurrent_1->setChecked(ahp_gt_get_mount_flags() & halfCurrentDec);
-        ui->TrackRate_1->setValue(-((double)ahp_gt_get_timing(motor_axis[1])-AHP_GT_ONE_SECOND)*(double)ui->TrackRate_0->maximum()*10.0/AHP_GT_ONE_SECOND);
+        ui->TrackRate_1->setValue(-((double)ahp_gt_get_timing(1)-AHP_GT_ONE_SECOND)*(double)ui->TrackRate_0->maximum()*10.0/AHP_GT_ONE_SECOND);
         ui->TrackRate_label_1->setText("Track Rate offset: " + QString::number((double)ui->TrackRate_1->value()/(double)ui->TrackRate_0->maximum()/10.0) + "%");
     }
-    switch(ahp_gt_get_feature(motor_axis[0]))
+    switch(ahp_gt_get_feature(0))
     {
         case GpioUnused:
             ui->GPIO_0->setCurrentIndex(0);
@@ -1770,7 +1775,7 @@ void MainWindow::UpdateValues(int axis)
         default:
             break;
     }
-    switch(ahp_gt_get_feature(motor_axis[1]))
+    switch(ahp_gt_get_feature(1))
     {
         case GpioUnused:
             ui->GPIO_1->setCurrentIndex(0);
@@ -1788,10 +1793,10 @@ void MainWindow::UpdateValues(int axis)
     ui->PWMFreq_label->setText("PWM: " + QString::number(1500 + 700 * ui->PWMFreq->value()) + " Hz");
     ui->BusIndex->setValue(ahp_gt_get_address());
     ui->MountType->setCurrentIndex(mounttypes.indexOf(ahp_gt_get_mount_type()));
-    ui->HalfCurrent->setChecked((ahp_gt_get_features(motor_axis[0]) & ahp_gt_get_features(motor_axis[1]) & hasHalfCurrentTracking) == hasHalfCurrentTracking);
+    ui->HalfCurrent->setChecked((ahp_gt_get_features(0) & ahp_gt_get_features(1) & hasHalfCurrentTracking) == hasHalfCurrentTracking);
     int index = 0;
-    index |= (((ahp_gt_get_features(motor_axis[0]) & isAZEQ) != 0) ? 2 : 0);
-    index |= (((ahp_gt_get_features(motor_axis[1]) & isAZEQ) != 0) ? 2 : 0);
+    index |= (((ahp_gt_get_features(0) & isAZEQ) != 0) ? 2 : 0);
+    index |= (((ahp_gt_get_features(1) & isAZEQ) != 0) ? 2 : 0);
     if(!index) {
         index |= (((ahp_gt_get_mount_flags() & isForkMount) != 0) ? 1 : 0);
     }
