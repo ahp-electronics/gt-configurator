@@ -198,7 +198,8 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_pwm_frequency(ui->PWMFreq->value());
     ahp_gt_set_address(ui->BusIndex->value());
 
-    ui->AxisIndex_0->setValue(settings->value("AxisIndex_0", axis_index[0]).toInt());
+    ui->AxisIndex_0->setEnabled(ahp_gt_get_mc_version((axis_index[0])&0xff) == 0x38);
+    ui->AxisIndex_0->setValue(settings->value("AxisIndex_0", axis_index[0]+1).toInt());
     ui->MotorSteps_0->setValue(settings->value("MotorSteps_0", ahp_gt_get_motor_steps(0)).toInt());
     ui->Motor_0->setValue(settings->value("Motor_0", ahp_gt_get_motor_teeth(0)).toInt());
     ui->Worm_0->setValue(settings->value("Worm_0", ahp_gt_get_worm_teeth(0)).toInt());
@@ -217,7 +218,8 @@ void MainWindow::readIni(QString ini)
     ui->SteppingMode_0->setCurrentIndex(settings->value("SteppingMode_0", ahp_gt_get_stepping_mode(0)).toInt());
     ui->Mean_0->setValue(settings->value("Mean_0", 1).toInt());
 
-    ui->AxisIndex_1->setValue(settings->value("AxisIndex_1", axis_index[1]).toInt());
+    ui->AxisIndex_1->setEnabled(ahp_gt_get_mc_version((axis_index[1])&0xff) == 0x38);
+    ui->AxisIndex_1->setValue(settings->value("AxisIndex_1", axis_index[1]+1).toInt());
     ui->MotorSteps_1->setValue(settings->value("MotorSteps_1", ahp_gt_get_motor_steps(1)).toInt());
     ui->Motor_1->setValue(settings->value("Motor_1", ahp_gt_get_motor_teeth(1)).toInt());
     ui->Worm_1->setValue(settings->value("Worm_1", ahp_gt_get_worm_teeth(1)).toInt());
@@ -462,8 +464,8 @@ MainWindow::MainWindow(QWidget *parent)
             if(isConnected) {
                 ui->WorkArea->setEnabled(false);
                 ui->commonSettings->setEnabled(false);
-                ahp_gt_write_values(0, &percent, &finished);
-                ahp_gt_write_values(1, &percent, &finished);
+                ahp_gt_write_values(axis_index[0], &percent, &finished);
+                ahp_gt_write_values(axis_index[1], &percent, &finished);
                 ui->WorkArea->setEnabled(true);
                 ui->commonSettings->setEnabled(true);
             }
@@ -547,8 +549,10 @@ MainWindow::MainWindow(QWidget *parent)
             settings->setValue("LastPort", ui->ComPort->currentText());
             ui->Write->setText("Write");
             ui->Write->setEnabled(true);
-            ahp_gt_read_values(0);
-            ahp_gt_read_values(1);
+            ahp_gt_read_values(axis_index[0]);
+            ahp_gt_read_values(axis_index[1]);
+            ui->AxisIndex_0->setEnabled(ahp_gt_get_mc_version(axis_index[0])&0xff == 0x38);
+            ui->AxisIndex_1->setEnabled(ahp_gt_get_mc_version(axis_index[1])&0xff == 0x38);
             int flags = ahp_gt_get_mount_flags();
             ahp_gt_set_mount_flags((GTFlags)flags);
             ui->LoadFW->setEnabled(false);
@@ -570,8 +574,6 @@ MainWindow::MainWindow(QWidget *parent)
             isConnected = true;
             finished = true;
             ui->ComPort->setEnabled(false);
-            ui->AxisIndex_0->setEnabled(ahp_gt_get_mc_version(0)&0xff == 0x38);
-            ui->AxisIndex_1->setEnabled(ahp_gt_get_mc_version(1)&0xff == 0x38);
             IndicationThread->start();
         }
     });
