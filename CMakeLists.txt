@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(GT_CONFIGURATOR_VERSION_MAJOR 1)
 set(GT_CONFIGURATOR_VERSION_MINOR 1)
 set(GT_CONFIGURATOR_VERSION_RELEASE 3)
-set(GT_CONFIGURATOR_VERSION "${GT_CONFIGURATOR_VERSION_MAJOR}.${GT_CONFIGURATOR_VERSION_MINOR}.${GT_CONFIGURATOR_VERSION_RELEASE}")
+set(AHP_GT_CONFIGURATOR_VERSION "${AHP_GT_CONFIGURATOR_VERSION_MAJOR}.${AHP_GT_CONFIGURATOR_VERSION_MINOR}.${AHP_GT_CONFIGURATOR_VERSION_RELEASE}")
 
 # QtCreator supports the following variables for Android, which are identical to qmake Android variables.
 # Check http://doc.qt.io/qt-5/deployment-android.html for more information.
@@ -37,10 +37,14 @@ find_package(Threads REQUIRED)
 find_package(M REQUIRED)
 
 include_directories(${CMAKE_INCLUDE_PATH})
-include_directories(${AHPGT_INCLUDE_DIR})
+include_directories(${AHP_GT_INCLUDE_DIR})
 include_directories(${DFU_INCLUDE_DIR})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/icon.ico ${CMAKE_CURRENT_BINARY_DIR}/icon.ico COPYONLY )
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt1.json ${CMAKE_CURRENT_BINARY_DIR}/gt1.json COPYONLY )
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt2dec.json ${CMAKE_CURRENT_BINARY_DIR}/gt2dec.json COPYONLY )
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt2ra.json ${CMAKE_CURRENT_BINARY_DIR}/gt2ra.json COPYONLY )
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt5.json ${CMAKE_CURRENT_BINARY_DIR}/gt5.json COPYONLY )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt-configurator.iss.cmake ${CMAKE_CURRENT_BINARY_DIR}/gt-configurator.iss )
 
@@ -71,7 +75,7 @@ if(ANDROID)
     endif(WIN32)
 endif(ANDROID)
 
-target_link_libraries(gt-configurator PRIVATE ${DFU_LIBRARIES} ${AHPGT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIB} Qt5::Widgets Qt5::SerialPort Qt5::Network)
+target_link_libraries(gt-configurator PRIVATE ${DFU_LIBRARIES} ${AHP_GT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${M_LIB} Qt5::Widgets Qt5::SerialPort Qt5::Network)
 install(TARGETS gt-configurator RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-install(FILES gt-configurator.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons)
-install(FILES gt-configurator.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
+install(FILES ahp-gt-configurator.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons)
+install(FILES ahp-gt-configurator.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)

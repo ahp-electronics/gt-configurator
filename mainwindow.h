@@ -79,7 +79,7 @@ class MainWindow : public QMainWindow
         int stop_correction[2] { true, true };
         bool initial;
         int timer { 1000 };
-        bool DownloadFirmware(QString url, QString filename, QSettings *settings, int timeout_ms = 30000);
+        bool DownloadFirmware(QString url, QString jsonfile, QString filename, QSettings *settings, int timeout_ms = 30000);
         void disconnectControls(bool block);
         void UpdateValues(int axis);
         Ui::MainWindow *ui;
