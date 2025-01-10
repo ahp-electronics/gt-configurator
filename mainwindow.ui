@@ -2434,7 +2434,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Write</string>
+      <string>Flash</string>
      </property>
     </widget>
     <widget class="QProgressBar" name="progress">

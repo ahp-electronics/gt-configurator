@@ -380,7 +380,7 @@ MainWindow::MainWindow(QWidget *parent)
         percent = 0;
         finished = 0;
         ui->WorkArea->setEnabled(false);
-        ui->Write->setEnabled(false);
+        ui->Write->setEnabled(true);
         ui->Connection->setEnabled(false);
         finished = 0;
         if(ui->Write->text() == "Flash")
@@ -421,10 +421,7 @@ MainWindow::MainWindow(QWidget *parent)
         QString selectedfirmware = "gt1";
         QString url = "https://www.iliaplatone.com/firmware.php?download=on&product="+selectedfirmware;
         QString jsonfile = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).at(0)+"/"+selectedfirmware+".json";
-        if(DownloadFirmware(url, jsonfile, firmwareFilename, settings)) {
-            ui->Write->setText("Flash");
-            ui->Write->setEnabled(true);
-        } else if(DownloadFirmware(jsonfile, jsonfile, firmwareFilename, settings)) {
+        if(DownloadFirmware(jsonfile, jsonfile, firmwareFilename, settings)) {
             ui->Write->setText("Flash");
             ui->Write->setEnabled(true);
         } else if(DownloadFirmware("qrc:///data/"+selectedfirmware+".json", jsonfile, firmwareFilename, settings)) {
@@ -500,7 +497,7 @@ MainWindow::MainWindow(QWidget *parent)
     {
         IndicationThread->stop();
         ui->Write->setText("Write");
-        ui->Write->setEnabled(false);
+        ui->Write->setEnabled(true);
         ui->ComPort->setEnabled(true);
         isConnected = false;
         finished = false;
