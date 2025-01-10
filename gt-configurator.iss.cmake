@@ -1,10 +1,10 @@
-#define MyAppName "GT1 Configurator"
+#define MyAppName "GT Configurator"
 #define TargetName "gt-configurator"
 
 [Setup]
 AppId={{9C18C97C-463A-42AD-B5D7-4154023BDE23}
 AppName={#MyAppName}
-AppVersion=@GT_CONFIGURATOR_VERSION@
+AppVersion=@AHP_GT_CONFIGURATOR_VERSION@
 DefaultDirName={autopf}\AHP\{#MyAppName}
 DefaultGroupName=AHP
 UninstallDisplayIcon={app}\{#TargetName}.exe
