@@ -110,6 +110,25 @@ dl_end:
     return true;
 }
 
+void MainWindow::initFlash()
+{
+    QString selectedfirmware = "gt1";
+    QString jsonfile = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).at(0)+"/"+selectedfirmware+".json";
+    if(DownloadFirmware(jsonfile, jsonfile, firmwareFilename, settings)) {
+        ui->Write->setText("Flash");
+        ui->Write->setEnabled(true);
+    } else if(DownloadFirmware("qrc:///data/"+selectedfirmware+".json", jsonfile, firmwareFilename, settings)) {
+        ui->Write->setText("Flash");
+        ui->Write->setEnabled(true);
+    }
+    ui->RA->setEnabled(false);
+    ui->DEC->setEnabled(false);
+    ui->Control->setEnabled(false);
+    ui->commonSettings->setEnabled(false);
+    ui->AdvancedRA->setEnabled(false);
+    ui->AdvancedDec->setEnabled(false);
+}
+
 void MainWindow::readIni(QString ini)
 {
     QString dir = QDir(ini).dirName();
@@ -415,28 +434,6 @@ MainWindow::MainWindow(QWidget *parent)
         thread->requestInterruption();
         thread->unlock();
     });
-    connect(ui->LoadFW, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            [ = ](bool checked)
-    {
-        QString selectedfirmware = "gt1";
-        QString url = "https://www.iliaplatone.com/firmware.php?download=on&product="+selectedfirmware;
-        QString jsonfile = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).at(0)+"/"+selectedfirmware+".json";
-        if(DownloadFirmware(jsonfile, jsonfile, firmwareFilename, settings)) {
-            ui->Write->setText("Flash");
-            ui->Write->setEnabled(true);
-        } else if(DownloadFirmware("qrc:///data/"+selectedfirmware+".json", jsonfile, firmwareFilename, settings)) {
-            ui->Write->setText("Flash");
-            ui->Write->setEnabled(true);
-        }
-        ui->Connection->setEnabled(false);
-        ui->RA->setEnabled(false);
-        ui->DEC->setEnabled(false);
-        ui->Control->setEnabled(false);
-        ui->commonSettings->setEnabled(false);
-        ui->AdvancedRA->setEnabled(false);
-        ui->AdvancedDec->setEnabled(false);
-
-    });
     connect(ui->Connect, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked)
     {
@@ -470,7 +467,6 @@ MainWindow::MainWindow(QWidget *parent)
             ahp_gt_read_values(1);
             int flags = ahp_gt_get_mount_flags();
             ahp_gt_set_mount_flags((GT1Flags)flags);
-            ui->LoadFW->setEnabled(false);
             ui->Connect->setEnabled(false);
             ui->Disconnect->setEnabled(true);
             ui->labelNotes->setEnabled(true);
@@ -503,7 +499,6 @@ MainWindow::MainWindow(QWidget *parent)
         finished = false;
         ui->HighBauds->setChecked(false);
         ui->Server->setChecked(false);
-        ui->LoadFW->setEnabled(true);
         ui->Connect->setEnabled(true);
         ui->Disconnect->setEnabled(false);
         ui->labelNotes->setEnabled(false);
@@ -519,6 +514,7 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_stop_motion(0, 0);
         ahp_gt_stop_motion(1, 0);
         ahp_gt_disconnect();
+        initFlash();
     });
     connect(ui->loadConfig, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool triggered)
@@ -1375,6 +1371,8 @@ MainWindow::MainWindow(QWidget *parent)
         }
         parent->unlock();
     });
+
+    initFlash();
     RaThread->start();
     DecThread->start();
     ProgressThread->start();

@@ -42,6 +42,7 @@ class MainWindow : public QMainWindow
         }
 
     private:
+        void initFlash();
         double Latitude, Longitude, Elevation;
         double Ra {0.0};
         double Dec {0.0};
