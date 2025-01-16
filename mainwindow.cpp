@@ -1714,7 +1714,7 @@ void MainWindow::UpdateValues(int axis)
         ui->Crown_0->setValue(ahp_gt_get_crown_teeth(axis));
         ui->Acceleration_0->setValue(ui->Acceleration_0->maximum() - ahp_gt_get_acceleration_angle(axis) * 1800.0 / M_PI);
         double speedlimit = maxf * ahp_gt_get_multiplier(axis) * SIDEREAL_DAY / totalsteps;
-        ui->Ra_Speed->setValue(fmin(speedlimit, fmax(1, ui->MaxSpeed_0->value())));
+        ui->Ra_Speed->setValue(fmin(speedlimit, fmax(1, ui->Ra_Speed->value())));
         ui->Ra_Speed->setRange(1, speedlimit);
         ui->MaxSpeed_0->setValue(fmin(speedlimit, fmax(1, ui->MaxSpeed_0->value())));
         ui->MaxSpeed_0->setRange(1, speedlimit);
@@ -1768,7 +1768,7 @@ void MainWindow::UpdateValues(int axis)
         ui->Crown_0->setValue(ahp_gt_get_crown_teeth(0));
         ui->Acceleration_0->setValue(ui->Acceleration_0->maximum() - ahp_gt_get_acceleration_angle(0) * 1800.0 / M_PI);
         double speedlimit = maxf * ahp_gt_get_multiplier(0) * SIDEREAL_DAY / totalsteps;
-        ui->Ra_Speed->setValue(fmin(speedlimit, fmax(1, ui->MaxSpeed_0->value())));
+        ui->Ra_Speed->setValue(fmin(speedlimit, fmax(1, ui->Ra_Speed->value())));
         ui->Ra_Speed->setRange(1, speedlimit);
         ui->MaxSpeed_0->setValue(fmin(speedlimit, fmax(1, ui->MaxSpeed_0->value())));
         ui->MaxSpeed_0->setRange(1, speedlimit);
@@ -1821,7 +1821,7 @@ void MainWindow::UpdateValues(int axis)
         ui->Crown_1->setValue(ahp_gt_get_crown_teeth(1));
         ui->Acceleration_1->setValue(ui->Acceleration_1->maximum() - ahp_gt_get_acceleration_angle(1) * 1800.0 / M_PI);
         double speedlimit = maxf * ahp_gt_get_multiplier(1) * SIDEREAL_DAY / totalsteps;
-        ui->Dec_Speed->setValue(fmin(speedlimit, fmax(1, ui->MaxSpeed_0->value())));
+        ui->Dec_Speed->setValue(fmin(speedlimit, fmax(1, ui->Dec_Speed->value())));
         ui->Dec_Speed->setRange(1, speedlimit);
         ui->MaxSpeed_1->setValue(fmin(speedlimit, fmax(1, ui->MaxSpeed_0->value())));
         ui->MaxSpeed_1->setRange(1, speedlimit);
