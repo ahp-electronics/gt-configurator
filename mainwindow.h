@@ -43,7 +43,7 @@ class MainWindow : public QMainWindow
 
     private:
         int axis_version[16] { 0 };
-        int axis_index[2] { 0, 1 };
+        int axis_index { 0 };
         double Altitude, Latitude, Longitude, Elevation;
         double Ra {0.0};
         double Dec {0.0};
