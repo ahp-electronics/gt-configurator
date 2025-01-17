@@ -1823,15 +1823,15 @@ void MainWindow::UpdateValues(int axis)
         double speedlimit = maxf * ahp_gt_get_multiplier(1) * SIDEREAL_DAY / totalsteps;
         ui->Dec_Speed->setValue(fmin(speedlimit, fmax(1, ui->Dec_Speed->value())));
         ui->Dec_Speed->setRange(1, speedlimit);
-        ui->MaxSpeed_1->setValue(fmin(speedlimit, fmax(1, ui->MaxSpeed_0->value())));
+        ui->MaxSpeed_1->setValue(fmin(speedlimit, fmax(1, ui->MaxSpeed_1->value())));
         ui->MaxSpeed_1->setRange(1, speedlimit);
         ui->MaxSpeed_label_1->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(1) * SIDEREAL_DAY / M_PI / 2) + "x");
         ui->Coil_1->setCurrentIndex(ahp_gt_get_stepping_conf(1));
         ui->SteppingMode_1->setCurrentIndex(ahp_gt_get_stepping_mode(1));
         ui->Invert_1->setChecked(ahp_gt_get_direction_invert(1));
         ui->HalfCurrent_1->setChecked(ahp_gt_get_mount_flags() & halfCurrentDec);
-        ui->TrackRate_1->setValue(-((double)ahp_gt_get_timing(1)-AHP_GT_ONE_SECOND)*(double)ui->TrackRate_0->maximum()*10.0/AHP_GT_ONE_SECOND);
-        ui->TrackRate_label_1->setText("Track Rate offset: " + QString::number((double)ui->TrackRate_1->value()/(double)ui->TrackRate_0->maximum()/10.0) + "%");
+        ui->TrackRate_1->setValue(-((double)ahp_gt_get_timing(1)-AHP_GT_ONE_SECOND)*(double)ui->TrackRate_1->maximum()*10.0/AHP_GT_ONE_SECOND);
+        ui->TrackRate_label_1->setText("Track Rate offset: " + QString::number((double)ui->TrackRate_1->value()/(double)ui->TrackRate_1->maximum()/10.0) + "%");
         switch(ahp_gt_get_feature(1))
         {
         case GpioUnused:
