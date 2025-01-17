@@ -419,6 +419,7 @@ MainWindow::MainWindow(QWidget *parent)
     isConnected = false;
     this->setFixedSize(1100, 700);
     ui->setupUi(this);
+    axis_version = new int[ui->AxisIndex_0->maximum()];
     QString lastPort = settings->value("LastPort", "").toString();
     if(lastPort != "")
         ui->ComPort->addItem(lastPort);
@@ -551,7 +552,7 @@ MainWindow::MainWindow(QWidget *parent)
                 ahp_gt_read_values(0);
             if(ahp_gt_get_mc_version(1) == 0x338 || (ahp_gt_get_mc_version(1) & 0xff) == 0x37)
                 ahp_gt_read_values(1);
-            for(int axis = 0; axis  < 16; axis ++) {
+            for(int axis = 0; axis  < ui->AxisIndex_0->maximum(); axis ++) {
                 axis_version[axis] = ahp_gt_get_mc_version(axis)&0xfff;
                 if(axis_version[axis] == 0x538) {
                     axis_index = axis;
@@ -786,7 +787,7 @@ MainWindow::MainWindow(QWidget *parent)
         int axis = ui->AxisIndex_0->value()-1;
         ahp_gt_set_axis_number(axis_index, axis);
         axis_index = axis;
-        for(int a = 0; a  < 16; a ++)
+        for(int a = 0; a  < ui->AxisIndex_0->maximum(); a ++)
             axis_version[a] = ahp_gt_get_mc_version(a)&0xfff;
         saveIni(ini);
     });
