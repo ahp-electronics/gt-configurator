@@ -153,7 +153,7 @@ dl_end:
 
 void MainWindow::readIni(QString ini)
 {
-    while(!IndicationThread->lock()) Thread::msleep(100);
+    finished = 0;
     QString dir = QDir(ini).dirName();
     if(!QDir(dir).exists())
     {
@@ -309,7 +309,6 @@ void MainWindow::readIni(QString ini)
     ui->Lon_2->setValue(lon[2]);
     ui->Alt_2->setValue(alt[2]);
     ui->Elevation->setValue(Elevation);
-    IndicationThread->unlock();
 }
 
 void MainWindow::saveIni(QString ini)
@@ -1267,9 +1266,7 @@ MainWindow::MainWindow(QWidget *parent)
         if(ui->Write->text() == "Write")
         {
         }
-        IndicationThread->stop();
         WriteThread->start();
-        IndicationThread->start();
     });
     connect(ui->Inductance_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
