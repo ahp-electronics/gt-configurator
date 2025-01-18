@@ -756,7 +756,6 @@ MainWindow::MainWindow(QWidget *parent)
     [ = ](int value)
     {
         ahp_gt_select_device(value);
-        ahp_gt_detect_device();
         if(isConnected) {
             ui->Disconnect->click();
             ui->Connect->click();
