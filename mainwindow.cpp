@@ -419,7 +419,6 @@ MainWindow::MainWindow(QWidget *parent)
     isConnected = false;
     this->setFixedSize(1100, 700);
     ui->setupUi(this);
-    axis_version = new int[ui->AxisIndex_0->maximum()];
     QString lastPort = settings->value("LastPort", "").toString();
     if(lastPort != "")
         ui->ComPort->addItem(lastPort);
@@ -525,6 +524,7 @@ MainWindow::MainWindow(QWidget *parent)
         int port = 9600;
         QString address = "localhost";
         int failure = 1;
+        ahp_gt_set_axes_limit(8);
         if(ui->ComPort->currentText().contains(':'))
         {
             address = ui->ComPort->currentText().split(":")[0];
@@ -536,9 +536,7 @@ MainWindow::MainWindow(QWidget *parent)
         else
         {
             portname.append(ui->ComPort->currentText());
-            if(!ahp_gt_connect(portname.toUtf8())) {
-                failure = ahp_gt_detect_device();
-            } else {
+            if(failure = ahp_gt_connect(portname.toUtf8())) {
                 ahp_gt_disconnect();
             }
         }
@@ -547,12 +545,14 @@ MainWindow::MainWindow(QWidget *parent)
             settings->setValue("LastPort", ui->ComPort->currentText());
             ui->Write->setText("Write");
             ui->Write->setEnabled(true);
+            num_axes = ahp_gt_get_axes_limit();
+            axis_version = new int[num_axes];
             axis_index = 0;
             if(ahp_gt_get_mc_version(0) == 0x238 || (ahp_gt_get_mc_version(0) & 0xff) == 0x37)
                 ahp_gt_read_values(0);
             if(ahp_gt_get_mc_version(1) == 0x338 || (ahp_gt_get_mc_version(1) & 0xff) == 0x37)
                 ahp_gt_read_values(1);
-            for(int axis = 0; axis  < ui->AxisIndex_0->maximum(); axis ++) {
+            for(int axis = 0; axis  < num_axes; axis ++) {
                 axis_version[axis] = ahp_gt_get_mc_version(axis)&0xfff;
                 if(axis_version[axis] == 0x538) {
                     axis_index = axis;
@@ -786,7 +786,7 @@ MainWindow::MainWindow(QWidget *parent)
         int axis = ui->AxisIndex_0->value()-1;
         ahp_gt_set_axis_number(axis_index, axis);
         axis_index = axis;
-        for(int a = 0; a  < ui->AxisIndex_0->maximum(); a ++)
+        for(int a = 0; a  < num_axes; a ++)
             axis_version[a] = ahp_gt_get_mc_version(a)&0xfff;
         saveIni(ini);
     });
