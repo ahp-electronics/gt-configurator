@@ -20,7 +20,7 @@
 #include "./ui_mainwindow.h"
 
 #define POSITION_THREAD_LOOP 1000
-
+#define axes_limit 8
 static const double SIDEREAL_DAY = 86164.0916000;
 static MountType mounttype[] =
 {
@@ -419,6 +419,7 @@ MainWindow::MainWindow(QWidget *parent)
     isConnected = false;
     this->setFixedSize(1100, 700);
     ui->setupUi(this);
+    ui->AxisIndex_0->setRange(3, axes_limit);
     QString lastPort = settings->value("LastPort", "").toString();
     if(lastPort != "")
         ui->ComPort->addItem(lastPort);
@@ -524,7 +525,7 @@ MainWindow::MainWindow(QWidget *parent)
         int port = 9600;
         QString address = "localhost";
         int failure = 1;
-        ahp_gt_set_axes_limit(8);
+        ahp_gt_set_axes_limit(axes_limit);
         if(ui->ComPort->currentText().contains(':'))
         {
             address = ui->ComPort->currentText().split(":")[0];
@@ -755,11 +756,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Index, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
     [ = ](int value)
     {
+        ahp_gt_set_axes_limit(axes_limit);
         ahp_gt_select_device(value);
-        if(isConnected) {
-            ui->Disconnect->click();
-            ui->Connect->click();
-        }
         saveIni(ini);
     });
     connect(ui->Invert_0, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
