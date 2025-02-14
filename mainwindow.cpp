@@ -419,7 +419,7 @@ MainWindow::MainWindow(QWidget *parent)
     isConnected = false;
     this->setFixedSize(1100, 700);
     ui->setupUi(this);
-    ui->AxisIndex_0->setRange(3, axes_limit);
+    ui->AxisIndex_0->setRange(1, axes_limit);
     QString lastPort = settings->value("LastPort", "").toString();
     if(lastPort != "")
         ui->ComPort->addItem(lastPort);
@@ -543,6 +543,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
         if(!failure)
         {
+            ahp_gt_select_device(ui->Index->value());
             settings->setValue("LastPort", ui->ComPort->currentText());
             ui->Write->setText("Write");
             ui->Write->setEnabled(true);
@@ -756,8 +757,28 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Index, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
     [ = ](int value)
     {
-        ahp_gt_set_axes_limit(axes_limit);
         ahp_gt_select_device(value);
+        ahp_gt_set_axes_limit(axes_limit);
+        num_axes = ahp_gt_get_axes_limit();
+        axis_version = new int[num_axes];
+        axis_index = 0;
+        if(ahp_gt_get_mc_version(0) == 0x238 || (ahp_gt_get_mc_version(0) & 0xff) == 0x37)
+            ahp_gt_read_values(0);
+        if(ahp_gt_get_mc_version(1) == 0x338 || (ahp_gt_get_mc_version(1) & 0xff) == 0x37)
+            ahp_gt_read_values(1);
+        for(int axis = 0; axis  < num_axes; axis ++) {
+            axis_version[axis] = ahp_gt_get_mc_version(axis)&0xfff;
+            if(axis_version[axis] == 0x538) {
+                axis_index = axis;
+                ui->RA->setTitle("GT5");
+                ui->AxisIndex_0->setEnabled(true);
+                ui->AxisIndex_0->setValue(axis+1);
+                ahp_gt_set_axis_number(axis_index, axis_index);
+                break;
+            }
+        }
+        int flags = ahp_gt_get_mount_flags();
+        ahp_gt_set_mount_flags((GTFlags)flags);
         saveIni(ini);
     });
     connect(ui->Invert_0, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
@@ -925,7 +946,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->BusIndex, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_set_address(value);
+        ahp_gt_set_address(ui->BusIndex->value());
         saveIni(ini);
     });
     connect(ui->HighBauds, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
@@ -1652,6 +1673,7 @@ void MainWindow::disconnectControls(bool block)
     ui->HalfCurrent->blockSignals(block);
     ui->HighBauds->blockSignals(block);
 
+    ui->AxisIndex_0->blockSignals(block);
     ui->HalfCurrent_0->blockSignals(block);
     ui->Invert_0->blockSignals(block);
     ui->MotorSteps_0->blockSignals(block);
