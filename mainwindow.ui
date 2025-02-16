@@ -1656,6 +1656,11 @@
       </item>
       <item>
        <property name="text">
+        <string>ENCODER</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
         <string>DRIVER</string>
        </property>
       </item>
@@ -2094,6 +2099,11 @@
       <item>
        <property name="text">
         <string>ST4</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ENCODER</string>
        </property>
       </item>
       <item>

@@ -253,6 +253,9 @@ void MainWindow::readIni(QString ini)
             ahp_gt_set_feature(axis_index, GpioAsST4);
             break;
         case 2:
+            ahp_gt_set_feature(axis_index, GpioAsEncoder);
+            break;
+        case 3:
             ahp_gt_set_feature(axis_index, GpioAsPulseDrive);
             break;
         default:
@@ -276,6 +279,9 @@ void MainWindow::readIni(QString ini)
             ahp_gt_set_feature(1, GpioAsST4);
             break;
         case 2:
+            ahp_gt_set_feature(1, GpioAsEncoder);
+            break;
+        case 3:
             ahp_gt_set_feature(1, GpioAsPulseDrive);
             break;
         default:
