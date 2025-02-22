@@ -198,8 +198,8 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_pwm_frequency(ui->PWMFreq->value());
     ahp_gt_set_address(ui->BusIndex->value());
 
-    ui->AxisIndex_0->setEnabled(ahp_gt_get_mc_version((axis_index)&0xff) == 0x38);
-    ui->AxisIndex_0->setValue(settings->value("AxisIndex_0", axis_index+1).toInt());
+    ui->AxisIndex->setEnabled(ahp_gt_get_mc_version((axis_index)&0xff) == 0x38);
+    ui->AxisIndex->setCurrentIndex(settings->value("AxisIndex", axis_index).toInt());
     ui->MotorSteps_0->setValue(settings->value("MotorSteps_0", ahp_gt_get_motor_steps(axis_index)).toInt());
     ui->Motor_0->setValue(settings->value("Motor_0", ahp_gt_get_motor_teeth(axis_index)).toInt());
     ui->Worm_0->setValue(settings->value("Worm_0", ahp_gt_get_worm_teeth(axis_index)).toInt());
@@ -335,7 +335,7 @@ void MainWindow::saveIni(QString ini)
     QSettings *s = new QSettings(ini, QSettings::Format::IniFormat);
     settings = s;
 
-    settings->setValue("AxisIndex_0", ui->AxisIndex_0->value());
+    settings->setValue("AxisIndex", ui->AxisIndex->currentIndex());
     settings->setValue("HalfCurrent_0", ui->HalfCurrent_0->isChecked());
     settings->setValue("Invert_0", ui->Invert_0->isChecked());
     settings->setValue("SteppingMode_0", ui->SteppingMode_0->currentIndex());
@@ -425,7 +425,42 @@ MainWindow::MainWindow(QWidget *parent)
     isConnected = false;
     this->setFixedSize(1100, 700);
     ui->setupUi(this);
-    ui->AxisIndex_0->setRange(1, axes_limit);
+    ui->AxisIndex->addItem("Ra");
+    ui->AxisIndex->addItem("Dec");
+    ui->AxisIndex->addItem("Focus");
+    ui->AxisIndex->addItem("Filter");
+    ui->AxisIndex->addItem("Rotator");
+    ui->AxisIndex->addItem("Iris");
+    ui->AxisIndex->addItem("Shutter");
+    ui->AxisIndex->addItem("Dome");
+    ui->AxisIndex->addItem("Instrument");
+    ui->AxisIndex->addItem("TipX");
+    ui->AxisIndex->addItem("TipY");
+    ui->AxisIndex->addItem("TipZ");
+    ui->AxisIndex->addItem("TiltX");
+    ui->AxisIndex->addItem("TiltY");
+    ui->AxisIndex->addItem("TiltZ");
+    ui->AxisIndex->addItem("InstrumentX");
+    ui->AxisIndex->addItem("InstrumentY");
+    ui->AxisIndex->addItem("InstrumentZ");
+    ui->AxisIndex->addItem("InstrumentRotationX");
+    ui->AxisIndex->addItem("InstrumentRotationY");
+    ui->AxisIndex->addItem("InstrumentRotationZ");
+    ui->AxisIndex->addItem("PhasePrimaryX");
+    ui->AxisIndex->addItem("PhasePrimaryY");
+    ui->AxisIndex->addItem("PhasePrimaryZ");
+    ui->AxisIndex->addItem("PhaseSecondaryX");
+    ui->AxisIndex->addItem("PhaseSecondaryY");
+    ui->AxisIndex->addItem("PhaseSecondaryZ");
+    ui->AxisIndex->addItem("PhaseTertiaryX");
+    ui->AxisIndex->addItem("PhaseTertiaryY");
+    ui->AxisIndex->addItem("PhaseTertiaryZ");
+    ui->AxisIndex->addItem("PlaneX");
+    ui->AxisIndex->addItem("PlaneY");
+    ui->AxisIndex->addItem("PlaneZ");
+    ui->AxisIndex->addItem("RailX");
+    ui->AxisIndex->addItem("RailY");
+    ui->AxisIndex->addItem("RailZ");
     QString lastPort = settings->value("LastPort", "").toString();
     if(lastPort != "")
         ui->ComPort->addItem(lastPort);
@@ -565,8 +600,8 @@ MainWindow::MainWindow(QWidget *parent)
                 if(axis_version[axis] == 0x538) {
                     axis_index = axis;
                     ui->RA->setTitle("GT5");
-                    ui->AxisIndex_0->setEnabled(true);
-                    ui->AxisIndex_0->setValue(axis+1);
+                    ui->AxisIndex->setEnabled(true);
+                    ui->AxisIndex->setCurrentIndex(axis);
                     ahp_gt_set_axis_number(axis_index, axis_index);
                     break;
                 }
@@ -777,8 +812,8 @@ MainWindow::MainWindow(QWidget *parent)
             if(axis_version[axis] == 0x538) {
                 axis_index = axis;
                 ui->RA->setTitle("GT5");
-                ui->AxisIndex_0->setEnabled(true);
-                ui->AxisIndex_0->setValue(axis+1);
+                ui->AxisIndex->setEnabled(true);
+                ui->AxisIndex->setCurrentIndex(axis);
                 ahp_gt_set_axis_number(axis_index, axis_index);
                 break;
             }
@@ -805,10 +840,10 @@ MainWindow::MainWindow(QWidget *parent)
                 ahp_gt_set_motor_steps(axis_index, value);
                 saveIni(ini);
             });
-    connect(ui->AxisIndex_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            [ = ](int value)
+    connect(ui->AxisIndex, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            [ = ](int index)
     {
-        int axis = ui->AxisIndex_0->value()-1;
+        int axis = ui->AxisIndex->currentIndex();
         ahp_gt_set_axis_number(axis_index, axis);
         axis_index = axis;
         for(int a = 0; a  < num_axes; a ++)
@@ -1679,7 +1714,7 @@ void MainWindow::disconnectControls(bool block)
     ui->HalfCurrent->blockSignals(block);
     ui->HighBauds->blockSignals(block);
 
-    ui->AxisIndex_0->blockSignals(block);
+    ui->AxisIndex->blockSignals(block);
     ui->HalfCurrent_0->blockSignals(block);
     ui->Invert_0->blockSignals(block);
     ui->MotorSteps_0->blockSignals(block);
