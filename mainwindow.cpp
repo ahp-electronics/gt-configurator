@@ -171,7 +171,7 @@ void MainWindow::readIni(QString ini)
 
     ui->Index->setValue(settings->value("Index", ahp_gt_get_current_device()).toInt());
     ui->BusIndex->setValue(settings->value("BusIndex", ahp_gt_get_address()).toInt());
-    ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency()).toInt());
+    ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency(axis_index)).toInt());
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
     ui->HighBauds->setChecked(settings->value("HighBauds", false).toBool());
@@ -195,7 +195,8 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_mount_type((MountType)mounttypes[ui->MountType->currentIndex()]);
     ahp_gt_set_features(axis_index, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0) | (ui->HalfCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
     ahp_gt_set_features(1, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0) | (ui->HalfCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
-    ahp_gt_set_pwm_frequency(ui->PWMFreq->value());
+    ahp_gt_set_pwm_frequency(axis_index, ui->PWMFreq->value());
+    ahp_gt_set_pwm_frequency(1, ui->PWMFreq->value());
     ahp_gt_set_address(ui->BusIndex->value());
 
     ui->AxisIndex->setEnabled(ahp_gt_get_mc_version((axis_index)&0xff) == 0x38);
@@ -1002,7 +1003,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->PWMFreq, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_set_pwm_frequency(value);
+        ahp_gt_set_pwm_frequency(axis_index, value);
+        ahp_gt_set_pwm_frequency(1, value);
         ui->PWMFreq_label->setText("PWM: " + QString::number(1500 + 700 * value) + " Hz");
         saveIni(ini);
     });
@@ -1905,7 +1907,7 @@ void MainWindow::UpdateValues(int axis)
             break;
         }
     }
-    ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency());
+    ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency(axis));
     ui->PWMFreq_label->setText("PWM: " + QString::number(1500 + 700 * ui->PWMFreq->value()) + " Hz");
     ui->BusIndex->setValue(ahp_gt_get_address());
     ui->MountType->setCurrentIndex(mounttypes.indexOf(ahp_gt_get_mount_type()));
