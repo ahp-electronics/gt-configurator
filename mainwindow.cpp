@@ -19,7 +19,7 @@
 #include <libdfu.h>
 #include "./ui_mainwindow.h"
 
-#define POSITION_THREAD_LOOP 1000
+#define POSITION_THREAD_LOOP 250
 
 static const double SIDEREAL_DAY = 86164.0916000;
 static MountType mounttype[] =
@@ -1090,7 +1090,7 @@ MainWindow::MainWindow(QWidget *parent)
         double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
         ahp_gt_stop_motion(axis_index, axisdirection[axis_index] != true || axis_lospeed[axis_index] != (fabs(rarate) < lowspeed_treshold));
         ahp_gt_start_motion(axis_index, rarate);
-        RaThread->setLoop(abs(POSITION_THREAD_LOOP/rarate)+10);
+        //RaThread->setLoop(abs(POSITION_THREAD_LOOP/rarate)+10);
         axisdirection[axis_index] = true;
         axis_lospeed[axis_index] = (fabs(rarate) < lowspeed_treshold);
     });
@@ -1102,7 +1102,7 @@ MainWindow::MainWindow(QWidget *parent)
         double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
         ahp_gt_stop_motion(axis_index, axisdirection[axis_index] != false || axis_lospeed[axis_index] != (fabs(rarate) < lowspeed_treshold));
         ahp_gt_start_motion(axis_index, -rarate);
-        RaThread->setLoop(abs(POSITION_THREAD_LOOP/rarate)+10);
+        //RaThread->setLoop(abs(POSITION_THREAD_LOOP/rarate)+10);
         axisdirection[axis_index] = false;
         axis_lospeed[axis_index] = (fabs(rarate) < lowspeed_treshold);
     });
@@ -1114,7 +1114,7 @@ MainWindow::MainWindow(QWidget *parent)
         double derate = ui->Dec_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
         ahp_gt_stop_motion(1, axisdirection[1] != true || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
         ahp_gt_start_motion(1, derate);
-        DecThread->setLoop(abs(POSITION_THREAD_LOOP/derate)+10);
+        //DecThread->setLoop(abs(POSITION_THREAD_LOOP/derate)+10);
         axisdirection[1] = true;
         axis_lospeed[1] = (fabs(derate) < lowspeed_treshold);
     });
@@ -1126,7 +1126,7 @@ MainWindow::MainWindow(QWidget *parent)
         double derate = ui->Dec_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
         ahp_gt_stop_motion(1, axisdirection[1] != false || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
         ahp_gt_start_motion(1, -derate);
-        DecThread->setLoop(abs(POSITION_THREAD_LOOP/derate)+10);
+        //DecThread->setLoop(abs(POSITION_THREAD_LOOP/derate)+10);
         axisdirection[1] = false;
         axis_lospeed[1] = (fabs(derate) < lowspeed_treshold);
     });
