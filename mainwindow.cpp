@@ -612,10 +612,10 @@ MainWindow::MainWindow(QWidget *parent)
                     ahp_gt_set_axis_number(axis_index, axis_index);
                     ahp_gt_read_values(axis_index);
                     ui->MountStyle->removeItem(2);
-                    ui->DEC->setEnabled(false);
-                    ui->AdvancedDec->setEnabled(false);
                     ui->Dec_Speed->setEnabled(false);
                     ui->TuneDec->setEnabled(false);
+                    ui->DEC->setEnabled(false);
+                    ui->AdvancedDec->setEnabled(false);
                     ui->TorqueOffset->setEnabled(true);
                     ui->TorqueOffsetEnable->setEnabled(true);
                     ui->TorqueOffset_label->setEnabled(true);
@@ -633,10 +633,8 @@ MainWindow::MainWindow(QWidget *parent)
             ui->Control->setEnabled(true);
             ui->commonSettings->setEnabled(true);
             ui->AdvancedRA->setEnabled(true);
-            if(axis_version[axis_index] != 0x538) {
-                ui->DEC->setEnabled(true);
-                ui->AdvancedDec->setEnabled(true);
-            }
+            ui->DEC->setEnabled(true);
+            ui->AdvancedDec->setEnabled(true);
             ui->loadConfig->setEnabled(true);
             ui->saveConfig->setEnabled(true);
             ui->WorkArea->setEnabled(true);
@@ -1092,7 +1090,7 @@ MainWindow::MainWindow(QWidget *parent)
         double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
         ahp_gt_stop_motion(axis_index, axisdirection[axis_index] != true || axis_lospeed[axis_index] != (fabs(rarate) < lowspeed_treshold));
         ahp_gt_start_motion(axis_index, rarate);
-        RaThread->setLoop(abs(POSITION_THREAD_LOOP/rarate));
+        RaThread->setLoop(abs(POSITION_THREAD_LOOP/rarate)+10);
         axisdirection[axis_index] = true;
         axis_lospeed[axis_index] = (fabs(rarate) < lowspeed_treshold);
     });
@@ -1104,7 +1102,7 @@ MainWindow::MainWindow(QWidget *parent)
         double rarate = ui->Ra_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
         ahp_gt_stop_motion(axis_index, axisdirection[axis_index] != false || axis_lospeed[axis_index] != (fabs(rarate) < lowspeed_treshold));
         ahp_gt_start_motion(axis_index, -rarate);
-        RaThread->setLoop(abs(POSITION_THREAD_LOOP/rarate));
+        RaThread->setLoop(abs(POSITION_THREAD_LOOP/rarate)+10);
         axisdirection[axis_index] = false;
         axis_lospeed[axis_index] = (fabs(rarate) < lowspeed_treshold);
     });
@@ -1116,7 +1114,7 @@ MainWindow::MainWindow(QWidget *parent)
         double derate = ui->Dec_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
         ahp_gt_stop_motion(1, axisdirection[1] != true || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
         ahp_gt_start_motion(1, derate);
-        DecThread->setLoop(abs(POSITION_THREAD_LOOP/derate));
+        DecThread->setLoop(abs(POSITION_THREAD_LOOP/derate)+10);
         axisdirection[1] = true;
         axis_lospeed[1] = (fabs(derate) < lowspeed_treshold);
     });
@@ -1128,7 +1126,7 @@ MainWindow::MainWindow(QWidget *parent)
         double derate = ui->Dec_Speed->value() * M_PI * 2 / SIDEREAL_DAY;
         ahp_gt_stop_motion(1, axisdirection[1] != false || axis_lospeed[1] != (fabs(derate) < lowspeed_treshold));
         ahp_gt_start_motion(1, -derate);
-        DecThread->setLoop(abs(POSITION_THREAD_LOOP/derate));
+        DecThread->setLoop(abs(POSITION_THREAD_LOOP/derate)+10);
         axisdirection[1] = false;
         axis_lospeed[1] = (fabs(derate) < lowspeed_treshold);
     });
@@ -1609,7 +1607,7 @@ MainWindow::MainWindow(QWidget *parent)
             if(oldTracking[a] && !isTracking[a]) {
                 status[a] = ahp_gt_get_status(a);
                 if(status[a].Running == 0) {
-                    RaThread->setLoop(POSITION_THREAD_LOOP);
+                    parent->setLoop(POSITION_THREAD_LOOP);
                     ahp_gt_start_tracking(a);
                     axis_lospeed[a] = true;
                     isTracking[a] = true;
@@ -1740,7 +1738,16 @@ MainWindow::~MainWindow()
 
 void MainWindow::disconnectControls(bool block)
 {
+    ui->TorqueOffset->blockSignals(block);
+    ui->PWMFreq->blockSignals(block);
+    ui->BusIndex->blockSignals(block);
+    ui->MountType->blockSignals(block);
+    ui->MountStyle->blockSignals(block);
+    ui->HighBauds->blockSignals(block);
+    ui->HalfCurrent->blockSignals(block);
+
     ui->AxisIndex->blockSignals(block);
+
     ui->HalfCurrent_0->blockSignals(block);
     ui->Invert_0->blockSignals(block);
     ui->MotorSteps_0->blockSignals(block);
@@ -1931,7 +1938,8 @@ void MainWindow::UpdateValues(int axis)
             break;
         }
     }
-    if(axis == axis_index) {
+    if(0 && axis == axis_index) {
+        ui->TorqueOffsetEnable->setChecked((ahp_gt_get_mount_flags() & torqueControl) != 0);
         ui->TorqueOffset->setValue(ahp_gt_get_torque(axis));
         ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency(axis));
         ui->PWMFreq_label->setText("PWM: " + QString::number(1500 + 700 * ui->PWMFreq->value()) + " Hz");
