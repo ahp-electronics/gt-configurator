@@ -20,7 +20,7 @@
 #include "./ui_mainwindow.h"
 
 #define POSITION_THREAD_LOOP 1000
-#define axes_limit 8
+
 static const double SIDEREAL_DAY = 86164.0916000;
 static MountType mounttype[] =
 {
@@ -567,7 +567,7 @@ MainWindow::MainWindow(QWidget *parent)
         int port = 9600;
         QString address = "localhost";
         int failure = 1;
-        ahp_gt_set_axes_limit(axes_limit);
+        ahp_gt_set_axes_limit(NumAxes);
         if(ui->ComPort->currentText().contains(':'))
         {
             address = ui->ComPort->currentText().split(":")[0];
@@ -589,6 +589,12 @@ MainWindow::MainWindow(QWidget *parent)
             settings->setValue("LastPort", ui->ComPort->currentText());
             ui->Write->setText("Write");
             ui->Write->setEnabled(true);
+            ui->MountStyle->removeItem(2);
+            ui->MountStyle->addItem("FORK");
+            ui->DEC->setEnabled(true);
+            ui->AdvancedDec->setEnabled(true);
+            ui->Dec_Speed->setEnabled(true);
+            ui->TuneDec->setEnabled(true);
             num_axes = ahp_gt_get_axes_limit();
             axis_version = new int[num_axes];
             axis_index = 0;
@@ -604,6 +610,15 @@ MainWindow::MainWindow(QWidget *parent)
                     ui->AxisIndex->setEnabled(true);
                     ui->AxisIndex->setCurrentIndex(axis);
                     ahp_gt_set_axis_number(axis_index, axis_index);
+                    ahp_gt_read_values(axis_index);
+                    ui->MountStyle->removeItem(2);
+                    ui->DEC->setEnabled(false);
+                    ui->AdvancedDec->setEnabled(false);
+                    ui->Dec_Speed->setEnabled(false);
+                    ui->TuneDec->setEnabled(false);
+                    ui->TorqueOffset->setEnabled(true);
+                    ui->TorqueOffsetEnable->setEnabled(true);
+                    ui->TorqueOffset_label->setEnabled(true);
                     break;
                 }
             }
@@ -615,11 +630,13 @@ MainWindow::MainWindow(QWidget *parent)
             ui->labelNotes->setEnabled(true);
             ui->Notes->setEnabled(true);
             ui->RA->setEnabled(true);
-            ui->DEC->setEnabled(true);
             ui->Control->setEnabled(true);
             ui->commonSettings->setEnabled(true);
             ui->AdvancedRA->setEnabled(true);
-            ui->AdvancedDec->setEnabled(true);
+            if(axis_version[axis_index] != 0x538) {
+                ui->DEC->setEnabled(true);
+                ui->AdvancedDec->setEnabled(true);
+            }
             ui->loadConfig->setEnabled(true);
             ui->saveConfig->setEnabled(true);
             ui->WorkArea->setEnabled(true);
@@ -800,7 +817,7 @@ MainWindow::MainWindow(QWidget *parent)
     [ = ](int value)
     {
         ahp_gt_select_device(value);
-        ahp_gt_set_axes_limit(axes_limit);
+        ahp_gt_set_axes_limit(NumAxes);
         num_axes = ahp_gt_get_axes_limit();
         axis_version = new int[num_axes];
         axis_index = 0;
@@ -1000,8 +1017,22 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_set_mount_flags((GTFlags)flags);
         saveIni(ini);
     });
-    connect(ui->PWMFreq, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-            [ = ](int value)
+    connect(ui->TorqueOffsetEnable, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ](bool checked)
+    {
+        int flags = (int)ahp_gt_get_mount_flags();
+        flags &= ~torqueControl;
+        if(checked)
+            flags |= torqueControl;
+        ahp_gt_set_mount_flags((GTFlags)flags);
+        saveIni(ini);
+    });
+    connect(ui->TorqueOffset, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ](int value)
+    {
+        ahp_gt_set_torque(axis_index, value);
+        ui->TorqueOffset_label->setText("Torque offset: " + QString::number(ahp_gt_get_torque(axis_index) * 100 / ui->TorqueOffset->maximum()) + "%");
+        saveIni(ini);
+    });
+    connect(ui->PWMFreq, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ](int value)
     {
         ahp_gt_set_pwm_frequency(axis_index, value);
         ahp_gt_set_pwm_frequency(1, value);
@@ -1571,7 +1602,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(RaThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * parent)
     {
-        int a = 0;
+        int a = axis_index;
         if(isConnected && finished)
         {
             currentSteps[a] = ahp_gt_get_position(a, &status[a].timestamp) * ahp_gt_get_totalsteps(a) / M_PI / 2.0;
@@ -1709,13 +1740,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::disconnectControls(bool block)
 {
-    ui->MountType->blockSignals(block);
-    ui->BusIndex->blockSignals(block);
-    ui->MountStyle->blockSignals(block);
-    ui->PWMFreq->blockSignals(block);
-    ui->HalfCurrent->blockSignals(block);
-    ui->HighBauds->blockSignals(block);
-
     ui->AxisIndex->blockSignals(block);
     ui->HalfCurrent_0->blockSignals(block);
     ui->Invert_0->blockSignals(block);
@@ -1746,7 +1770,7 @@ void MainWindow::UpdateValues(int axis)
 {
     disconnectControls(true);
     int mountversion = axis_version[axis];
-    if(mountversion == 0x538) {
+    if((mountversion & 0xfff) == 0x538) {
 
         double totalsteps = ahp_gt_get_totalsteps(axis) * ahp_gt_get_divider(axis);
         ui->Divider0->setValue(ahp_gt_get_divider(axis));
@@ -1800,7 +1824,7 @@ void MainWindow::UpdateValues(int axis)
             break;
         }
         ui->HalfCurrent->setChecked((ahp_gt_get_features(axis) & hasHalfCurrentTracking) == hasHalfCurrentTracking);
-    } else if(axis == 0 && ((mountversion == 0x238) || (mountversion&0xff) == 0x37))
+    } else if(axis == 0 && (((mountversion & 0xfff) == 0x238) || (mountversion&0xff) == 0x37))
     {
         double totalsteps = ahp_gt_get_totalsteps(0) * ahp_gt_get_divider(0);
         ui->Divider0->setValue(ahp_gt_get_divider(0));
@@ -1853,7 +1877,7 @@ void MainWindow::UpdateValues(int axis)
         default:
             break;
         }
-    } else if(axis == 1 && ((mountversion == 0x338) || (mountversion&0xff) == 0x37))
+    } else if(axis == 1 && (((mountversion & 0xfff) == 0x338) || (mountversion&0xff) == 0x37))
     {
         double totalsteps = ahp_gt_get_totalsteps(1) * ahp_gt_get_divider(1);
         ui->Divider1->setValue(ahp_gt_get_divider(1));
@@ -1892,11 +1916,6 @@ void MainWindow::UpdateValues(int axis)
         ui->HalfCurrent_1->setChecked(ahp_gt_get_mount_flags() & halfCurrentDec);
         ui->TrackRate_1->setValue(-((double)ahp_gt_get_timing(1)-AHP_GT_ONE_SECOND)*(double)ui->TrackRate_1->maximum()*10.0/AHP_GT_ONE_SECOND);
         ui->TrackRate_label_1->setText("Track Rate offset: " + QString::number((double)ui->TrackRate_1->value()/(double)ui->TrackRate_1->maximum()/10.0) + "%");
-    }
-    if(axis == axis_index) {
-        //ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency(axis));
-        //ui->PWMFreq_label->setText("PWM: " + QString::number(1500 + 700 * ui->PWMFreq->value()) + " Hz");
-        //ui->BusIndex->setValue(ahp_gt_get_address());
         switch(ahp_gt_get_feature(1))
         {
         case GpioUnused:
@@ -1911,17 +1930,23 @@ void MainWindow::UpdateValues(int axis)
         default:
             break;
         }
-        //ui->MountType->setCurrentIndex(mounttypes.indexOf(ahp_gt_get_mount_type()));
+    }
+    if(axis == axis_index) {
+        ui->TorqueOffset->setValue(ahp_gt_get_torque(axis));
+        ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency(axis));
+        ui->PWMFreq_label->setText("PWM: " + QString::number(1500 + 700 * ui->PWMFreq->value()) + " Hz");
+        ui->BusIndex->setValue(ahp_gt_get_address());
+        ui->MountType->setCurrentIndex(mounttypes.indexOf(ahp_gt_get_mount_type()));
         ui->HighBauds->setChecked((ahp_gt_get_mount_flags() & bauds_115200) != 0);
         int index = 0;
-        index |= (((ahp_gt_get_features(axis_index) & isAZEQ) != 0) ? 2 : 0);
-        index |= (((ahp_gt_get_features(0) & isAZEQ) != 0) ? 2 : 0);
-        index |= (((ahp_gt_get_features(1) & isAZEQ) != 0) ? 2 : 0);
-        if(!index) {
-            index |= (((ahp_gt_get_mount_flags() & isForkMount) != 0) ? 1 : 0);
+        index |= (((ahp_gt_get_features(axis_index) & isAZEQ) != 0) ? 1 : 0);
+        index |= (((ahp_gt_get_features(0) & isAZEQ) != 0) ? 1 : 0);
+        index |= (((ahp_gt_get_features(1) & isAZEQ) != 0) ? 1 : 0);
+        if(!index && ((mountversion & 0xfff) == 0x538)) {
+            index |= (((ahp_gt_get_mount_flags() & isForkMount) != 0) ? 2 : 0);
         }
         ui->MountStyle->setCurrentIndex(index);
-        if(mountversion != 0x538)
+        if((mountversion & 0xfff) != 0x538)
             ui->HalfCurrent->setChecked((ahp_gt_get_features(0) & ahp_gt_get_features(1) & hasHalfCurrentTracking) == hasHalfCurrentTracking);
         else
             ui->HalfCurrent->setChecked((ahp_gt_get_features(axis) & hasHalfCurrentTracking) == hasHalfCurrentTracking);
