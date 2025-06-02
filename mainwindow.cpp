@@ -175,8 +175,6 @@ void MainWindow::readIni(QString ini)
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
     ui->HighBauds->setChecked(settings->value("HighBauds", false).toBool());
-    ui->HalfCurrent_0->setChecked(settings->value("HalfCurrent_0", false).toBool());
-    ui->HalfCurrent_1->setChecked(settings->value("HalfCurrent_1", false).toBool());
     int flags = ahp_gt_get_mount_flags();
     int features = ahp_gt_get_features(axis_index);
     features &= ~(isAZEQ | hasHalfCurrentTracking);
@@ -185,12 +183,8 @@ void MainWindow::readIni(QString ini)
     ui->HalfCurrent->setChecked(settings->value("HalfCurrent", false).toBool());
     flags &= ~isForkMount;
     flags &= ~bauds_115200;
-    flags &= ~halfCurrentRA;
-    flags &= ~halfCurrentDec;
     flags |= ((ui->MountStyle->currentIndex() == 1) ? isForkMount : 0);
     flags |= (ui->HighBauds->isChecked() ? bauds_115200 : 0);
-    flags |= (ui->HalfCurrent_0->isChecked() ? halfCurrentRA : 0);
-    flags |= (ui->HalfCurrent_1->isChecked() ? halfCurrentDec : 0);
     ahp_gt_set_mount_flags((GTFlags)flags);
     ahp_gt_set_mount_type((MountType)mounttypes[ui->MountType->currentIndex()]);
     ahp_gt_set_features(axis_index, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0) | (ui->HalfCurrent->isChecked() ? hasHalfCurrentTracking : 0)));
@@ -337,7 +331,6 @@ void MainWindow::saveIni(QString ini)
     settings = s;
 
     settings->setValue("AxisIndex", ui->AxisIndex->currentIndex());
-    settings->setValue("HalfCurrent_0", ui->HalfCurrent_0->isChecked());
     settings->setValue("Invert_0", ui->Invert_0->isChecked());
     settings->setValue("SteppingMode_0", ui->SteppingMode_0->currentIndex());
     settings->setValue("MotorSteps_0", ui->MotorSteps_0->value());
@@ -355,7 +348,6 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("TimingValue_0", ui->TrackRate_0->value());
     settings->setValue("Mean_0", ui->Mean_0->value());
 
-    settings->setValue("HalfCurrent_1", ui->HalfCurrent_1->isChecked());
     settings->setValue("Invert_1", ui->Invert_1->isChecked());
     settings->setValue("SteppingMode_1", ui->SteppingMode_1->currentIndex());
     settings->setValue("MotorSteps_1", ui->MotorSteps_1->value());
@@ -597,7 +589,7 @@ MainWindow::MainWindow(QWidget *parent)
         else
         {
             portname.append(ui->ComPort->currentText());
-            if(failure = ahp_gt_connect(portname.toUtf8())) {
+            if(true == (failure = ahp_gt_connect(portname.toUtf8()))) {
                 ahp_gt_disconnect();
             }
         }
@@ -641,7 +633,9 @@ MainWindow::MainWindow(QWidget *parent)
                 }
             }
             int flags = ahp_gt_get_mount_flags();
-            ahp_gt_set_mount_flags((GTFlags)flags);
+            flags &= ~(halfCurrentRA | halfCurrentDec);
+            flags |= (halfCurrentRA | halfCurrentDec);
+            ahp_gt_set_mount_flags((GTFlags)(flags));
             ui->LoadFW->setEnabled(false);
             ui->Connect->setEnabled(false);
             ui->Disconnect->setEnabled(true);
@@ -1074,20 +1068,6 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ahp_gt_set_features(axis_index, (SkywatcherFeature)((ahp_gt_get_features(axis_index) & ahp_gt_get_features(1) & ~hasHalfCurrentTracking) | (checked ? hasHalfCurrentTracking : 0)));
         ahp_gt_set_features(1, (SkywatcherFeature)((ahp_gt_get_features(axis_index) & ahp_gt_get_features(1) & ~hasHalfCurrentTracking) | (checked ? hasHalfCurrentTracking : 0)));
-        saveIni(ini);
-    });
-    connect(ui->HalfCurrent_0, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
-    {
-        int flags = (int)ahp_gt_get_mount_flags();
-        flags &= ~halfCurrentRA;
-        ahp_gt_set_mount_flags((GTFlags)(flags | (checked ? halfCurrentRA : 0)));
-        saveIni(ini);
-    });
-    connect(ui->HalfCurrent_1, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
-    {
-        int flags = (int)ahp_gt_get_mount_flags();
-        flags &= ~halfCurrentDec;
-        ahp_gt_set_mount_flags((GTFlags)(flags | (checked ? halfCurrentDec : 0)));
         saveIni(ini);
     });
     connect(ui->Ra_Speed, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
@@ -1770,7 +1750,6 @@ void MainWindow::disconnectControls(bool block)
 
     ui->AxisIndex->blockSignals(block);
 
-    ui->HalfCurrent_0->blockSignals(block);
     ui->Invert_0->blockSignals(block);
     ui->MotorSteps_0->blockSignals(block);
     ui->Worm_0->blockSignals(block);
@@ -1782,7 +1761,6 @@ void MainWindow::disconnectControls(bool block)
     ui->Coil_0->blockSignals(block);
     ui->GPIO_0->blockSignals(block);
 
-    ui->HalfCurrent_1->blockSignals(block);
     ui->Invert_1->blockSignals(block);
     ui->MotorSteps_1->blockSignals(block);
     ui->Worm_1->blockSignals(block);
@@ -1835,7 +1813,6 @@ void MainWindow::UpdateValues(int axis)
         ui->Coil_0->setCurrentIndex(ahp_gt_get_stepping_conf(axis));
         ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(axis));
         ui->Invert_0->setChecked(ahp_gt_get_direction_invert(axis));
-        ui->HalfCurrent_0->setChecked(ahp_gt_get_mount_flags() & halfCurrentRA);
         ui->TrackRate_0->setValue(-((double)ahp_gt_get_timing(axis)-AHP_GT_ONE_SECOND)*(double)ui->TrackRate_0->maximum()*10.0/AHP_GT_ONE_SECOND);
         ui->TrackRate_label_0->setText("Track Rate offset: " + QString::number((double)ui->TrackRate_0->value()/(double)ui->TrackRate_0->maximum()/10.0) + "%");
         switch(ahp_gt_get_feature(axis))
@@ -1889,7 +1866,6 @@ void MainWindow::UpdateValues(int axis)
         ui->Coil_0->setCurrentIndex(ahp_gt_get_stepping_conf(0));
         ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(0));
         ui->Invert_0->setChecked(ahp_gt_get_direction_invert(0));
-        ui->HalfCurrent_0->setChecked(ahp_gt_get_mount_flags() & halfCurrentRA);
         ui->TrackRate_0->setValue(-((double)ahp_gt_get_timing(0)-AHP_GT_ONE_SECOND)*(double)ui->TrackRate_0->maximum()*10.0/AHP_GT_ONE_SECOND);
         ui->TrackRate_label_0->setText("Track Rate offset: " + QString::number((double)ui->TrackRate_0->value()/(double)ui->TrackRate_0->maximum()/10.0) + "%");
         switch(ahp_gt_get_feature(0))
@@ -1942,7 +1918,6 @@ void MainWindow::UpdateValues(int axis)
         ui->Coil_1->setCurrentIndex(ahp_gt_get_stepping_conf(1));
         ui->SteppingMode_1->setCurrentIndex(ahp_gt_get_stepping_mode(1));
         ui->Invert_1->setChecked(ahp_gt_get_direction_invert(1));
-        ui->HalfCurrent_1->setChecked(ahp_gt_get_mount_flags() & halfCurrentDec);
         ui->TrackRate_1->setValue(-((double)ahp_gt_get_timing(1)-AHP_GT_ONE_SECOND)*(double)ui->TrackRate_1->maximum()*10.0/AHP_GT_ONE_SECOND);
         ui->TrackRate_label_1->setText("Track Rate offset: " + QString::number((double)ui->TrackRate_1->value()/(double)ui->TrackRate_1->maximum()/10.0) + "%");
         switch(ahp_gt_get_feature(1))

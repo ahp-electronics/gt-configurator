@@ -1843,19 +1843,6 @@
        <string>Stepping mode</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="HalfCurrent_0">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>270</y>
-        <width>101</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Half-current</string>
-      </property>
-     </widget>
      <widget class="QSlider" name="TrackRate_0">
       <property name="geometry">
        <rect>
@@ -2387,19 +2374,6 @@
       </property>
       <property name="text">
        <string>Stepping mode</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="HalfCurrent_1">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>270</y>
-        <width>101</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Half-current</string>
       </property>
      </widget>
      <widget class="QLabel" name="TrackRate_label_1">
