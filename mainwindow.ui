@@ -1958,7 +1958,7 @@
        <string>Low current</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="TorqueOffsetEnable">
+     <widget class="QCheckBox" name="CurrentLimiter">
       <property name="enabled">
        <bool>false</bool>
       </property>
@@ -1974,7 +1974,7 @@
        <string>Enable</string>
       </property>
      </widget>
-     <widget class="QSlider" name="TorqueOffset">
+     <widget class="QSlider" name="Current">
       <property name="enabled">
        <bool>false</bool>
       </property>
@@ -2002,7 +2002,7 @@
        <enum>QSlider::NoTicks</enum>
       </property>
      </widget>
-     <widget class="QLabel" name="TorqueOffset_label">
+     <widget class="QLabel" name="CurrentLimiter_label">
       <property name="enabled">
        <bool>false</bool>
       </property>
@@ -2015,7 +2015,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Torque offset: 0</string>
+       <string>Current offset: 0</string>
       </property>
      </widget>
     </widget>

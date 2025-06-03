@@ -616,7 +616,7 @@ MainWindow::MainWindow(QWidget *parent)
                 axis_version[axis] = ahp_gt_get_mc_version(axis)&0xfff;
                 if(axis_version[axis] == 0x538) {
                     axis_index = axis;
-                    ui->RA->setTitle("GT5");
+                    ui->RA->setTitle(QString(ahp_gt_axis_name(axis)));
                     ui->AxisIndex->setEnabled(true);
                     ui->AxisIndex->setCurrentIndex(axis);
                     ahp_gt_set_axis_number(axis_index, axis_index);
@@ -626,9 +626,9 @@ MainWindow::MainWindow(QWidget *parent)
                     ui->TuneDec->setEnabled(false);
                     ui->DEC->setEnabled(false);
                     ui->AdvancedDec->setEnabled(false);
-                    ui->TorqueOffset->setEnabled(true);
-                    ui->TorqueOffsetEnable->setEnabled(true);
-                    ui->TorqueOffset_label->setEnabled(true);
+                    ui->Current->setEnabled(true);
+                    ui->CurrentLimiter->setEnabled(true);
+                    ui->CurrentLimiter_label->setEnabled(true);
                     break;
                 }
             }
@@ -1027,19 +1027,14 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_set_mount_flags((GTFlags)flags);
         saveIni(ini);
     });
-    connect(ui->TorqueOffsetEnable, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ](bool checked)
+    connect(ui->CurrentLimiter, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ](bool checked)
     {
-        int flags = (int)ahp_gt_get_mount_flags();
-        flags &= ~torqueControl;
-        if(checked)
-            flags |= torqueControl;
-        ahp_gt_set_mount_flags((GTFlags)flags);
-        saveIni(ini);
+        ahp_gt_limit_intensity(axis_index, ui->CurrentLimiter->isChecked());
     });
-    connect(ui->TorqueOffset, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ](int value)
+    connect(ui->Current, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ](int value)
     {
-        ahp_gt_set_torque(axis_index, value);
-        ui->TorqueOffset_label->setText("Torque offset: " + QString::number(ui->TorqueOffset->value() * 100 / ui->TorqueOffset->maximum()) + "%");
+        ahp_gt_set_intensity_limit(axis_index, ui->Current->value());
+        ui->CurrentLimiter_label->setText("Current offset: " + QString::number(ui->Current->value() * 100 / ui->Current->maximum()) + "%");
         saveIni(ini);
     });
     connect(ui->PWMFreq, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ](int value)
@@ -1740,7 +1735,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::disconnectControls(bool block)
 {
-    ui->TorqueOffset->blockSignals(block);
+    ui->Current->blockSignals(block);
     ui->PWMFreq->blockSignals(block);
     ui->BusIndex->blockSignals(block);
     ui->MountType->blockSignals(block);
@@ -1830,6 +1825,11 @@ void MainWindow::UpdateValues(int axis)
             break;
         }
         ui->HalfCurrent->setChecked((ahp_gt_get_features(axis) & hasHalfCurrentTracking) == hasHalfCurrentTracking);
+        ui->CurrentLimiter_label->setEnabled(true);
+        ui->CurrentLimiter->setEnabled(true);
+        ui->Current->setEnabled(true);
+        ui->Current->setValue(ahp_gt_get_intensity_limit(axis));
+        ui->CurrentLimiter->setChecked(ahp_gt_is_intensity_limited(axis));
     } else if(axis == 0 && (((mountversion & 0xfff) == 0x238) || (mountversion&0xff) == 0x37))
     {
         double totalsteps = ahp_gt_get_totalsteps(0) * ahp_gt_get_divider(0);
@@ -1881,6 +1881,13 @@ void MainWindow::UpdateValues(int axis)
             break;
         default:
             break;
+        }
+        if((mountversion & 0xfff) == 0x238) {
+            ui->CurrentLimiter_label->setEnabled(true);
+            ui->CurrentLimiter->setEnabled(true);
+            ui->Current->setEnabled(true);
+            ui->Current->setValue(ahp_gt_get_intensity_limit(axis));
+            ui->CurrentLimiter->setChecked(ahp_gt_is_intensity_limited(axis));
         }
     } else if(axis == 1 && (((mountversion & 0xfff) == 0x338) || (mountversion&0xff) == 0x37))
     {
@@ -1934,10 +1941,17 @@ void MainWindow::UpdateValues(int axis)
         default:
             break;
         }
+        if((mountversion & 0xfff) == 0x338) {
+            ui->CurrentLimiter_label->setEnabled(true);
+            ui->CurrentLimiter->setEnabled(true);
+            ui->Current->setEnabled(true);
+            ui->Current->setValue(ahp_gt_get_intensity_limit(axis));
+            ui->CurrentLimiter->setChecked(ahp_gt_is_intensity_limited(axis));
+        }
     }
     if(0 && axis == axis_index) {
-        ui->TorqueOffsetEnable->setChecked((ahp_gt_get_mount_flags() & torqueControl) != 0);
-        ui->TorqueOffset->setValue(ahp_gt_get_torque(axis));
+        ui->CurrentLimiter->setChecked((ahp_gt_get_mount_flags() & torqueControl) != 0);
+        ui->Current->setValue(ahp_gt_get_intensity_limit(axis));
         ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency(axis));
         ui->PWMFreq_label->setText("PWM: " + QString::number(1500 + 700 * ui->PWMFreq->value()) + " Hz");
         ui->BusIndex->setValue(ahp_gt_get_address());
