@@ -32,19 +32,12 @@ class MainWindow : public QMainWindow
         {
             return ini;
         }
-        void lockRA()
-        {
-            while(!RAmutex.tryLock());
-        }
-        void unlockRA()
-        {
-            RAmutex.unlock();
-        }
 
     private:
-
+        void WriteThread(QObject* sender = nullptr);
+        void Connect(bool clicked = false);
+        void Disconnect(bool clicked = false);
         int num_axes;
-        int *axis_version;
         int axis_index { 0 };
         double Altitude, Latitude, Longitude, Elevation;
         double Ra {0.0};
@@ -55,25 +48,23 @@ class MainWindow : public QMainWindow
         QString toDMS(double dms);
         double fromHMSorDMS(QString dms);
 
-        bool axis_lospeed[2] { false, false };
-        bool axisdirection[2] { false, false };
-        double Speed[2];
-        double currentSteps[2];
-        SkywatcherAxisStatus status[2];
-        double lastPollTime[2];
-        double lastSteps[2];
-        double lastSpeeds[2][60] { { 0 }, { 0 }};
-        bool oldTracking[2] { false, false };
-        bool isTracking[2] { false, false };
-        int axisstatus[2];
-        int motionmode[2];
-        bool correcting_tracking[2] { false, false };
-        int stop_correction[2] { true, true };
-        Thread *RaThread;
-        Thread *DecThread;
+        bool axis_lospeed { false };
+        bool axisdirection { false };
+        double Speed;
+        double currentSteps;
+        SkywatcherAxisStatus status;
+        double lastPollTime;
+        double lastSteps;
+        double lastSpeeds[60] { { 0 } };
+        bool oldTracking { false };
+        bool isTracking { false };
+        int axisstatus;
+        int motionmode;
+        bool correcting_tracking { false };
+        int stop_correction { true };
+        Thread *PositionThread;
         Thread *IndicationThread;
         Thread *ProgressThread;
-        Thread *WriteThread;
         Thread *ServerThread;
         QSettings * settings;
         QString ini;
@@ -88,9 +79,10 @@ class MainWindow : public QMainWindow
         QStringList CheckFirmware(QString url, int timeout_ms = 30000);
         bool DownloadFirmware(QString url, QString jsonfile, QString filename, QSettings *settings, int timeout_ms = 30000);
         void disconnectControls(bool block);
-        void UpdateValues(int axis);
+        void disconnectDecControls(bool block);
+        void ReadValues(int axis);
         Ui::MainWindow *ui;
         static void WriteValues(MainWindow *wnd);
-        QMutex RAmutex, DEmutex;
+        QMutex mutex;
 };
 #endif // MAINWINDOW_H
