@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>70</y>
+      <y>80</y>
       <width>1081</width>
       <height>541</height>
      </rect>
@@ -1495,7 +1495,7 @@
        <x>10</x>
        <y>30</y>
        <width>231</width>
-       <height>501</height>
+       <height>421</height>
       </rect>
      </property>
      <property name="title">
@@ -1652,11 +1652,6 @@
       <item>
        <property name="text">
         <string>ST4</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>ENCODER</string>
        </property>
       </item>
       <item>
@@ -1843,6 +1838,19 @@
        <string>Stepping mode</string>
       </property>
      </widget>
+     <widget class="QCheckBox" name="HalfCurrent_0">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>270</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Half-current</string>
+      </property>
+     </widget>
      <widget class="QSlider" name="TrackRate_0">
       <property name="geometry">
        <rect>
@@ -1897,125 +1905,14 @@
        <string>Axis Index</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="AxisIndex">
+     <widget class="QComboBox" name="AxisIndex_0">
       <property name="geometry">
        <rect>
         <x>130</x>
         <y>30</y>
-        <width>91</width>
+        <width>86</width>
         <height>25</height>
        </rect>
-      </property>
-     </widget>
-     <widget class="QSlider" name="PWMFreq">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>420</y>
-        <width>101</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>8</number>
-      </property>
-      <property name="maximum">
-       <number>15</number>
-      </property>
-      <property name="singleStep">
-       <number>1</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::NoTicks</enum>
-      </property>
-     </widget>
-     <widget class="QLabel" name="PWMFreq_label">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>400</y>
-        <width>111</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>PWM: 0 Hz</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="HalfCurrent">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>420</y>
-        <width>111</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Low current</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="CurrentLimiter">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>470</y>
-        <width>111</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Enable</string>
-      </property>
-     </widget>
-     <widget class="QSlider" name="Current">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>470</y>
-        <width>101</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>0</number>
-      </property>
-      <property name="maximum">
-       <number>1023</number>
-      </property>
-      <property name="singleStep">
-       <number>1</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::NoTicks</enum>
-      </property>
-     </widget>
-     <widget class="QLabel" name="CurrentLimiter_label">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>450</y>
-        <width>201</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Current offset: 0</string>
       </property>
      </widget>
     </widget>
@@ -2028,7 +1925,7 @@
        <x>250</x>
        <y>30</y>
        <width>231</width>
-       <height>411</height>
+       <height>421</height>
       </rect>
      </property>
      <property name="title">
@@ -2185,11 +2082,6 @@
       <item>
        <property name="text">
         <string>ST4</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>ENCODER</string>
        </property>
       </item>
       <item>
@@ -2376,6 +2268,19 @@
        <string>Stepping mode</string>
       </property>
      </widget>
+     <widget class="QCheckBox" name="HalfCurrent_1">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>270</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Half-current</string>
+      </property>
+     </widget>
      <widget class="QLabel" name="TrackRate_label_1">
       <property name="geometry">
        <rect>
@@ -2424,10 +2329,10 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>250</x>
-       <y>440</y>
-       <width>231</width>
-       <height>91</height>
+       <x>10</x>
+       <y>450</y>
+       <width>471</width>
+       <height>81</height>
       </rect>
      </property>
      <property name="title">
@@ -2516,6 +2421,44 @@
        </property>
       </item>
      </widget>
+     <widget class="QLabel" name="PWMFreq_label">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>46</y>
+        <width>171</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>PWM: 0 Hz</string>
+      </property>
+     </widget>
+     <widget class="QSlider" name="PWMFreq">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>60</y>
+        <width>171</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>0</number>
+      </property>
+      <property name="maximum">
+       <number>10</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::NoTicks</enum>
+      </property>
+     </widget>
      <widget class="QComboBox" name="MountStyle">
       <property name="geometry">
        <rect>
@@ -2532,59 +2475,20 @@
       </item>
       <item>
        <property name="text">
-        <string>AZEQ</string>
+        <string>FORK</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>FORK</string>
+        <string>AZEQ</string>
        </property>
       </item>
-     </widget>
-     <widget class="QCheckBox" name="Server">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>20</y>
-        <width>101</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Start server</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="HighBauds">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>40</y>
-        <width>121</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>115200 Bauds</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_12">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>60</y>
-        <width>71</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Bus Index:</string>
-      </property>
      </widget>
      <widget class="QSpinBox" name="BusIndex">
       <property name="geometry">
        <rect>
-        <x>170</x>
-        <y>60</y>
+        <x>200</x>
+        <y>50</y>
         <width>51</width>
         <height>21</height>
        </rect>
@@ -2597,6 +2501,58 @@
       </property>
       <property name="value">
        <number>1</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_12">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>51</y>
+        <width>91</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Bus Index:</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="Server">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>30</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Start server</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="HighBauds">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>30</y>
+        <width>121</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>115200 Bauds</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="HalfCurrent">
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>30</y>
+        <width>141</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Half-current track</string>
       </property>
      </widget>
     </widget>

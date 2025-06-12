@@ -42,9 +42,9 @@ class MainWindow : public QMainWindow
         }
 
     private:
-
+        void Connect(bool = false);
+        void Disconnect(bool = false);
         int num_axes;
-        int *axis_version;
         int axis_index { 0 };
         double Altitude, Latitude, Longitude, Elevation;
         double Ra {0.0};
@@ -63,12 +63,6 @@ class MainWindow : public QMainWindow
         double lastPollTime[2];
         double lastSteps[2];
         double lastSpeeds[2][60] { { 0 }, { 0 }};
-        bool oldTracking[2] { false, false };
-        bool isTracking[2] { false, false };
-        int axisstatus[2];
-        int motionmode[2];
-        bool correcting_tracking[2] { false, false };
-        int stop_correction[2] { true, true };
         Thread *RaThread;
         Thread *DecThread;
         Thread *IndicationThread;
@@ -83,6 +77,10 @@ class MainWindow : public QMainWindow
         int finished { 1 };
         int threadsStopped;
         bool isConnected;
+        int axisstatus[2];
+        int motionmode[2];
+        bool correcting_tracking[2] { false, false };
+        int stop_correction[2] { true, true };
         bool initial;
         int timer { 1000 };
         QStringList CheckFirmware(QString url, int timeout_ms = 30000);
@@ -90,6 +88,8 @@ class MainWindow : public QMainWindow
         void disconnectControls(bool block);
         void UpdateValues(int axis);
         Ui::MainWindow *ui;
+        bool oldTracking[2] { false, false };
+        bool isTracking[2] { false, false };
         static void WriteValues(MainWindow *wnd);
         QMutex RAmutex, DEmutex;
 };
