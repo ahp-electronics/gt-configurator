@@ -34,9 +34,10 @@ class MainWindow : public QMainWindow
         }
 
     private:
-        void indicationThread(Thread* parent);
+        void uiThread(Thread* parent);
         void Connect(bool clicked = false);
         void Disconnect(bool clicked = false);
+        int mountversion;
         int num_axes;
         int axis_index { 0 };
         double Altitude, Latitude, Longitude, Elevation;
@@ -63,7 +64,7 @@ class MainWindow : public QMainWindow
         bool correcting_tracking { false };
         int stop_correction { true };
         Thread *PositionThread;
-        Thread *IndicationThread;
+        Thread *UIThread;
         Thread *ServerThread;
         QSettings * settings;
         QString ini;
@@ -79,9 +80,11 @@ class MainWindow : public QMainWindow
         bool DownloadFirmware(QString url, QString jsonfile, QString filename, QSettings *settings, int timeout_ms = 30000);
         void disconnectControls(bool block);
         void disconnectDecControls(bool block);
-        void ReadValues(int axis);
+        void ReadValues();
         Ui::MainWindow *ui;
         static void WriteValues(MainWindow *wnd);
         QMutex mutex;
+signals:
+        void uithread(Thread* sender);
 };
 #endif // MAINWINDOW_H
