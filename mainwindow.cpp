@@ -1098,7 +1098,7 @@ void MainWindow::indicationThread(Thread *parent) {
             ui->Plus->setEnabled(oldstate);
             ui->Stop->setEnabled(oldstate);
         }
-    } else {
+    }
 
     ///////////
     oldstate = finished;
@@ -1132,19 +1132,18 @@ void MainWindow::indicationThread(Thread *parent) {
         double R = (double)ui->Resistance->value() / 1000.0;
         double I = (double)ui->Current->value() / 1000.0;
         double V = (double)ui->Voltage->value();
-        double maxf = (2.0 * M_PI * pow(V*I/(pow(R, 2)*pow(L, 2)), 0.5));
-        double minf = (2.0 * M_PI * pow(V*I*(pow(R, 2)), 0.5));
         double goto_hz = totalsteps / ahp_gt_get_multiplier(axis_index) * ahp_gt_get_max_speed(axis_index) / SIDEREAL_DAY;
         double goto_omega = M_PI*2*goto_hz;
         double goto_kilo = M_PI*2*1000/ui->MotorSteps->value();
         double curf = V / pow(pow(R, 2)+pow(goto_omega*L, 2), 0.5);
-        double i_omega = V / pow(pow(I, 2)-pow(R, 2), 0.5) / L;
+        double maxf = V / fmin(I, pow(pow(I, 2)-pow(R, 2), 0.5) / L * totalsteps / ahp_gt_get_multiplier(axis_index) / M_PI / 2);
+        double minf = V / fmin(I, pow(pow(R, 2), 0.5) / L * totalsteps / ahp_gt_get_multiplier(axis_index) / M_PI / 2);
         ui->ImpedanceEstimator->setText("Estimated impedance: " + QString::number(ahp_gt_get_intensity_deviation(axis_index, M_PI*2*Speed*3600*60)));
-        ui->PWMFrequency->setText("PWM Hz: " + QString::number(maxf));
+        ui->PWMFrequency->setText("PWM Hz: " + QString::number(maxf*ahp_gt_get_multiplier(axis_index)));
         ui->MinFrequency->setText("Min Hz: " + QString::number(minf));
         ui->omega->setText("ω@max: " + QString::number(goto_omega));
         ui->ref_inductance->setText("ω@1k: " + QString::number(goto_kilo));
-        ui->GotoFrequency->setText("Goto Hz: " + QString::number(goto_hz));
+        ui->GotoFrequency->setText("Goto Hz: " + QString::number(maxf));
         ui->MaxSpeed_label->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(axis_index) * SIDEREAL_DAY / M_PI / 2) + "x");
         ui->PWMFreq_label->setText("PWM: " + QString::number(round(366.2109375 * ahp_gt_get_pwm_frequency(axis_index))) + " Hz");
         ui->TrackRate_label->setText("Track Rate offset: " + QString::number((double)ui->TrackRate->value()/(double)ui->TrackRate->maximum()/10.0) + "%");
