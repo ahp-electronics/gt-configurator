@@ -1484,25 +1484,6 @@ background-color: rgb(219,218,223);</string>
     </widget>
    </widget>
    <widget class="QProgressBar" name="progress">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>640</y>
-      <width>581</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="value">
-     <number>0</number>
-    </property>
-    <property name="textVisible">
-     <bool>false</bool>
-    </property>
-   </widget>
-   <widget class="QProgressBar" name="progress">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -1513,6 +1494,9 @@ background-color: rgb(219,218,223);</string>
     </property>
     <property name="value">
      <number>0</number>
+    </property>
+    <property name="textVisible">
+     <bool>false</bool>
     </property>
    </widget>
   </widget>
