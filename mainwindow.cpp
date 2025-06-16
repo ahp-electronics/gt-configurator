@@ -314,7 +314,7 @@ MainWindow::MainWindow(QWidget *parent)
     stop_correction = true;
     settings = new QSettings(ini, QSettings::Format::IniFormat);
     isConnected = false;
-    this->setFixedSize(810, 660);
+    this->setFixedSize(650, 660);
     ui->setupUi(this);
 
     ui->SetAxis->addItem("Ra");
