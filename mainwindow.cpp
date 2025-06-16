@@ -1140,7 +1140,6 @@ void MainWindow::uiThread(Thread *parent) {
         double L_max = pow(pow(V/R, 2) - pow(R, 2) - omega_kilo, 0.5) * 512;
         double L_min = pow(pow(I, 2) - pow(R, 2) - omega_kilo, 0.5) * 512;
         ui->omega->setText("ω: " + QString::number(omega_current));
-        ui->torque->setText("torque: " + QString::number(V/pow(pow((fmax(0, omega_current-omega_kilo))*L, 2)+pow(R*0.001953125, 2), 1.0/2)));
         ui->Maxtorque->setText("DC torque: " + QString::number(fmin(I, V/pow(pow(R*0.001953125, 2), 0.5))));
         ui->Mintorque->setText("Reference torque: " + QString::number(fmin(I, V/pow(pow(L*omega_kilo, 2), 0.5))));
         ui->Currenttorque->setText("Current torque: " + QString::number(fmin(I, V/pow(pow(L*fmax(0, omega_current-omega_kilo), 2), 0.5))));

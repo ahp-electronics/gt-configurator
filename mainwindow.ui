@@ -6,12 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>811</width>
+    <width>650</width>
     <height>661</height>
    </rect>
   </property>
   <property name="styleSheet">
-   <string notr="true">font: 63 9pt &quot;FreeSans&quot;;</string>
+   <string notr="true">font: 63 9pt &quot;FreeSans&quot;;
+color: rgb(61, 56, 70);
+background-color: rgb(219,218,223);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
@@ -25,7 +27,7 @@
      <rect>
       <x>10</x>
       <y>70</y>
-      <width>781</width>
+      <width>631</width>
       <height>501</height>
      </rect>
     </property>
@@ -34,7 +36,7 @@
       <rect>
        <x>250</x>
        <y>10</y>
-       <width>521</width>
+       <width>371</width>
        <height>201</height>
       </rect>
      </property>
@@ -44,8 +46,8 @@
      <widget class="QSpinBox" name="Resistance">
       <property name="geometry">
        <rect>
-        <x>290</x>
-        <y>40</y>
+        <x>100</x>
+        <y>110</y>
         <width>81</width>
         <height>21</height>
        </rect>
@@ -63,8 +65,8 @@
      <widget class="QLabel" name="label_19">
       <property name="geometry">
        <rect>
-        <x>200</x>
-        <y>40</y>
+        <x>10</x>
+        <y>110</y>
         <width>71</width>
         <height>20</height>
        </rect>
@@ -76,8 +78,8 @@
      <widget class="QLabel" name="label_20">
       <property name="geometry">
        <rect>
-        <x>200</x>
-        <y>60</y>
+        <x>10</x>
+        <y>130</y>
         <width>91</width>
         <height>20</height>
        </rect>
@@ -89,8 +91,8 @@
      <widget class="QSpinBox" name="Inductance">
       <property name="geometry">
        <rect>
-        <x>310</x>
-        <y>60</y>
+        <x>120</x>
+        <y>130</y>
         <width>61</width>
         <height>21</height>
        </rect>
@@ -108,8 +110,8 @@
      <widget class="QSpinBox" name="Current">
       <property name="geometry">
        <rect>
-        <x>320</x>
-        <y>80</y>
+        <x>130</x>
+        <y>150</y>
         <width>51</width>
         <height>21</height>
        </rect>
@@ -127,8 +129,8 @@
      <widget class="QLabel" name="label_21">
       <property name="geometry">
        <rect>
-        <x>200</x>
-        <y>80</y>
+        <x>10</x>
+        <y>150</y>
         <width>81</width>
         <height>21</height>
        </rect>
@@ -140,8 +142,8 @@
      <widget class="QSpinBox" name="Voltage">
       <property name="geometry">
        <rect>
-        <x>330</x>
-        <y>100</y>
+        <x>140</x>
+        <y>170</y>
         <width>41</width>
         <height>21</height>
        </rect>
@@ -159,10 +161,10 @@
      <widget class="QLabel" name="GotoFrequency">
       <property name="geometry">
        <rect>
-        <x>390</x>
-        <y>90</y>
+        <x>190</x>
+        <y>110</y>
         <width>121</width>
-        <height>21</height>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
@@ -172,10 +174,10 @@
      <widget class="QLabel" name="SPT">
       <property name="geometry">
        <rect>
-        <x>390</x>
-        <y>110</y>
+        <x>190</x>
+        <y>130</y>
         <width>121</width>
-        <height>21</height>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
@@ -199,7 +201,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>60</y>
+        <y>50</y>
         <width>91</width>
         <height>21</height>
        </rect>
@@ -211,8 +213,8 @@
      <widget class="QLabel" name="label_34">
       <property name="geometry">
        <rect>
-        <x>200</x>
-        <y>100</y>
+        <x>10</x>
+        <y>170</y>
         <width>81</width>
         <height>21</height>
        </rect>
@@ -225,7 +227,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>91</y>
+        <y>70</y>
         <width>71</width>
         <height>20</height>
        </rect>
@@ -238,7 +240,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>120</y>
+        <y>90</y>
         <width>51</width>
         <height>21</height>
        </rect>
@@ -250,10 +252,10 @@
      <widget class="QLabel" name="Maxtorque">
       <property name="geometry">
        <rect>
-        <x>390</x>
-        <y>30</y>
+        <x>190</x>
+        <y>50</y>
         <width>121</width>
-        <height>20</height>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
@@ -263,85 +265,27 @@
      <widget class="QLabel" name="Currenttorque">
       <property name="geometry">
        <rect>
-        <x>390</x>
-        <y>70</y>
+        <x>190</x>
+        <y>90</y>
         <width>121</width>
-        <height>20</height>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
        <string>Currenttorque</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="CurrentSteps">
-      <property name="geometry">
-       <rect>
-        <x>290</x>
-        <y>150</y>
-        <width>81</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QLabel" name="Rate">
       <property name="geometry">
        <rect>
-        <x>200</x>
-        <y>130</y>
+        <x>190</x>
+        <y>30</y>
         <width>171</width>
-        <height>21</height>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
        <string>as/sec:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="CurrentStepsLabel">
-      <property name="geometry">
-       <rect>
-        <x>200</x>
-        <y>150</y>
-        <width>41</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Pos:</string>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Mean">
-      <property name="geometry">
-       <rect>
-        <x>320</x>
-        <y>170</y>
-        <width>51</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>60</number>
-      </property>
-      <property name="value">
-       <number>1</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="Rate2">
-      <property name="geometry">
-       <rect>
-        <x>200</x>
-        <y>170</y>
-        <width>61</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Mean (s)</string>
       </property>
      </widget>
      <widget class="QSpinBox" name="TotalSteps">
@@ -364,7 +308,7 @@
       <property name="geometry">
        <rect>
         <x>100</x>
-        <y>60</y>
+        <y>50</y>
         <width>81</width>
         <height>21</height>
        </rect>
@@ -379,9 +323,9 @@
      <widget class="QSpinBox" name="Divider">
       <property name="geometry">
        <rect>
-        <x>100</x>
-        <y>120</y>
-        <width>51</width>
+        <x>140</x>
+        <y>90</y>
+        <width>41</width>
         <height>21</height>
        </rect>
       </property>
@@ -395,9 +339,9 @@
      <widget class="QSpinBox" name="Multiplier">
       <property name="geometry">
        <rect>
-        <x>100</x>
-        <y>90</y>
-        <width>51</width>
+        <x>140</x>
+        <y>69</y>
+        <width>41</width>
         <height>21</height>
        </rect>
       </property>
@@ -411,10 +355,10 @@
      <widget class="QLabel" name="Mintorque">
       <property name="geometry">
        <rect>
-        <x>390</x>
-        <y>50</y>
+        <x>190</x>
+        <y>70</y>
         <width>121</width>
-        <height>20</height>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
@@ -424,10 +368,10 @@
      <widget class="QLabel" name="TrackingFrequency">
       <property name="geometry">
        <rect>
-        <x>390</x>
-        <y>130</y>
+        <x>190</x>
+        <y>150</y>
         <width>121</width>
-        <height>21</height>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
@@ -437,27 +381,14 @@
      <widget class="QLabel" name="omega">
       <property name="geometry">
        <rect>
-        <x>390</x>
-        <y>150</y>
+        <x>190</x>
+        <y>170</y>
         <width>121</width>
-        <height>21</height>
+        <height>16</height>
        </rect>
       </property>
       <property name="text">
        <string>ω:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="torque">
-      <property name="geometry">
-       <rect>
-        <x>390</x>
-        <y>170</y>
-        <width>121</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>torque:</string>
       </property>
      </widget>
     </widget>
@@ -960,7 +891,7 @@
       <rect>
        <x>250</x>
        <y>220</y>
-       <width>521</width>
+       <width>371</width>
        <height>271</height>
       </rect>
      </property>
@@ -1078,8 +1009,8 @@
      <widget class="QCheckBox" name="Server">
       <property name="geometry">
        <rect>
-        <x>360</x>
-        <y>40</y>
+        <x>250</x>
+        <y>100</y>
         <width>101</width>
         <height>21</height>
        </rect>
@@ -1091,8 +1022,8 @@
      <widget class="QCheckBox" name="HighBauds">
       <property name="geometry">
        <rect>
-        <x>360</x>
-        <y>70</y>
+        <x>250</x>
+        <y>120</y>
         <width>121</width>
         <height>21</height>
        </rect>
@@ -1105,8 +1036,8 @@
       <property name="geometry">
        <rect>
         <x>180</x>
-        <y>70</y>
-        <width>81</width>
+        <y>60</y>
+        <width>71</width>
         <height>20</height>
        </rect>
       </property>
@@ -1117,9 +1048,9 @@
      <widget class="QSpinBox" name="SetIndex">
       <property name="geometry">
        <rect>
-        <x>240</x>
-        <y>70</y>
-        <width>91</width>
+        <x>250</x>
+        <y>60</y>
+        <width>51</width>
         <height>21</height>
        </rect>
       </property>
@@ -1191,8 +1122,8 @@
      <widget class="QCheckBox" name="FixTracking">
       <property name="geometry">
        <rect>
-        <x>340</x>
-        <y>220</y>
+        <x>80</x>
+        <y>250</y>
         <width>131</width>
         <height>16</height>
        </rect>
@@ -1225,7 +1156,7 @@
        <rect>
         <x>240</x>
         <y>40</y>
-        <width>91</width>
+        <width>61</width>
         <height>21</height>
        </rect>
       </property>
@@ -1233,10 +1164,10 @@
      <widget class="QPushButton" name="Minus">
       <property name="geometry">
        <rect>
-        <x>250</x>
-        <y>100</y>
+        <x>20</x>
+        <y>180</y>
         <width>61</width>
-        <height>61</height>
+        <height>41</height>
        </rect>
       </property>
       <property name="text">
@@ -1246,10 +1177,10 @@
      <widget class="QPushButton" name="Stop">
       <property name="geometry">
        <rect>
-        <x>320</x>
-        <y>100</y>
+        <x>90</x>
+        <y>180</y>
         <width>71</width>
-        <height>61</height>
+        <height>41</height>
        </rect>
       </property>
       <property name="text">
@@ -1259,10 +1190,10 @@
      <widget class="QPushButton" name="Plus">
       <property name="geometry">
        <rect>
-        <x>400</x>
-        <y>100</y>
+        <x>170</x>
+        <y>180</y>
         <width>71</width>
-        <height>61</height>
+        <height>41</height>
        </rect>
       </property>
       <property name="text">
@@ -1272,9 +1203,9 @@
      <widget class="QLabel" name="Speed_label">
       <property name="geometry">
        <rect>
-        <x>250</x>
-        <y>170</y>
-        <width>61</width>
+        <x>20</x>
+        <y>230</y>
+        <width>51</width>
         <height>16</height>
        </rect>
       </property>
@@ -1285,10 +1216,10 @@
      <widget class="QSlider" name="Speed">
       <property name="geometry">
        <rect>
-        <x>250</x>
-        <y>190</y>
-        <width>221</width>
-        <height>20</height>
+        <x>60</x>
+        <y>230</y>
+        <width>171</width>
+        <height>16</height>
        </rect>
       </property>
       <property name="minimum">
@@ -1313,14 +1244,72 @@
      <widget class="QCheckBox" name="Tracking">
       <property name="geometry">
        <rect>
-        <x>250</x>
-        <y>220</y>
-        <width>71</width>
+        <x>20</x>
+        <y>250</y>
+        <width>51</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
        <string>Track</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="CurrentSteps">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>170</y>
+        <width>71</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="CurrentStepsLabel">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>170</y>
+        <width>31</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Pos:</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="Mean">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>140</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>60</number>
+      </property>
+      <property name="value">
+       <number>1</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="Rate2">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>140</y>
+        <width>51</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Mean (s)</string>
       </property>
      </widget>
     </widget>
@@ -1330,7 +1319,7 @@
      <rect>
       <x>10</x>
       <y>580</y>
-      <width>781</width>
+      <width>631</width>
       <height>61</height>
      </rect>
     </property>
@@ -1421,7 +1410,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>781</width>
+      <width>631</width>
       <height>61</height>
      </rect>
     </property>
@@ -1518,7 +1507,7 @@
      <rect>
       <x>10</x>
       <y>640</y>
-      <width>781</width>
+      <width>631</width>
       <height>16</height>
      </rect>
     </property>
