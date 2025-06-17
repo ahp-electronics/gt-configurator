@@ -34,7 +34,6 @@ class MainWindow : public QMainWindow
         }
 
     private:
-        void uiThread(Thread* parent);
         void Connect(bool clicked = false);
         void Disconnect(bool clicked = false);
         int mountversion;
@@ -84,7 +83,5 @@ class MainWindow : public QMainWindow
         Ui::MainWindow *ui;
         static void WriteValues(MainWindow *wnd);
         QMutex mutex;
-signals:
-        void uithread(Thread* sender);
 };
 #endif // MAINWINDOW_H

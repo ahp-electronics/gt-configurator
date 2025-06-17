@@ -810,7 +810,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Write, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked = false)
     {
-        if(percent == 0 && finished != 0)
+        if(finished)
             percent = finished = 0;
         if(percent == 0 && finished == 0) {
             saveIni(getDefaultIni());
@@ -867,8 +867,138 @@ MainWindow::MainWindow(QWidget *parent)
             threadsStopped = true;
         }
     });
-    connect(this, static_cast<void (MainWindow::*)(Thread *)>(&MainWindow::uithread), this, &MainWindow::uiThread);
-    connect(UIThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread* sender) { emit uithread(sender);});
+    connect(UIThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ](Thread *parent) {
+        disconnectControls(true);
+        ui->MotorSteps->setValue(ahp_gt_get_motor_steps(axis_index));
+        ui->Motor->setValue(ahp_gt_get_motor_teeth(axis_index));
+        ui->Worm->setValue(ahp_gt_get_worm_teeth(axis_index));
+        ui->Crown->setValue(ahp_gt_get_crown_teeth(axis_index));
+        ui->Acceleration->setValue(ui->Acceleration->maximum() - ahp_gt_get_acceleration_angle(axis_index) * 1800.0 / M_PI);
+        double speedlimit = ahp_gt_get_speed_limit(axis_index) * SIDEREAL_DAY / M_PI / 2;
+        ui->Speed->setValue(fmin(speedlimit, fmax(1, 200)));
+        ui->Speed->setRange(1, speedlimit);
+        ui->MaxSpeed->setValue(fmin(speedlimit, fmax(1, ahp_gt_get_max_speed(axis_index) * SIDEREAL_DAY / M_PI / 2)));
+        ui->MaxSpeed->setRange(1, speedlimit);
+        ui->Coil->setCurrentIndex(ahp_gt_get_stepping_conf(axis_index));
+        ui->SteppingMode->setCurrentIndex(ahp_gt_get_stepping_mode(axis_index));
+        ui->Invert->setChecked(ahp_gt_get_direction_invert(axis_index));
+        ui->TrackRate->setValue(-((double)ahp_gt_get_timing(axis_index)-AHP_GT_ONE_SECOND)*(double)ui->TrackRate->maximum()*10.0/AHP_GT_ONE_SECOND);
+        switch(ahp_gt_get_feature(axis_index))
+        {
+        case GpioUnused:
+            ui->GPIO->setCurrentIndex(0);
+            break;
+        case GpioAsST4:
+            ui->GPIO->setCurrentIndex(1);
+            break;
+        case GpioAsPulseDrive:
+            ui->GPIO->setCurrentIndex(2);
+            break;
+        default:
+            break;
+        }
+        if((mountversion & 0xff) == 0x38) {
+            ui->IntensityLimiter_label->setEnabled(true);
+            ui->IntensityLimiter->setEnabled(true);
+            ui->Intensity->setEnabled(true);
+            ui->IntensityLimiter->setChecked(ahp_gt_is_intensity_limited(axis_index));
+            ui->Intensity->setValue(ahp_gt_get_intensity_limit(axis_index));
+        } else {
+            ui->IntensityLimiter_label->setEnabled(false);
+            ui->IntensityLimiter->setEnabled(false);
+            ui->Intensity->setEnabled(false);
+        }
+        if((mountversion & 0xfff) == 0x538) {
+            ui->GPIO->setEnabled(false);
+            ui->SetAxis_label->setEnabled(true);
+            ui->SetAxis->setEnabled(true);
+        } else {
+            ui->GPIO->setEnabled(true);
+            ui->SetAxis_label->setEnabled(false);
+            ui->SetAxis->setEnabled(false);
+        }
+        ui->SetIndex->setValue(ahp_gt_get_address());
+        ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency(axis_index));
+        ui->MountType->setCurrentIndex(mounttypes.indexOf(ahp_gt_get_mount_type()));
+        ui->HighBauds->setChecked((ahp_gt_get_mount_flags() & bauds_115200) != 0);
+        int index = 0;
+        index |= (((ahp_gt_get_features(axis_index) & isAZEQ) != 0) ? 1 : 0);
+        index |= (((ahp_gt_get_features(0) & isAZEQ) != 0) ? 1 : 0);
+        index |= (((ahp_gt_get_features(1) & isAZEQ) != 0) ? 1 : 0);
+        if(!index && ((mountversion & 0xf0) == 0x70)) {
+            index |= (((ahp_gt_get_mount_flags() & isForkMount) != 0) ? 2 : 0);
+        }
+        ui->MountStyle->setCurrentIndex(index);
+        bool oldstate = false;
+        ///////////
+        oldstate = stop_correction;
+        if(oldstate != ui->FixTracking->isChecked()) {
+            if(!oldstate) {
+                ui->Minus->setEnabled(true);
+                ui->Plus->setEnabled(true);
+                ui->Stop->setEnabled(true);
+            } else if(oldstate){
+                ui->Minus->setEnabled(oldstate);
+                ui->Plus->setEnabled(oldstate);
+                ui->Stop->setEnabled(oldstate);
+            }
+        }
+
+        ///////////
+        if(isConnected)
+        {
+            if(!finished) {
+                ui->Write->setEnabled(false);
+                ui->Connection->setEnabled(false);
+                ui->WorkArea->setEnabled(false);
+                ui->progress->setValue(percent);
+            } else if(oldstate){
+                ui->Write->setEnabled(oldstate);
+                ui->Connection->setEnabled(oldstate);
+                ui->WorkArea->setEnabled(oldstate);
+                ui->progress->setValue(0);
+            }
+        }
+        /////////
+        if(isConnected && finished)
+        {
+            ui->CurrentSteps->setText(QString::number((int)currentSteps));
+            ui->Rate->setText("as/sec: " + QString::number(Speed));
+            double totalsteps = ahp_gt_get_totalsteps(axis_index) * ahp_gt_get_divider(axis_index);
+            double microsteps = ahp_gt_get_multiplier(axis_index);
+            ui->Divider->setValue(ahp_gt_get_divider(axis_index));
+            ui->Multiplier->setValue(microsteps);
+            ui->WormSteps->setValue(ahp_gt_get_wormsteps(axis_index));
+            ui->TotalSteps->setValue(ahp_gt_get_totalsteps(axis_index));
+            if(ahp_gt_get_tracking_mode() == HalfStep)
+                ui->TrackingFrequency->setText("Steps/s: " + QString::number(totalsteps / microsteps / SIDEREAL_DAY));
+            else
+                ui->TrackingFrequency->setText("Steps/s: " + QString::number(totalsteps / SIDEREAL_DAY));
+            ui->SPT->setText("sec/turn: " + QString::number(SIDEREAL_DAY / (ahp_gt_get_crown_teeth(axis_index)*ahp_gt_get_worm_teeth(axis_index) / ahp_gt_get_motor_teeth(axis_index))));
+            double L = (double)ui->Inductance->value() / 1000000.0;
+            double R = (double)ui->Resistance->value() / 1000.0;
+            double I = (double)ui->Current->value() / 1000.0;
+            double V = (double)ui->Voltage->value();
+            double omega_current = fabs(M_PI*2*Speed/360/60/60);
+            double omega_kilo = fabs(M_PI*2*1000/totalsteps/microsteps);
+            double L_current = pow(pow(I, 2) - pow(R, 2) - fabs(omega_current), 0.5) * 512;
+            double L_max = pow(pow(V/R, 2) - pow(R, 2) - omega_kilo, 0.5) * 512;
+            double L_min = pow(pow(I, 2) - pow(R, 2) - omega_kilo, 0.5) * 512;
+            ui->omega->setText("ω: " + QString::number(omega_current));
+            ui->Maxtorque->setText("DC torque: " + QString::number(fmin(I, V/pow(pow(R*0.001953125, 2), 0.5))));
+            ui->Mintorque->setText("Reference torque: " + QString::number(fmin(I, V/pow(pow(L*omega_kilo, 2), 0.5))));
+            ui->Currenttorque->setText("Current torque: " + QString::number(fmin(I, V/pow(pow(L*fmax(0, omega_current-omega_kilo), 2), 0.5))));
+            ui->GotoFrequency->setText("Goto Hz: " + QString::number(ahp_gt_get_totalsteps(axis_index) * ahp_gt_get_divider(axis_index) * ahp_gt_get_max_speed(axis_index) / microsteps / M_PI / 2.0));
+
+            double value = ui->Acceleration->maximum() - ahp_gt_get_acceleration_angle(axis_index) * 1800.0 / M_PI;
+            ui->Acceleration_label->setText("Acceleration: " + QString::number((double)ui->Acceleration->maximum() / 10.0 - value / 10.0) + "°");
+            ui->MaxSpeed_label->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(axis_index) * SIDEREAL_DAY / M_PI / 2) + "x");
+            ui->PWMFreq_label->setText("PWM: " + QString::number(round(366.2109375 * ahp_gt_get_pwm_frequency(axis_index))) + " Hz");
+            ui->TrackRate_label->setText("Track Rate offset: " + QString::number((double)ui->TrackRate->value()/(double)ui->TrackRate->maximum()/10.0) + "%");
+        }
+        disconnectControls(false);
+        parent->unlock();
+    });
     connect(PositionThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * parent)
     {
         int a = axis_index;
@@ -972,6 +1102,7 @@ void MainWindow::Connect(bool clicked)
     int port = 9600;
     QString address = "localhost";
     int failure = 0;
+    isConnected = false;
     ahp_gt_set_axes_limit(NumAxes);
     ahp_gt_select_device(0);
     if(ui->ComPort->currentText().contains(':'))
@@ -1019,142 +1150,4 @@ void MainWindow::Disconnect(bool clicked)
     ahp_gt_disconnect();
     isConnected = false;
     finished = false;
-}
-
-void MainWindow::uiThread(Thread *parent) {
-    disconnectControls(true);
-    ui->MotorSteps->setValue(ahp_gt_get_motor_steps(axis_index));
-    ui->Motor->setValue(ahp_gt_get_motor_teeth(axis_index));
-    ui->Worm->setValue(ahp_gt_get_worm_teeth(axis_index));
-    ui->Crown->setValue(ahp_gt_get_crown_teeth(axis_index));
-    ui->Acceleration->setValue(ui->Acceleration->maximum() - ahp_gt_get_acceleration_angle(axis_index) * 1800.0 / M_PI);
-    double speedlimit = ahp_gt_get_speed_limit(axis_index) * SIDEREAL_DAY / M_PI / 2;
-    ui->Speed->setValue(fmin(speedlimit, fmax(1, 200)));
-    ui->Speed->setRange(1, speedlimit);
-    ui->MaxSpeed->setValue(fmin(speedlimit, fmax(1, ahp_gt_get_max_speed(axis_index) * SIDEREAL_DAY / M_PI / 2)));
-    ui->MaxSpeed->setRange(1, speedlimit);
-    ui->Coil->setCurrentIndex(ahp_gt_get_stepping_conf(axis_index));
-    ui->SteppingMode->setCurrentIndex(ahp_gt_get_stepping_mode(axis_index));
-    ui->Invert->setChecked(ahp_gt_get_direction_invert(axis_index));
-    ui->TrackRate->setValue(-((double)ahp_gt_get_timing(axis_index)-AHP_GT_ONE_SECOND)*(double)ui->TrackRate->maximum()*10.0/AHP_GT_ONE_SECOND);
-    switch(ahp_gt_get_feature(axis_index))
-    {
-    case GpioUnused:
-        ui->GPIO->setCurrentIndex(0);
-        break;
-    case GpioAsST4:
-        ui->GPIO->setCurrentIndex(1);
-        break;
-    case GpioAsPulseDrive:
-        ui->GPIO->setCurrentIndex(2);
-        break;
-    default:
-        break;
-    }
-    if((mountversion & 0xff) == 0x38) {
-        ui->IntensityLimiter_label->setEnabled(true);
-        ui->IntensityLimiter->setEnabled(true);
-        ui->Intensity->setEnabled(true);
-        ui->IntensityLimiter->setChecked(ahp_gt_is_intensity_limited(axis_index));
-        ui->Intensity->setValue(ahp_gt_get_intensity_limit(axis_index));
-    } else {
-        ui->IntensityLimiter_label->setEnabled(false);
-        ui->IntensityLimiter->setEnabled(false);
-        ui->Intensity->setEnabled(false);
-    }
-    if((mountversion & 0xfff) == 0x538) {
-        ui->GPIO->setEnabled(false);
-        ui->SetAxis_label->setEnabled(true);
-        ui->SetAxis->setEnabled(true);
-    } else {
-        ui->GPIO->setEnabled(true);
-        ui->SetAxis_label->setEnabled(false);
-        ui->SetAxis->setEnabled(false);
-    }
-    ui->SetIndex->setValue(ahp_gt_get_address());
-    ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency(axis_index));
-    ui->MountType->setCurrentIndex(mounttypes.indexOf(ahp_gt_get_mount_type()));
-    ui->HighBauds->setChecked((ahp_gt_get_mount_flags() & bauds_115200) != 0);
-    int index = 0;
-    index |= (((ahp_gt_get_features(axis_index) & isAZEQ) != 0) ? 1 : 0);
-    index |= (((ahp_gt_get_features(0) & isAZEQ) != 0) ? 1 : 0);
-    index |= (((ahp_gt_get_features(1) & isAZEQ) != 0) ? 1 : 0);
-    if(!index && ((mountversion & 0xf0) == 0x70)) {
-        index |= (((ahp_gt_get_mount_flags() & isForkMount) != 0) ? 2 : 0);
-    }
-    ui->MountStyle->setCurrentIndex(index);
-    bool oldstate = false;
-    ///////////
-    oldstate = stop_correction;
-    if(oldstate != ui->FixTracking->isChecked()) {
-        if(!oldstate) {
-            ui->Minus->setEnabled(true);
-            ui->Plus->setEnabled(true);
-            ui->Stop->setEnabled(true);
-        } else if(oldstate){
-            ui->Minus->setEnabled(oldstate);
-            ui->Plus->setEnabled(oldstate);
-            ui->Stop->setEnabled(oldstate);
-        }
-    }
-
-    ///////////
-    oldstate = finished;
-    if(oldstate == ui->Write->isEnabled()) {
-        if(!oldstate) {
-            ui->Write->setEnabled(false);
-            ui->Connection->setEnabled(false);
-            ui->WorkArea->setEnabled(false);
-        } else if(oldstate){
-            ui->Write->setEnabled(oldstate);
-            ui->Connection->setEnabled(oldstate);
-            ui->WorkArea->setEnabled(oldstate);
-        }
-    }
-
-    ui->progress->setValue(percent);
-
-    /////////
-    if(isConnected && finished)
-    {
-        ui->CurrentSteps->setText(QString::number((int)currentSteps));
-        ui->Rate->setText("as/sec: " + QString::number(Speed));
-        double totalsteps = ahp_gt_get_totalsteps(axis_index) * ahp_gt_get_divider(axis_index);
-        double microsteps = ahp_gt_get_multiplier(axis_index);
-        ui->Divider->setValue(ahp_gt_get_divider(axis_index));
-        ui->Multiplier->setValue(microsteps);
-        ui->WormSteps->setValue(ahp_gt_get_wormsteps(axis_index));
-        ui->TotalSteps->setValue(ahp_gt_get_totalsteps(axis_index));
-        if(ahp_gt_get_tracking_mode() == HalfStep)
-            ui->TrackingFrequency->setText("Steps/s: " + QString::number(totalsteps / microsteps / SIDEREAL_DAY));
-        else
-            ui->TrackingFrequency->setText("Steps/s: " + QString::number(totalsteps / SIDEREAL_DAY));
-        ui->SPT->setText("sec/turn: " + QString::number(SIDEREAL_DAY / (ahp_gt_get_crown_teeth(axis_index)*ahp_gt_get_worm_teeth(axis_index) / ahp_gt_get_motor_teeth(axis_index))));
-        double L = (double)ui->Inductance->value() / 1000000.0;
-        double R = (double)ui->Resistance->value() / 1000.0;
-        double I = (double)ui->Current->value() / 1000.0;
-        double V = (double)ui->Voltage->value();
-        double omega_current = fabs(M_PI*2*Speed/360/60/60);
-        double omega_kilo = fabs(M_PI*2*1000/totalsteps/microsteps);
-        double L_current = pow(pow(I, 2) - pow(R, 2) - fabs(omega_current), 0.5) * 512;
-        double L_max = pow(pow(V/R, 2) - pow(R, 2) - omega_kilo, 0.5) * 512;
-        double L_min = pow(pow(I, 2) - pow(R, 2) - omega_kilo, 0.5) * 512;
-        ui->omega->setText("ω: " + QString::number(omega_current));
-        ui->Maxtorque->setText("DC torque: " + QString::number(fmin(I, V/pow(pow(R*0.001953125, 2), 0.5))));
-        ui->Mintorque->setText("Reference torque: " + QString::number(fmin(I, V/pow(pow(L*omega_kilo, 2), 0.5))));
-        ui->Currenttorque->setText("Current torque: " + QString::number(fmin(I, V/pow(pow(L*fmax(0, omega_current-omega_kilo), 2), 0.5))));
-        ui->GotoFrequency->setText("Goto Hz: " + QString::number(ahp_gt_get_totalsteps(axis_index) * ahp_gt_get_divider(axis_index) * ahp_gt_get_max_speed(axis_index) / microsteps / M_PI / 2.0));
-
-        double value = ui->Acceleration->maximum() - ahp_gt_get_acceleration_angle(axis_index) * 1800.0 / M_PI;
-        ui->Acceleration_label->setText("Acceleration: " + QString::number((double)ui->Acceleration->maximum() / 10.0 - value / 10.0) + "°");
-        ui->Acceleration->setValue(value);
-        ui->MaxSpeed_label->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(axis_index) * SIDEREAL_DAY / M_PI / 2) + "x");
-        ui->MaxSpeed->setRange(1, ahp_gt_get_speed_limit(axis_index) * SIDEREAL_DAY / M_PI / 2);
-        ui->MaxSpeed->setValue(ahp_gt_get_max_speed(axis_index) * SIDEREAL_DAY / M_PI / 2);
-        ui->PWMFreq_label->setText("PWM: " + QString::number(round(366.2109375 * ahp_gt_get_pwm_frequency(axis_index))) + " Hz");
-        ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency(axis_index));
-        ui->TrackRate_label->setText("Track Rate offset: " + QString::number((double)ui->TrackRate->value()/(double)ui->TrackRate->maximum()/10.0) + "%");
-    }
-    disconnectControls(false);
-    parent->unlock();
 }
