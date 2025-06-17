@@ -55,7 +55,7 @@ class MainWindow : public QMainWindow
         SkywatcherAxisStatus status;
         double lastPollTime;
         double lastSteps;
-        double lastSpeeds[60] { { 0 } };
+        double lastSpeeds[60] { 0 };
         bool oldTracking { false };
         bool isTracking { false };
         int axisstatus;
