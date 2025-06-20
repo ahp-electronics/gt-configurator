@@ -10,11 +10,6 @@
     <height>661</height>
    </rect>
   </property>
-  <property name="styleSheet">
-   <string notr="true">font: 63 9pt &quot;FreeSans&quot;;
-color: rgb(61, 56, 70);
-background-color: rgb(219,218,223);</string>
-  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
     <string notr="true"/>
@@ -46,9 +41,9 @@ background-color: rgb(219,218,223);</string>
      <widget class="QSpinBox" name="Resistance">
       <property name="geometry">
        <rect>
-        <x>100</x>
+        <x>120</x>
         <y>110</y>
-        <width>81</width>
+        <width>61</width>
         <height>21</height>
        </rect>
       </property>
@@ -59,7 +54,7 @@ background-color: rgb(219,218,223);</string>
        <number>1000000</number>
       </property>
       <property name="value">
-       <number>20000</number>
+       <number>1200</number>
       </property>
      </widget>
      <widget class="QLabel" name="label_19">
@@ -104,15 +99,15 @@ background-color: rgb(219,218,223);</string>
        <number>1000000</number>
       </property>
       <property name="value">
-       <number>1000</number>
+       <number>3400</number>
       </property>
      </widget>
      <widget class="QSpinBox" name="Current">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>120</x>
         <y>150</y>
-        <width>51</width>
+        <width>61</width>
         <height>21</height>
        </rect>
       </property>
@@ -123,7 +118,7 @@ background-color: rgb(219,218,223);</string>
        <number>100000</number>
       </property>
       <property name="value">
-       <number>700</number>
+       <number>15000</number>
       </property>
      </widget>
      <widget class="QLabel" name="label_21">
@@ -142,9 +137,9 @@ background-color: rgb(219,218,223);</string>
      <widget class="QSpinBox" name="Voltage">
       <property name="geometry">
        <rect>
-        <x>140</x>
+        <x>120</x>
         <y>170</y>
-        <width>41</width>
+        <width>61</width>
         <height>21</height>
        </rect>
       </property>
@@ -163,12 +158,12 @@ background-color: rgb(219,218,223);</string>
        <rect>
         <x>190</x>
         <y>110</y>
-        <width>121</width>
+        <width>171</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>GotoFrequency</string>
+       <string>Goto Hz: </string>
       </property>
      </widget>
      <widget class="QLabel" name="SPT">
@@ -176,12 +171,12 @@ background-color: rgb(219,218,223);</string>
        <rect>
         <x>190</x>
         <y>130</y>
-        <width>121</width>
+        <width>171</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>SPT</string>
+       <string>sec/turn: </string>
       </property>
      </widget>
      <widget class="QLabel" name="label_32">
@@ -254,12 +249,12 @@ background-color: rgb(219,218,223);</string>
        <rect>
         <x>190</x>
         <y>50</y>
-        <width>121</width>
+        <width>171</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>Maxtorque</string>
+       <string>DC torque: </string>
       </property>
      </widget>
      <widget class="QLabel" name="Currenttorque">
@@ -267,12 +262,12 @@ background-color: rgb(219,218,223);</string>
        <rect>
         <x>190</x>
         <y>90</y>
-        <width>121</width>
+        <width>171</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>Currenttorque</string>
+       <string>Current torque:</string>
       </property>
      </widget>
      <widget class="QLabel" name="Rate">
@@ -357,12 +352,12 @@ background-color: rgb(219,218,223);</string>
        <rect>
         <x>190</x>
         <y>70</y>
-        <width>121</width>
+        <width>171</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>Mintorque</string>
+       <string>Reference torque:</string>
       </property>
      </widget>
      <widget class="QLabel" name="TrackingFrequency">
@@ -370,12 +365,12 @@ background-color: rgb(219,218,223);</string>
        <rect>
         <x>190</x>
         <y>150</y>
-        <width>121</width>
+        <width>171</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>TrackingFrequency</string>
+       <string>Steps/s:</string>
       </property>
      </widget>
      <widget class="QLabel" name="omega">
@@ -383,12 +378,12 @@ background-color: rgb(219,218,223);</string>
        <rect>
         <x>190</x>
         <y>170</y>
-        <width>121</width>
+        <width>171</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>ω:</string>
+       <string>ω: </string>
       </property>
      </widget>
     </widget>
@@ -650,17 +645,23 @@ background-color: rgb(219,218,223);</string>
         <height>21</height>
        </rect>
       </property>
+      <property name="minimum">
+       <number>0</number>
+      </property>
       <property name="maximum">
        <number>100</number>
       </property>
       <property name="singleStep">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="value">
-       <number>100</number>
+       <number>0</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="invertedAppearance">
+       <bool>false</bool>
       </property>
       <property name="tickPosition">
        <enum>QSlider::NoTicks</enum>
@@ -787,31 +788,6 @@ background-color: rgb(219,218,223);</string>
        <string>Track Rate offset</string>
       </property>
      </widget>
-     <widget class="QSlider" name="PWMFreq">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>390</y>
-        <width>201</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>5</number>
-      </property>
-      <property name="maximum">
-       <number>15</number>
-      </property>
-      <property name="singleStep">
-       <number>1</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::NoTicks</enum>
-      </property>
-     </widget>
      <widget class="QLabel" name="PWMFreq_label">
       <property name="geometry">
        <rect>
@@ -883,6 +859,34 @@ background-color: rgb(219,218,223);</string>
       </property>
       <property name="text">
        <string>Current offset: 0</string>
+      </property>
+     </widget>
+     <widget class="QSlider" name="PWMFreq">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>390</y>
+        <width>211</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>0</number>
+      </property>
+      <property name="maximum">
+       <number>15</number>
+      </property>
+      <property name="value">
+       <number>5</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::NoTicks</enum>
+      </property>
+      <property name="tickInterval">
+       <number>50</number>
       </property>
      </widget>
     </widget>

@@ -80,8 +80,13 @@ class MainWindow : public QMainWindow
         void disconnectControls(bool block);
         void disconnectDecControls(bool block);
         void ReadValues();
+        void UiThread();
         Ui::MainWindow *ui;
         static void WriteValues(MainWindow *wnd);
         QMutex mutex;
+
+signals:
+        void update_ui();
+        void reload_values();
 };
 #endif // MAINWINDOW_H
