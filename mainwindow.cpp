@@ -292,6 +292,7 @@ MainWindow::MainWindow(QWidget *parent)
     ahp_set_app_name((char*)"GT Configurator");
     ahp_set_debug_level(AHP_DEBUG_DEBUG);
     UIThread = new Thread(this, 100, 50);
+    ProgressThread = new Thread(this, 100, 150);
     PositionThread = new Thread(this, 1000, POSITION_THREAD_LOOP);
     ServerThread = new Thread(this);
     setAccessibleName("GT Configurator");
@@ -731,25 +732,19 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ]()
     {
         isTracking = false;
-        double lowspeed_treshold = 128.0;
-        double rate = ui->Speed->value();
-        ahp_gt_stop_motion(axis_index, axisdirection != true || axis_lospeed != (fabs(rate) < lowspeed_treshold));
-        ahp_gt_start_motion(axis_index, rate);
-        PositionThread->setLoop(abs(POSITION_THREAD_LOOP/rate)+10);
+        ahp_gt_stop_motion(axis_index, axisdirection != true || axis_lospeed != (fabs(ui->Speed->value()) < 128.0));
+        ahp_gt_start_motion(axis_index, ui->Speed->value());
         axisdirection = true;
-        axis_lospeed = (fabs(rate) < lowspeed_treshold);
+        axis_lospeed = (fabs(ui->Speed->value()) < 128.0);
     });
     connect(ui->Minus, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
     {
         isTracking = false;
-        double lowspeed_treshold = 128.0;
-        double rate = ui->Speed->value();
-        ahp_gt_stop_motion(axis_index, axisdirection != false || axis_lospeed != (fabs(rate) < lowspeed_treshold));
-        ahp_gt_start_motion(axis_index, -rate);
-        PositionThread->setLoop(abs(POSITION_THREAD_LOOP/rate)+10);
-        axisdirection = false;
-        axis_lospeed = (fabs(rate) < lowspeed_treshold);
+        ahp_gt_stop_motion(axis_index, axisdirection != true || axis_lospeed != (fabs(ui->Speed->value()) < 128.0));
+        ahp_gt_start_motion(axis_index, -ui->Speed->value());
+        axisdirection = true;
+        axis_lospeed = (fabs(ui->Speed->value()) < 128.0);
     });
     connect(ui->Stop, static_cast<void (QPushButton::*)()>(&QPushButton::pressed),
             [ = ]()
@@ -857,8 +852,13 @@ MainWindow::MainWindow(QWidget *parent)
             threadsStopped = true;
         }
     });
+    connect(ProgressThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * parent)
+    {
+        ui->progress->setValue(fmax(ui->progress->minimum(), fmin(ui->progress->maximum(), percent)));
+        parent->unlock();
+    });
     connect(this, static_cast<void (MainWindow::*)()>(&MainWindow::reload_values), this, &MainWindow::ReadValues);
-    //connect(UIThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ](Thread *parent) { emit update_ui(); parent->unlock(); });
+    connect(UIThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ](Thread *parent) { emit update_ui(); parent->unlock(); });
     connect(this, static_cast<void (MainWindow::*)()>(&MainWindow::update_ui), this, &MainWindow::UiThread);
     connect(PositionThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * parent)
     {
@@ -905,10 +905,10 @@ MainWindow::MainWindow(QWidget *parent)
                 oldTracking = oldtracking;
             }
         }
-        emit update_ui();
         parent->unlock();
     });
     PositionThread->start();
+    ProgressThread->start();
 }
 
 MainWindow::~MainWindow()
@@ -916,9 +916,11 @@ MainWindow::~MainWindow()
     if(isConnected)
         ui->Disconnect->click();
     PositionThread->stop();
+    ProgressThread->stop();
     UIThread->stop();
     ServerThread->stop();
     PositionThread->wait();
+    ProgressThread->stop();
     UIThread->wait();
     ServerThread->wait();
     if(QFile(firmwareFilename).exists())
@@ -1040,12 +1042,10 @@ void MainWindow::UiThread() {
             ui->Write->setEnabled(false);
             ui->Connection->setEnabled(false);
             ui->WorkArea->setEnabled(false);
-            ui->progress->setValue(percent);
         } else if(oldstate){
             ui->Write->setEnabled(oldstate);
             ui->Connection->setEnabled(oldstate);
             ui->WorkArea->setEnabled(oldstate);
-            ui->progress->setValue(0);
         }
     }
     /////////

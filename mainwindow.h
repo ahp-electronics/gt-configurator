@@ -63,6 +63,7 @@ class MainWindow : public QMainWindow
         bool correcting_tracking { false };
         int stop_correction { true };
         Thread *PositionThread;
+        Thread *ProgressThread;
         Thread *UIThread;
         Thread *ServerThread;
         QSettings * settings;
