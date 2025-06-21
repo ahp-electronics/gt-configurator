@@ -291,7 +291,6 @@ MainWindow::MainWindow(QWidget *parent)
     ahp_set_app_name((char*)"GT Configurator");
     ahp_set_debug_level(AHP_DEBUG_DEBUG);
     UIThread = new Thread(this, 100, 50);
-    ProgressThread = new Thread(this, 100, 150);
     PositionThread = new Thread(this, 1000, POSITION_THREAD_LOOP);
     ServerThread = new Thread(this);
     setAccessibleName("GT Configurator");
@@ -854,11 +853,6 @@ MainWindow::MainWindow(QWidget *parent)
             threadsStopped = true;
         }
     });
-    connect(ProgressThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * parent)
-    {
-        ui->progress->setValue(fmax(ui->progress->minimum(), fmin(ui->progress->maximum(), percent)));
-        parent->unlock();
-    });
     connect(this, static_cast<void (MainWindow::*)()>(&MainWindow::reload_values), this, &MainWindow::ReadValues);
     connect(UIThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ](Thread *parent) { emit update_ui(); parent->unlock(); });
     connect(this, static_cast<void (MainWindow::*)()>(&MainWindow::update_ui), this, &MainWindow::UiThread);
@@ -910,7 +904,6 @@ MainWindow::MainWindow(QWidget *parent)
         parent->unlock();
     });
     PositionThread->start();
-    ProgressThread->start();
 }
 
 MainWindow::~MainWindow()
@@ -918,11 +911,9 @@ MainWindow::~MainWindow()
     if(isConnected)
         ui->Disconnect->click();
     PositionThread->stop();
-    ProgressThread->stop();
     UIThread->stop();
     ServerThread->stop();
     PositionThread->wait();
-    ProgressThread->stop();
     UIThread->wait();
     ServerThread->wait();
     if(QFile(firmwareFilename).exists())
@@ -1024,31 +1015,28 @@ void MainWindow::UiThread() {
     ///////////
     bool oldstate = false;
     oldstate = stop_correction;
-    if(oldstate != ui->FixTracking->isChecked()) {
-        if(!oldstate) {
-            ui->Minus->setEnabled(true);
-            ui->Plus->setEnabled(true);
-            ui->Stop->setEnabled(true);
-        } else if(oldstate){
-            ui->Minus->setEnabled(oldstate);
-            ui->Plus->setEnabled(oldstate);
-            ui->Stop->setEnabled(oldstate);
-        }
+    if(!oldstate) {
+        ui->Minus->setEnabled(true);
+        ui->Plus->setEnabled(true);
+        ui->Stop->setEnabled(true);
+    } else if(oldstate){
+        ui->Minus->setEnabled(oldstate);
+        ui->Plus->setEnabled(oldstate);
+        ui->Stop->setEnabled(oldstate);
     }
 
     ///////////
     oldstate = finished;
-    if(isConnected)
-    {
-        if(!oldstate) {
-            ui->Write->setEnabled(false);
-            ui->Connection->setEnabled(false);
-            ui->WorkArea->setEnabled(false);
-        } else if(oldstate){
-            ui->Write->setEnabled(oldstate);
-            ui->Connection->setEnabled(oldstate);
-            ui->WorkArea->setEnabled(oldstate);
-        }
+    if(!oldstate) {
+        ui->Write->setEnabled(false);
+        ui->Connection->setEnabled(false);
+        ui->WorkArea->setEnabled(false);
+        ui->progress->setValue(fmax(ui->progress->minimum(), fmin(ui->progress->maximum(), percent)));
+    } else if(oldstate){
+        ui->Write->setEnabled(oldstate);
+        ui->Connection->setEnabled(oldstate);
+        ui->WorkArea->setEnabled(oldstate);
+        ui->progress->setValue(0);
     }
     ///////////
     if(isConnected && finished)
