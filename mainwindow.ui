@@ -1220,10 +1220,10 @@
      <widget class="QSlider" name="Speed">
       <property name="geometry">
        <rect>
-        <x>60</x>
+        <x>90</x>
         <y>230</y>
-        <width>171</width>
-        <height>16</height>
+        <width>141</width>
+        <height>20</height>
        </rect>
       </property>
       <property name="minimum">
