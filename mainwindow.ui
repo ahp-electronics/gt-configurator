@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1100</width>
-    <height>738</height>
+    <height>688</height>
    </rect>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -1536,7 +1536,7 @@
        <number>16777215</number>
       </property>
       <property name="value">
-       <number>50</number>
+       <number>1</number>
       </property>
      </widget>
      <widget class="QSpinBox" name="Crown_0">
@@ -1694,7 +1694,7 @@
        <number>16777215</number>
       </property>
       <property name="value">
-       <number>10</number>
+       <number>1</number>
       </property>
      </widget>
      <widget class="QLabel" name="label_15">
@@ -1843,19 +1843,6 @@
        <string>Stepping mode</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="HalfCurrent_0">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>270</y>
-        <width>101</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Half-current</string>
-      </property>
-     </widget>
      <widget class="QSlider" name="TrackRate_0">
       <property name="geometry">
        <rect>
@@ -1956,19 +1943,6 @@
       </property>
       <property name="text">
        <string>PWM: 0 Hz</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="HalfCurrent">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>420</y>
-        <width>111</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Low current</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="TorqueOffsetEnable">
@@ -2082,7 +2056,7 @@
        <number>16777215</number>
       </property>
       <property name="value">
-       <number>50</number>
+       <number>1</number>
       </property>
      </widget>
      <widget class="QSpinBox" name="Crown_1">
@@ -2240,7 +2214,7 @@
        <number>16777215</number>
       </property>
       <property name="value">
-       <number>10</number>
+       <number>1</number>
       </property>
      </widget>
      <widget class="QLabel" name="label_16">
@@ -2387,19 +2361,6 @@
       </property>
       <property name="text">
        <string>Stepping mode</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="HalfCurrent_1">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>270</y>
-        <width>101</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Half-current</string>
       </property>
      </widget>
      <widget class="QLabel" name="TrackRate_label_1">
@@ -2886,17 +2847,6 @@
     </widget>
    </widget>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1100</width>
-     <height>22</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen_FW">
    <property name="text">
     <string>Open FW...</string>

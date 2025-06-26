@@ -65,7 +65,6 @@ class MainWindow : public QMainWindow
         double lastSpeeds[2][60] { { 0 }, { 0 }};
         Thread *RaThread;
         Thread *DecThread;
-        Thread *IndicationThread;
         Thread *ProgressThread;
         Thread *WriteThread;
         Thread *ServerThread;
@@ -87,10 +86,13 @@ class MainWindow : public QMainWindow
         bool DownloadFirmware(QString url, QString jsonfile, QString filename, QSettings *settings, int timeout_ms = 30000);
         void disconnectControls(bool block);
         void UpdateValues(int axis);
+        void ResetValues(int axis);
         Ui::MainWindow *ui;
         bool oldTracking[2] { false, false };
         bool isTracking[2] { false, false };
         static void WriteValues(MainWindow *wnd);
         QMutex RAmutex, DEmutex;
+signals:
+        void read_values(int axis);
 };
 #endif // MAINWINDOW_H
