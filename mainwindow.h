@@ -32,12 +32,19 @@ class MainWindow : public QMainWindow
         {
             return ini;
         }
+        void lockRA()
+        {
+            while(!RAmutex.tryLock());
+        }
+        void unlockRA()
+        {
+            RAmutex.unlock();
+        }
 
     private:
-        void Connect(bool clicked = false);
-        void Disconnect(bool clicked = false);
-        int mountversion;
+
         int num_axes;
+        int *axis_version;
         int axis_index { 0 };
         double Altitude, Latitude, Longitude, Elevation;
         double Ra {0.0};
@@ -48,22 +55,19 @@ class MainWindow : public QMainWindow
         QString toDMS(double dms);
         double fromHMSorDMS(QString dms);
 
-        bool axis_lospeed { false };
-        bool axisdirection { false };
-        double Speed;
-        double currentSteps;
-        SkywatcherAxisStatus status;
-        double lastPollTime;
-        double lastSteps;
-        double lastSpeeds[60] { 0 };
-        bool oldTracking { false };
-        bool isTracking { false };
-        int axisstatus;
-        int motionmode;
-        bool correcting_tracking { false };
-        int stop_correction { true };
-        Thread *PositionThread;
-        Thread *UIThread;
+        bool axis_lospeed[2] { false, false };
+        bool axisdirection[2] { false, false };
+        double Speed[2];
+        double currentSteps[2];
+        SkywatcherAxisStatus status[2];
+        double lastPollTime[2];
+        double lastSteps[2];
+        double lastSpeeds[2][60] { { 0 }, { 0 }};
+        Thread *RaThread;
+        Thread *DecThread;
+        Thread *IndicationThread;
+        Thread *ProgressThread;
+        Thread *WriteThread;
         Thread *ServerThread;
         QSettings * settings;
         QString ini;
@@ -73,20 +77,20 @@ class MainWindow : public QMainWindow
         int finished { 1 };
         int threadsStopped;
         bool isConnected;
+        int axisstatus[2];
+        int motionmode[2];
+        bool correcting_tracking[2] { false, false };
+        int stop_correction[2] { true, true };
         bool initial;
         int timer { 1000 };
         QStringList CheckFirmware(QString url, int timeout_ms = 30000);
         bool DownloadFirmware(QString url, QString jsonfile, QString filename, QSettings *settings, int timeout_ms = 30000);
         void disconnectControls(bool block);
-        void disconnectDecControls(bool block);
-        void ReadValues();
-        void UiThread();
+        void UpdateValues(int axis);
         Ui::MainWindow *ui;
+        bool oldTracking[2] { false, false };
+        bool isTracking[2] { false, false };
         static void WriteValues(MainWindow *wnd);
-        QMutex mutex;
-
-signals:
-        void update_ui();
-        void reload_values();
+        QMutex RAmutex, DEmutex;
 };
 #endif // MAINWINDOW_H
