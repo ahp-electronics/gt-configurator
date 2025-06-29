@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1100</width>
-    <height>657</height>
+    <width>600</width>
+    <height>641</height>
    </rect>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -19,8 +19,8 @@
      <rect>
       <x>10</x>
       <y>80</y>
-      <width>1081</width>
-      <height>451</height>
+      <width>581</width>
+      <height>491</height>
      </rect>
     </property>
     <property name="contextMenuPolicy">
@@ -38,87 +38,61 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>490</x>
+       <x>250</x>
        <y>30</y>
-       <width>251</width>
-       <height>411</height>
+       <width>221</width>
+       <height>121</height>
       </rect>
      </property>
      <property name="title">
       <string>Control</string>
      </property>
-     <widget class="QPushButton" name="N">
+     <widget class="QPushButton" name="Minus">
       <property name="geometry">
        <rect>
-        <x>90</x>
+        <x>10</x>
         <y>30</y>
         <width>61</width>
-        <height>61</height>
+        <height>31</height>
        </rect>
       </property>
       <property name="text">
-       <string>N</string>
+       <string>-</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="W">
+     <widget class="QPushButton" name="Plus">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>100</y>
+        <x>150</x>
+        <y>30</y>
         <width>61</width>
-        <height>61</height>
+        <height>31</height>
        </rect>
       </property>
       <property name="text">
-       <string>W</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="E">
-      <property name="geometry">
-       <rect>
-        <x>160</x>
-        <y>100</y>
-        <width>61</width>
-        <height>61</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>E</string>
+       <string>+</string>
       </property>
      </widget>
      <widget class="QPushButton" name="Stop">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>100</y>
+        <x>80</x>
+        <y>30</y>
         <width>61</width>
-        <height>61</height>
+        <height>31</height>
        </rect>
       </property>
       <property name="text">
        <string>STOP</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="S">
+     <widget class="QSlider" name="Speed">
       <property name="geometry">
        <rect>
         <x>90</x>
-        <y>170</y>
-        <width>61</width>
-        <height>61</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>S</string>
-      </property>
-     </widget>
-     <widget class="QSlider" name="Ra_Speed">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>370</y>
-        <width>141</width>
-        <height>16</height>
+        <y>95</y>
+        <width>111</width>
+        <height>21</height>
        </rect>
       </property>
       <property name="minimum">
@@ -140,78 +114,24 @@
        <number>50</number>
       </property>
      </widget>
-     <widget class="QLabel" name="Ra_Speed_label">
+     <widget class="QLabel" name="Speed_label">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>370</y>
+        <y>95</y>
         <width>81</width>
-        <height>16</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>Ra Speed</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="Dec_Speed_label">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>390</y>
-        <width>81</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Dec Speed</string>
-      </property>
-     </widget>
-     <widget class="QSlider" name="Dec_Speed">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>390</y>
-        <width>141</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>1000</number>
-      </property>
-      <property name="value">
-       <number>200</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::NoTicks</enum>
-      </property>
-      <property name="tickInterval">
-       <number>50</number>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="Tracking">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>350</y>
-        <width>71</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Track</string>
+       <string>Speed</string>
       </property>
      </widget>
      <widget class="QPushButton" name="Goto">
       <property name="geometry">
        <rect>
-        <x>160</x>
-        <y>326</y>
+        <x>150</x>
+        <y>70</y>
         <width>61</width>
         <height>20</height>
        </rect>
@@ -220,11 +140,11 @@
        <string>Goto</string>
       </property>
      </widget>
-     <widget class="QSpinBox" name="Ra_0">
+     <widget class="QSpinBox" name="Target">
       <property name="geometry">
        <rect>
         <x>90</x>
-        <y>240</y>
+        <y>70</y>
         <width>51</width>
         <height>21</height>
        </rect>
@@ -239,356 +159,17 @@
        <number>0</number>
       </property>
      </widget>
-     <widget class="QSpinBox" name="Dec_0">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>260</y>
-        <width>51</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>-16777216</number>
-      </property>
-      <property name="maximum">
-       <number>16777216</number>
-      </property>
-      <property name="value">
-       <number>0</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="Ra_Speed_label_2">
+     <widget class="QLabel" name="Speed_label_1">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>240</y>
+        <y>70</y>
         <width>71</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>Ra Target</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="Ra_Speed_label_3">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>260</y>
-        <width>71</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>De Target</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="TuneRa">
-      <property name="geometry">
-       <rect>
-        <x>170</x>
-        <y>350</y>
-        <width>71</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Fix RA</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="SE">
-      <property name="geometry">
-       <rect>
-        <x>160</x>
-        <y>170</y>
-        <width>61</width>
-        <height>61</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>SE</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="NE">
-      <property name="geometry">
-       <rect>
-        <x>160</x>
-        <y>30</y>
-        <width>61</width>
-        <height>61</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>NE</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="NW">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>30</y>
-        <width>61</width>
-        <height>61</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>NW</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="SW">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>170</y>
-        <width>61</width>
-        <height>61</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>SW</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="TuneDec">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>350</y>
-        <width>71</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Fix Dec</string>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Ra_1">
-      <property name="geometry">
-       <rect>
-        <x>140</x>
-        <y>240</y>
-        <width>41</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>-16777216</number>
-      </property>
-      <property name="maximum">
-       <number>16777216</number>
-      </property>
-      <property name="value">
-       <number>0</number>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Ra_2">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>240</y>
-        <width>41</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>-16777216</number>
-      </property>
-      <property name="maximum">
-       <number>16777216</number>
-      </property>
-      <property name="value">
-       <number>0</number>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Dec_1">
-      <property name="geometry">
-       <rect>
-        <x>140</x>
-        <y>260</y>
-        <width>41</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>-16777216</number>
-      </property>
-      <property name="maximum">
-       <number>16777216</number>
-      </property>
-      <property name="value">
-       <number>0</number>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Dec_2">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>260</y>
-        <width>41</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>-16777216</number>
-      </property>
-      <property name="maximum">
-       <number>16777216</number>
-      </property>
-      <property name="value">
-       <number>0</number>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="Halt">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>326</y>
-        <width>61</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Halt</string>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Lat_1">
-      <property name="geometry">
-       <rect>
-        <x>140</x>
-        <y>280</y>
-        <width>41</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>-16777216</number>
-      </property>
-      <property name="maximum">
-       <number>16777216</number>
-      </property>
-      <property name="value">
-       <number>0</number>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Lon_0">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>300</y>
-        <width>51</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>-16777216</number>
-      </property>
-      <property name="maximum">
-       <number>16777216</number>
-      </property>
-      <property name="value">
-       <number>0</number>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Lon_2">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>300</y>
-        <width>41</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>-16777216</number>
-      </property>
-      <property name="maximum">
-       <number>16777216</number>
-      </property>
-      <property name="value">
-       <number>0</number>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Lat_0">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>280</y>
-        <width>51</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>-16777216</number>
-      </property>
-      <property name="maximum">
-       <number>16777216</number>
-      </property>
-      <property name="value">
-       <number>0</number>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Lon_1">
-      <property name="geometry">
-       <rect>
-        <x>140</x>
-        <y>300</y>
-        <width>41</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>-16777216</number>
-      </property>
-      <property name="maximum">
-       <number>16777216</number>
-      </property>
-      <property name="value">
-       <number>0</number>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Lat_2">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>280</y>
-        <width>41</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>-16777216</number>
-      </property>
-      <property name="maximum">
-       <number>16777216</number>
-      </property>
-      <property name="value">
-       <number>0</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="Ra_Speed_label_4">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>280</y>
-        <width>71</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Latitude</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="Ra_Speed_label_5">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>300</y>
-        <width>71</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Longitude</string>
+       <string>Target</string>
       </property>
      </widget>
     </widget>
@@ -599,8 +180,8 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>360</y>
-       <width>471</width>
+       <y>390</y>
+       <width>561</width>
        <height>81</height>
       </rect>
      </property>
@@ -693,8 +274,8 @@
      <widget class="QLabel" name="PWMFreq_label">
       <property name="geometry">
        <rect>
-        <x>270</x>
-        <y>46</y>
+        <x>260</x>
+        <y>30</y>
         <width>171</width>
         <height>20</height>
        </rect>
@@ -706,9 +287,9 @@
      <widget class="QSlider" name="PWMFreq">
       <property name="geometry">
        <rect>
-        <x>270</x>
-        <y>60</y>
-        <width>171</width>
+        <x>260</x>
+        <y>50</y>
+        <width>151</width>
         <height>21</height>
        </rect>
       </property>
@@ -785,24 +366,11 @@
        <string>Bus Address:</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="Server">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>30</y>
-        <width>101</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Start server</string>
-      </property>
-     </widget>
      <widget class="QCheckBox" name="HighBauds">
       <property name="geometry">
        <rect>
-        <x>200</x>
-        <y>30</y>
+        <x>430</x>
+        <y>50</y>
         <width>121</width>
         <height>16</height>
        </rect>
@@ -811,23 +379,59 @@
        <string>115200 Bauds</string>
       </property>
      </widget>
+     <widget class="QCheckBox" name="Tune">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>30</y>
+        <width>121</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Fix Tracking</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_13">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>20</y>
+        <width>41</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Axis</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="Axis">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>26</y>
+        <width>86</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
-    <widget class="QGroupBox" name="AdvancedRA">
+    <widget class="QGroupBox" name="Advanced">
      <property name="enabled">
       <bool>false</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>750</x>
-       <y>30</y>
+       <x>250</x>
+       <y>150</y>
        <width>321</width>
-       <height>201</height>
+       <height>231</height>
       </rect>
      </property>
      <property name="title">
-      <string>Advanced RA</string>
+      <string>Advanced</string>
      </property>
-     <widget class="QLineEdit" name="TotalSteps0">
+     <widget class="QLineEdit" name="TotalSteps">
       <property name="geometry">
        <rect>
         <x>100</x>
@@ -840,7 +444,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLineEdit" name="WormSteps0">
+     <widget class="QLineEdit" name="WormSteps">
       <property name="geometry">
        <rect>
         <x>100</x>
@@ -853,7 +457,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QSpinBox" name="Resistance_0">
+     <widget class="QSpinBox" name="Resistance">
       <property name="geometry">
        <rect>
         <x>100</x>
@@ -898,7 +502,7 @@
        <string>Coil (µH)</string>
       </property>
      </widget>
-     <widget class="QSpinBox" name="Inductance_0">
+     <widget class="QSpinBox" name="Inductance">
       <property name="geometry">
        <rect>
         <x>100</x>
@@ -917,7 +521,7 @@
        <number>1000</number>
       </property>
      </widget>
-     <widget class="QSpinBox" name="Current_0">
+     <widget class="QSpinBox" name="Current">
       <property name="geometry">
        <rect>
         <x>100</x>
@@ -949,7 +553,7 @@
        <string>Supply (mA)</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="Multiplier0">
+     <widget class="QLineEdit" name="Multiplier">
       <property name="geometry">
        <rect>
         <x>100</x>
@@ -962,7 +566,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLineEdit" name="Divider0">
+     <widget class="QLineEdit" name="Divider">
       <property name="geometry">
        <rect>
         <x>100</x>
@@ -975,7 +579,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QSpinBox" name="Voltage_0">
+     <widget class="QSpinBox" name="Voltage">
       <property name="geometry">
        <rect>
         <x>100</x>
@@ -994,7 +598,7 @@
        <number>12</number>
       </property>
      </widget>
-     <widget class="QLabel" name="TrackingFrequency_0">
+     <widget class="QLabel" name="TrackingFrequency">
       <property name="geometry">
        <rect>
         <x>190</x>
@@ -1007,7 +611,7 @@
        <string>Steps/s:</string>
       </property>
      </widget>
-     <widget class="QLabel" name="SPT_0">
+     <widget class="QLabel" name="SPT">
       <property name="geometry">
        <rect>
         <x>190</x>
@@ -1085,7 +689,7 @@
        <string>Divider</string>
       </property>
      </widget>
-     <widget class="QLabel" name="PWMFrequency_0">
+     <widget class="QLabel" name="PWMFrequency">
       <property name="geometry">
        <rect>
         <x>190</x>
@@ -1098,7 +702,7 @@
        <string>PWM Hz:</string>
       </property>
      </widget>
-     <widget class="QLabel" name="GotoFrequency_0">
+     <widget class="QLabel" name="GotoFrequency">
       <property name="geometry">
        <rect>
         <x>190</x>
@@ -1111,11 +715,11 @@
        <string>Goto Hz:</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="CurrentSteps_0">
+     <widget class="QLineEdit" name="CurrentSteps">
       <property name="geometry">
        <rect>
-        <x>230</x>
-        <y>110</y>
+        <x>100</x>
+        <y>190</y>
         <width>81</width>
         <height>20</height>
        </rect>
@@ -1124,11 +728,11 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLabel" name="Rate_0">
+     <widget class="QLabel" name="Rate">
       <property name="geometry">
        <rect>
         <x>190</x>
-        <y>130</y>
+        <y>110</y>
         <width>121</width>
         <height>21</height>
        </rect>
@@ -1137,11 +741,11 @@
        <string>as/sec:</string>
       </property>
      </widget>
-     <widget class="QLabel" name="CurrentStepsLabel_0">
+     <widget class="QLabel" name="CurrentStepsLabel">
       <property name="geometry">
        <rect>
-        <x>190</x>
-        <y>110</y>
+        <x>10</x>
+        <y>190</y>
         <width>41</width>
         <height>21</height>
        </rect>
@@ -1150,11 +754,11 @@
        <string>Pos:</string>
       </property>
      </widget>
-     <widget class="QSpinBox" name="Mean_0">
+     <widget class="QSpinBox" name="Mean">
       <property name="geometry">
        <rect>
         <x>260</x>
-        <y>150</y>
+        <y>130</y>
         <width>51</width>
         <height>21</height>
        </rect>
@@ -1173,7 +777,7 @@
       <property name="geometry">
        <rect>
         <x>190</x>
-        <y>150</y>
+        <y>130</y>
         <width>61</width>
         <height>21</height>
        </rect>
@@ -1183,378 +787,7 @@
       </property>
      </widget>
     </widget>
-    <widget class="QGroupBox" name="AdvancedDec">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>750</x>
-       <y>240</y>
-       <width>321</width>
-       <height>201</height>
-      </rect>
-     </property>
-     <property name="title">
-      <string>Advanced Dec</string>
-     </property>
-     <widget class="QLineEdit" name="TotalSteps1">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>31</y>
-        <width>81</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="WormSteps1">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>51</y>
-        <width>81</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Resistance_1">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>110</y>
-        <width>81</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>1000000</number>
-      </property>
-      <property name="value">
-       <number>20000</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_22">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>110</y>
-        <width>71</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Coil (mΩ)</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_23">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>131</y>
-        <width>71</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Coil (µH)</string>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Inductance_1">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>130</y>
-        <width>61</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>1000000</number>
-      </property>
-      <property name="value">
-       <number>1000</number>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Current_1">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>150</y>
-        <width>51</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>100000</number>
-      </property>
-      <property name="value">
-       <number>700</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_24">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>150</y>
-        <width>81</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Supply (mA)</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="Multiplier1">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>71</y>
-        <width>51</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="Divider1">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>91</y>
-        <width>51</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Voltage_1">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>170</y>
-        <width>41</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>3</number>
-      </property>
-      <property name="maximum">
-       <number>240</number>
-      </property>
-      <property name="value">
-       <number>12</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="TrackingFrequency_1">
-      <property name="geometry">
-       <rect>
-        <x>190</x>
-        <y>70</y>
-        <width>121</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Steps/s:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="SPT_1">
-      <property name="geometry">
-       <rect>
-        <x>190</x>
-        <y>90</y>
-        <width>121</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>sec/turn:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_37">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>81</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Total Steps</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_38">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>50</y>
-        <width>91</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Worm Steps</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_39">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>170</y>
-        <width>81</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Supply (V):</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_40">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>71</y>
-        <width>71</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Mutiplier</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_41">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>90</y>
-        <width>51</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Divider</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="PWMFrequency_1">
-      <property name="geometry">
-       <rect>
-        <x>190</x>
-        <y>30</y>
-        <width>121</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>PWM Hz:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="GotoFrequency_1">
-      <property name="geometry">
-       <rect>
-        <x>190</x>
-        <y>50</y>
-        <width>121</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Goto Hz:</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="CurrentSteps_1">
-      <property name="geometry">
-       <rect>
-        <x>230</x>
-        <y>110</y>
-        <width>81</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QLabel" name="CurrentStepsLabel_1">
-      <property name="geometry">
-       <rect>
-        <x>190</x>
-        <y>110</y>
-        <width>41</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Pos:</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="Rate_1">
-      <property name="geometry">
-       <rect>
-        <x>190</x>
-        <y>130</y>
-        <width>121</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>as/sec:</string>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Mean_1">
-      <property name="geometry">
-       <rect>
-        <x>260</x>
-        <y>150</y>
-        <width>51</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>60</number>
-      </property>
-      <property name="value">
-       <number>1</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="Rate_3">
-      <property name="geometry">
-       <rect>
-        <x>190</x>
-        <y>150</y>
-        <width>61</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Mean (s)</string>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QGroupBox" name="RA">
+    <widget class="QGroupBox" name="Configuration">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -1563,13 +796,13 @@
        <x>10</x>
        <y>30</y>
        <width>231</width>
-       <height>331</height>
+       <height>351</height>
       </rect>
      </property>
      <property name="title">
-      <string>RA</string>
+      <string>Configuration</string>
      </property>
-     <widget class="QSpinBox" name="MotorSteps_0">
+     <widget class="QSpinBox" name="MotorSteps">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -1588,7 +821,7 @@
        <number>200</number>
       </property>
      </widget>
-     <widget class="QSpinBox" name="Worm_0">
+     <widget class="QSpinBox" name="Worm">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -1607,7 +840,7 @@
        <number>50</number>
       </property>
      </widget>
-     <widget class="QSpinBox" name="Crown_0">
+     <widget class="QSpinBox" name="Crown">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -1665,7 +898,7 @@
        <string>Crown teeth</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="Coil_0">
+     <widget class="QComboBox" name="Coil">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -1703,7 +936,7 @@
        <string>Coil config.</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="GPIO_0">
+     <widget class="QComboBox" name="GPIO">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -1741,7 +974,7 @@
        <string>ST4 config.</string>
       </property>
      </widget>
-     <widget class="QSpinBox" name="Motor_0">
+     <widget class="QSpinBox" name="Motor">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -1773,7 +1006,7 @@
        <string>Motor teeth</string>
       </property>
      </widget>
-     <widget class="QSlider" name="MaxSpeed_0">
+     <widget class="QSlider" name="MaxSpeed">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -1801,7 +1034,7 @@
        <number>50</number>
       </property>
      </widget>
-     <widget class="QSlider" name="Acceleration_0">
+     <widget class="QSlider" name="Acceleration">
       <property name="geometry">
        <rect>
         <x>120</x>
@@ -1829,7 +1062,7 @@
        <number>8</number>
       </property>
      </widget>
-     <widget class="QLabel" name="MaxSpeed_label_0">
+     <widget class="QLabel" name="MaxSpeed_label">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -1842,7 +1075,7 @@
        <string>Max speed</string>
       </property>
      </widget>
-     <widget class="QLabel" name="Acceleration_label_0">
+     <widget class="QLabel" name="Acceleration_label">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -1855,7 +1088,7 @@
        <string>Acceleration</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="Invert_0">
+     <widget class="QCheckBox" name="Invert">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -1868,7 +1101,7 @@
        <string>Invert axis</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="SteppingMode_0">
+     <widget class="QComboBox" name="SteppingMode">
       <property name="geometry">
        <rect>
         <x>130</x>
@@ -1906,271 +1139,23 @@
        <string>Stepping mode</string>
       </property>
      </widget>
-    </widget>
-    <widget class="QGroupBox" name="DEC">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>250</x>
-       <y>30</y>
-       <width>231</width>
-       <height>331</height>
-      </rect>
-     </property>
-     <property name="title">
-      <string>DEC</string>
-     </property>
-     <widget class="QSpinBox" name="MotorSteps_1">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>30</y>
-        <width>91</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>16777215</number>
-      </property>
-      <property name="value">
-       <number>200</number>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Worm_1">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>90</y>
-        <width>91</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>16777215</number>
-      </property>
-      <property name="value">
-       <number>50</number>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Crown_1">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>120</y>
-        <width>91</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>16777215</number>
-      </property>
-      <property name="value">
-       <number>360</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_3">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Motor Steps</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_10">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>90</y>
-        <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Worm teeth</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_11">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>120</y>
-        <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Crown teeth</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="Coil_1">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>150</y>
-        <width>91</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <item>
-       <property name="text">
-        <string>AABB</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>ABAB</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>ABBA</string>
-       </property>
-      </item>
-     </widget>
-     <widget class="QLabel" name="label_13">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>150</y>
-        <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Coil config.</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="GPIO_1">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>180</y>
-        <width>91</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <item>
-       <property name="text">
-        <string>NONE</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>ST4</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>DRIVER</string>
-       </property>
-      </item>
-     </widget>
-     <widget class="QLabel" name="label_14">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>180</y>
-        <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>ST4 config.</string>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="Motor_1">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>60</y>
-        <width>91</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>16777215</number>
-      </property>
-      <property name="value">
-       <number>10</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_16">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>60</y>
-        <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Motor teeth</string>
-      </property>
-     </widget>
-     <widget class="QSlider" name="MaxSpeed_1">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>281</y>
-        <width>211</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>1000</number>
-      </property>
-      <property name="value">
-       <number>200</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::NoTicks</enum>
-      </property>
-      <property name="tickInterval">
-       <number>50</number>
-      </property>
-     </widget>
-     <widget class="QSlider" name="Acceleration_1">
+     <widget class="QSlider" name="Intensity">
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>300</y>
+        <y>320</y>
         <width>101</width>
         <height>21</height>
        </rect>
       </property>
       <property name="maximum">
-       <number>100</number>
+       <number>1023</number>
       </property>
       <property name="singleStep">
        <number>1</number>
       </property>
       <property name="value">
-       <number>10</number>
+       <number>0</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -2182,83 +1167,80 @@
        <number>8</number>
       </property>
      </widget>
-     <widget class="QLabel" name="MaxSpeed_label_1">
+     <widget class="QCheckBox" name="LimitIntensity">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>260</y>
-        <width>201</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Max speed</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="Acceleration_label_1">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>300</y>
+        <y>320</y>
         <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Acceleration</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="Invert_1">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>238</y>
-        <width>91</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>Invert axis</string>
+       <string>Limit  torque</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="SteppingMode_1">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>210</y>
-        <width>91</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <item>
-       <property name="text">
-        <string>Mixed</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Microstep</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Half-step</string>
-       </property>
-      </item>
-     </widget>
-     <widget class="QLabel" name="label_17">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>210</y>
-        <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Stepping mode</string>
-      </property>
-     </widget>
+    </widget>
+    <widget class="QPushButton" name="loadConfig">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>480</x>
+       <y>30</y>
+       <width>89</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Load config</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="saveConfig">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>480</x>
+       <y>60</y>
+       <width>89</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Save config</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="Notes">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>480</x>
+       <y>110</y>
+       <width>81</width>
+       <height>51</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelNotes">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>480</x>
+       <y>90</y>
+       <width>51</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Notes:</string>
+     </property>
     </widget>
    </widget>
    <widget class="QGroupBox" name="Connection">
@@ -2266,7 +1248,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>1081</width>
+      <width>581</width>
       <height>61</height>
      </rect>
     </property>
@@ -2331,67 +1313,6 @@
       <string>Disconnect</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="loadConfig">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>440</x>
-       <y>30</y>
-       <width>89</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Load config</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="saveConfig">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>540</x>
-       <y>30</y>
-       <width>89</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Save config</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="labelNotes">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>640</x>
-       <y>30</y>
-       <width>51</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Notes:</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="Notes">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>690</x>
-       <y>30</y>
-       <width>381</width>
-       <height>21</height>
-      </rect>
-     </property>
-    </widget>
    </widget>
    <widget class="QGroupBox" name="WriteArea">
     <property name="enabled">
@@ -2400,8 +1321,8 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>540</y>
-      <width>1081</width>
+      <y>570</y>
+      <width>581</width>
       <height>61</height>
      </rect>
     </property>
@@ -2429,7 +1350,7 @@
       <rect>
        <x>200</x>
        <y>30</y>
-       <width>871</width>
+       <width>371</width>
        <height>23</height>
       </rect>
      </property>
@@ -2452,17 +1373,6 @@
     </widget>
    </widget>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1100</width>
-     <height>22</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen_FW">
    <property name="text">
     <string>Open FW...</string>
