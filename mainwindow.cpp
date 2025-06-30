@@ -124,7 +124,6 @@ void MainWindow::readIni(QString ini)
 
     ui->Address->setValue(settings->value("Address", ahp_gt_get_address()).toInt());
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency(axis_number)).toInt());
-    ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency(axis_number)).toInt());
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
     ui->HighBauds->setChecked(settings->value("HighBauds", false).toBool());
@@ -145,7 +144,6 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_mount_type((MountType)mounttypes[ui->MountType->currentIndex()]);
     ahp_gt_set_features(axis_number, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0)));
     ahp_gt_set_features(axis_number, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0)));
-    ahp_gt_set_pwm_frequency(axis_number, ui->PWMFreq->value());
     ahp_gt_set_pwm_frequency(axis_number, ui->PWMFreq->value());
     ahp_gt_set_address(ui->Address->value());
 
@@ -312,7 +310,7 @@ MainWindow::MainWindow(QWidget *parent)
         else
         {
             ahp_gt_write_values(axis_number, &percent, &finished);
-            ahp_gt_write_values(axis_number, &percent, &finished);
+            ahp_gt_reload(axis_number);
             ui->Write->setEnabled(true);
             ui->WorkArea->setEnabled(true);
         }
@@ -353,32 +351,28 @@ MainWindow::MainWindow(QWidget *parent)
         else
         {
             portname.append(ui->ComPort->currentText());
-            if(!ahp_gt_connect(portname.toUtf8())) {
-                failure = ahp_gt_detect_device();
-            } else {
+            failure = ahp_gt_connect(portname.toUtf8());
+            if(failure)
                 ahp_gt_disconnect();
-            }
         }
         if(!failure)
         {
             int a = 0;
-            for (a= 0; a < ahp_gt_get_axes_limit(); a++) {
-                version[a] = ahp_gt_get_mc_version(a);
-                if(version[a] > 0)
-                    break;
-            }
+            version[0] = 0;
+            for (a= 0; a < NumAxes && version[0] == 0; a++)
+                version[0] = ahp_gt_get_mc_version(a);
             if (a == 1)
                 version[1] = ahp_gt_get_mc_version(a);
-            else
-                a--;
+            a--;
             axis_number = 0;
-            if((version[0] & 0xff0) == 0x37 && (version[1] & 0xff) == 0x37)
+            GT = 0;
+            if((version[0] & 0xff) == 0x37 && (version[1] & 0xff) == 0x37)
                 GT = GT1;
             else if((version[0] & 0xf00) == 0x200 && (version[1] & 0xf00) == 0x300)
                 GT = GT2;
             else if((version[0] & 0x00f) == 0x009 && (version[1] & 0x00f) == 0x009)
                 GT = GT2_BRAKE;
-            else if((version[a] & 0xfff) == 0x538) {
+            else if((version[0] & 0xfff) == 0x538) {
                 GT = GT5;
                 axis_number = a;
             } else return;
@@ -547,7 +541,6 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ](int value)
     {
         ahp_gt_set_pwm_frequency(axis_number, value);
-        ahp_gt_set_pwm_frequency(axis_number, value);
         ui->PWMFreq_label->setText("PWM: " + QString::number(366 + 366 * value) + " Hz");
         saveIni(ini);
     });
@@ -574,20 +567,19 @@ MainWindow::MainWindow(QWidget *parent)
         case GT2:
         case GT2_BRAKE:
             if(value > 1) {
-                axis_number = 1;
-                ui->Axis->setCurrentIndex(axis_number);
+                value = 1;
+                ui->Axis->setCurrentIndex(value);
             }
             break;
         case GT5:
-            if(value < NumAxes) {
-                ahp_gt_copy_axis(axis_number, value);
-                WriteThread->start();
-                axis_number = value;
-            }
+            ahp_gt_copy_axis(axis_number, value);
+            ahp_gt_write_values(axis_number, nullptr, nullptr);
+            ahp_gt_delete_axis(axis_number);
             break;
         default:
             break;
         }
+        axis_number = value;
     });
     connect(ui->Speed, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)

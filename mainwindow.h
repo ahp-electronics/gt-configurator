@@ -50,7 +50,7 @@ class MainWindow : public QMainWindow
 
     private:
         int GT { 0 };
-        int version[2] { 0, 0 };
+        int version[NumAxes] { 0 };
         int axis_number { 0  };
         double phi {0.0};
 
