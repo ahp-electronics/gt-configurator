@@ -122,7 +122,6 @@ void MainWindow::readIni(QString ini)
     QSettings *settings = new QSettings(ini, QSettings::Format::IniFormat);
     ui->Notes->setText(QByteArray::fromBase64(settings->value("Notes").toString().toUtf8()));
 
-    ui->Address->setValue(settings->value("Address", ahp_gt_get_address()).toInt());
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency(axis_number)).toInt());
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
@@ -145,7 +144,6 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_features(axis_number, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0)));
     ahp_gt_set_features(axis_number, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0)));
     ahp_gt_set_pwm_frequency(axis_number, ui->PWMFreq->value());
-    ahp_gt_set_address(ui->Address->value());
 
 
     ui->MotorSteps->setValue(settings->value("MotorSteps", ahp_gt_get_motor_steps(axis_number)).toInt());
@@ -357,6 +355,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
         if(!failure)
         {
+            ahp_gt_select_device(0);
             int a = 0;
             version[0] = 0;
             for (a= 0; a < NumAxes && version[0] == 0; a++)
@@ -525,7 +524,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Address, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_set_address(value);
+        if(isConnected) {
+            ahp_gt_copy_device(ahp_gt_get_current_device(), value);
+            ahp_gt_write_values(axis_number, nullptr, nullptr);
+            if(ahp_gt_get_current_device() > 0)
+                ahp_gt_delete_device(ahp_gt_get_current_device());
+        }
         saveIni(ini);
     });
     connect(ui->HighBauds, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
@@ -572,9 +576,11 @@ MainWindow::MainWindow(QWidget *parent)
             }
             break;
         case GT5:
-            ahp_gt_copy_axis(axis_number, value);
-            ahp_gt_write_values(axis_number, nullptr, nullptr);
-            ahp_gt_delete_axis(axis_number);
+            if(isConnected) {
+                ahp_gt_copy_axis(axis_number, value);
+                ahp_gt_write_values(axis_number, nullptr, nullptr);
+                ahp_gt_delete_axis(axis_number);
+            }
             break;
         default:
             break;
@@ -818,7 +824,8 @@ void MainWindow::UpdateValues(int axis)
     }
     ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency(axis_number));
     ui->PWMFreq_label->setText("PWM: " + QString::number(366 + 366 * ui->PWMFreq->value()) + " Hz");
-    ui->Address->setValue(ahp_gt_get_address());
+    if(ahp_gt_get_current_device() > 0)
+        ui->Address->setValue(ahp_gt_get_current_device());
     ui->MountType->setCurrentIndex(mounttypes.indexOf(ahp_gt_get_mount_type()));
     int index = 0;
     index |= (((ahp_gt_get_features(axis_number) & isAZEQ) != 0) ? 2 : 0);
