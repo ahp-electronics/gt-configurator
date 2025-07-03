@@ -21,13 +21,6 @@ class MainWindow : public QMainWindow
 {
         Q_OBJECT
 
-    enum {
-        GT1 = 1,
-        GT2 = 2,
-        GT2_BRAKE = 3,
-        GT5 = 5
-    } GT_Version;
-
     public:
         MainWindow(QWidget *parent = nullptr);
         ~MainWindow();
@@ -49,23 +42,29 @@ class MainWindow : public QMainWindow
         }
 
     private:
-        int GT { 0 };
-        int version[NumAxes] { 0 };
-        int axis_number { 0  };
-        double phi {0.0};
+        double Latitude, Longitude, Elevation;
+        double Ra {0.0};
+        double Dec {0.0};
 
-        bool axis_lospeed { false};
-        bool axisdirection { false };
-        double Speed;
-        double currentSteps;
-        SkywatcherAxisStatus status;
-        double lastPollTime;
-        double lastSteps;
-        double lastSpeeds[60] { 0 };
-        Thread *PositionThread;
+        double* toDms(double d);
+        QString toHMS(double hms);
+        QString toDMS(double dms);
+        double fromHMSorDMS(QString dms);
+
+        bool axis_lospeed[2] { false, false };
+        bool axisdirection[2] { false, false };
+        double Speed[2];
+        double currentSteps[2];
+        SkywatcherAxisStatus status[2];
+        double lastPollTime[2];
+        double lastSteps[2];
+        double lastSpeeds[2][60] { { 0 }, { 0 }};
+        Thread *RaThread;
+        Thread *DecThread;
         Thread *IndicationThread;
         Thread *ProgressThread;
         Thread *WriteThread;
+        Thread *ServerThread;
         QSettings * settings;
         QString ini;
         QString firmwareFilename;
@@ -74,16 +73,19 @@ class MainWindow : public QMainWindow
         int finished { 1 };
         int threadsStopped;
         bool isConnected;
-        int axisstatus;
-        int motionmode;
-        bool correcting_tracking { false };
-        int stop_correction { true };
+        int axisstatus[2];
+        int motionmode[2];
+        bool correcting_tracking[2] { false, false };
+        int stop_correction[2] { true, true };
         bool initial;
         int timer { 1000 };
+        QStringList CheckFirmware(QString url, int timeout_ms);
         bool DownloadFirmware(QString url, QString filename, QSettings *settings, int timeout_ms = 30000);
         void disconnectControls(bool block);
         void UpdateValues(int axis);
         Ui::MainWindow *ui;
+        bool oldTracking[2] { false, false };
+        bool isTracking[2] { false, false };
         static void WriteValues(MainWindow *wnd);
         QMutex RAmutex, DEmutex;
 };
