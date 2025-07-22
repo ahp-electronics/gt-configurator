@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>641</height>
+    <height>658</height>
    </rect>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -1323,7 +1323,7 @@
       <x>10</x>
       <y>570</y>
       <width>581</width>
-      <height>61</height>
+      <height>81</height>
      </rect>
     </property>
     <property name="title">
@@ -1348,14 +1348,17 @@
     <widget class="QProgressBar" name="progress">
      <property name="geometry">
       <rect>
-       <x>200</x>
-       <y>30</y>
-       <width>371</width>
-       <height>23</height>
+       <x>10</x>
+       <y>60</y>
+       <width>561</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="value">
       <number>0</number>
+     </property>
+     <property name="textVisible">
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QPushButton" name="LoadFW">
@@ -1370,6 +1373,46 @@
      <property name="text">
       <string>Check FW..</string>
      </property>
+    </widget>
+    <widget class="QComboBox" name="FW_List">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>30</y>
+       <width>91</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <item>
+      <property name="text">
+       <string>gt1</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>gt2dec</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>gt2dec_brake</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>gt2ra</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>gt2ra_brake</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>gt5</string>
+      </property>
+     </item>
     </widget>
    </widget>
   </widget>

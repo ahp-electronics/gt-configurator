@@ -72,6 +72,39 @@ char *strrand(int len)
     return ret;
 }
 
+QStringList MainWindow::CheckFirmware(QString url, int timeout_ms)
+{
+    QByteArray list;
+    QJsonDocument doc;
+    QNetworkAccessManager* manager = new QNetworkAccessManager();
+    QNetworkReply *response = manager->get(QNetworkRequest(QUrl(url)));
+    QTimer timer;
+    timer.setSingleShot(true);
+    QEventLoop loop;
+    connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+    connect(response, SIGNAL(finished()), &loop, SLOT(quit()));
+    timer.start(timeout_ms);
+    loop.exec();
+    QString base64 = "";
+    if(response->error() == QNetworkReply::NetworkError::NoError) {
+        QJsonDocument doc = QJsonDocument::fromJson(response->readAll());
+        QJsonObject obj = doc.object();
+        base64 = obj["data"].toString();
+    }
+    if(base64.isNull() || base64.isEmpty()) {
+        goto ck_end;
+    }
+    list = QByteArray::fromBase64(base64.toUtf8());
+    doc = QJsonDocument::fromJson(list.toStdString().c_str());
+    response->deleteLater();
+    response->manager()->deleteLater();
+    return doc.toVariant().toStringList();
+ck_end:
+    response->deleteLater();
+    response->manager()->deleteLater();
+    return QStringList();
+}
+
 bool MainWindow::DownloadFirmware(QString url, QString filename, QSettings *settings, int timeout_ms)
 {
     QByteArray bin;
@@ -262,7 +295,7 @@ MainWindow::MainWindow(QWidget *parent)
     stop_correction = true;
     settings = new QSettings(ini, QSettings::Format::IniFormat);
     isConnected = false;
-    this->setFixedSize(600, 640);
+    this->setFixedSize(600, 660);
     ui->setupUi(this);
     QString lastPort = settings->value("LastPort", "").toString();
     if(lastPort != "")
@@ -317,19 +350,33 @@ MainWindow::MainWindow(QWidget *parent)
         thread->requestInterruption();
         thread->unlock();
     });
-    connect(ui->LoadFW, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            [ = ](bool checked)
+    connect(ui->FW_List, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            [ = ](int value)
     {
-        QString url = "https://www.iliaplatone.com/firmware.php?product=gt1";
+        QString url = "https://www.iliaplatone.com/firmware.php?product="+ui->FW_List->currentText();
         if(DownloadFirmware(url, firmwareFilename, settings))
             ui->Write->setText("Flash");
+        else {
+            QFile f(firmwareFilename);
+            QFile s(":/data/"+ui->FW_List->currentText());
+            QJsonDocument doc = QJsonDocument::fromJson(s.readAll());
+            QJsonObject obj = doc.object();
+            QString base64 = obj["data"].toString();
+            if(base64.isNull() || base64.isEmpty()) {
+                goto dl_end;
+            }
+            f.write(QByteArray::fromBase64(base64.toUtf8()));
+            s.close();
+            f.close();
+        }
         ui->Write->setEnabled(true);
         ui->Connection->setEnabled(false);
         ui->Configuration->setEnabled(false);
         ui->Control->setEnabled(false);
         ui->commonSettings->setEnabled(false);
         ui->Advanced->setEnabled(false);
-
+        dl_end:
+        return;
     });
     connect(ui->Connect, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked)

@@ -7,5 +7,7 @@
         <file>gt2ra.json</file>
         <file>gt2dec.json</file>
         <file>gt5.json</file>
+        <file>gt2ra_brake.json</file>
+        <file>gt2dec_brake.json</file>
     </qresource>
 </RCC>
