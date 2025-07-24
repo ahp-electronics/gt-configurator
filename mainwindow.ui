@@ -1413,6 +1413,11 @@
        <string>gt5</string>
       </property>
      </item>
+     <item>
+      <property name="text">
+       <string>gt5_brake</string>
+      </property>
+     </item>
     </widget>
    </widget>
   </widget>
