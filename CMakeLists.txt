@@ -36,6 +36,7 @@ find_package(DFU REQUIRED)
 find_package(Threads REQUIRED)
 find_package(M REQUIRED)
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include_directories(${CMAKE_INCLUDE_PATH})
 include_directories(${AHP_GT_INCLUDE_DIR})
 include_directories(${DFU_INCLUDE_DIR})
