@@ -80,12 +80,13 @@ class MainWindow : public QMainWindow
         int stop_correction { true };
         bool initial;
         int timer { 1000 };
-        QStringList CheckFirmware(QString url, int timeout_ms = 1000);
+        QStringList CheckFirmware(QString url, int timeout_ms);
         bool DownloadFirmware(QString url, QString filename, QSettings *settings, int timeout_ms = 30000);
         void disconnectControls(bool block);
         void UpdateValues(int axis);
         Ui::MainWindow *ui;
         static void WriteValues(MainWindow *wnd);
         QMutex RAmutex, DEmutex;
+        QMutex mutex;
 };
 #endif // MAINWINDOW_H

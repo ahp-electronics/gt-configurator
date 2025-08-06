@@ -15,6 +15,7 @@
 #include <QSerialPortInfo>
 #include <QFileDialog>
 #include <QTimer>
+#include <QMutex>
 #include <errno.h>
 #include <libdfu.h>
 #include "./ui_mainwindow.h"
@@ -324,12 +325,12 @@ MainWindow::MainWindow(QWidget *parent)
         percent = 0;
         finished = 0;
         ui->WorkArea->setEnabled(false);
-        ui->Write->setEnabled(false);
         ui->Connection->setEnabled(false);
         finished = 0;
         if(ui->Write->text() == "Flash")
         {
             if(QFile::exists(firmwareFilename)) {
+                while(mutex.tryLock()) QThread::msleep(10);
                 QFile f(firmwareFilename);
                 f.open(QIODevice::ReadOnly);
                 if(!dfu_flash(f.handle(), &percent, &finished))
@@ -337,10 +338,12 @@ MainWindow::MainWindow(QWidget *parent)
                     settings->setValue("firmware", f.readAll().toBase64());
                 }
                 f.close();
+                mutex.unlock();
             }
         }
         else
         {
+            ui->Write->setEnabled(false);
             ahp_gt_write_values(axis_number, &percent, &finished);
             ahp_gt_reload(axis_number);
             ui->Write->setEnabled(true);
@@ -351,6 +354,16 @@ MainWindow::MainWindow(QWidget *parent)
         thread->requestInterruption();
         thread->unlock();
     });
+    connect(ui->LoadFW, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            [ = ](bool triggered)
+    {
+        QStringList versions = CheckFirmware("https://www.iliaplatone.com/firmware.php?product=gt*", 3000);
+        if(versions.count() > 0) {
+            ui->FW_List->clear();
+            for (QString version : versions)
+                ui->FW_List->addItem(version.replace("firmware/", "").replace("-firmware.bin", ""));
+        }
+    });
     connect(ui->FW_List, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             [ = ](int value)
     {
@@ -359,7 +372,7 @@ MainWindow::MainWindow(QWidget *parent)
             ui->Write->setText("Flash");
         else {
             QFile f(firmwareFilename);
-            QFile s(":/data/"+ui->FW_List->currentText());
+            QFile s("qrc:/data/"+ui->FW_List->currentText()+".json");
             QJsonDocument doc = QJsonDocument::fromJson(s.readAll());
             s.close();
             QJsonObject obj = doc.object();
@@ -371,7 +384,6 @@ MainWindow::MainWindow(QWidget *parent)
             f.write(QByteArray::fromBase64(base64.toUtf8()));
             f.close();
         }
-        ui->Write->setEnabled(true);
         ui->Connection->setEnabled(false);
         ui->Configuration->setEnabled(false);
         ui->Control->setEnabled(false);
@@ -453,8 +465,8 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ](bool checked)
     {
         IndicationThread->stop();
-        ui->Write->setText("Write");
-        ui->Write->setEnabled(false);
+        ui->Write->setText("Flash");
+        ui->Write->setEnabled(true);
         ui->ComPort->setEnabled(true);
         isConnected = false;
         finished = false;
