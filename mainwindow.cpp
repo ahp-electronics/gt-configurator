@@ -426,13 +426,13 @@ MainWindow::MainWindow(QWidget *parent)
             a--;
             axis_number = 0;
             GT = 0;
-            if((version[0] & 0xff) == 0x37 && (version[1] & 0xff) == 0x37)
+            if((version[0] & 0xf) == 1 && (version[1] & 0xf) == 1)
                 GT = GT1;
-            else if((version[0] & 0xf00) == 0x200 && (version[1] & 0xf00) == 0x300)
+            else if((version[0] & 0xf) == 0x2 && (version[1] & 0xf) == 0x3)
                 GT = GT2;
-            else if((version[0] & 0x00f) == 0x009 && (version[1] & 0x00f) == 0x009)
+            else if((version[0] & 0xf00) == 0x900 && (version[1] & 0xf00) == 0x900)
                 GT = GT2_BRAKE;
-            else if((version[0] & 0xfff) == 0x538) {
+            else if((version[0] & 0xf) == 0x5) {
                 GT = GT5;
                 axis_number = a;
             } else return;
