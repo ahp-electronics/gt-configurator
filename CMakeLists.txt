@@ -64,6 +64,7 @@ if(ANDROID)
         ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.ui
     )
     else(ANDROID)
+    qt5_add_resources(RESOURCES resource.qrc)
     add_executable(gt-configurator ${DFU_SOURCES}
         ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
@@ -71,7 +72,6 @@ if(ANDROID)
         ${CMAKE_CURRENT_SOURCE_DIR}/threads.h
         ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.ui
         ${CMAKE_CURRENT_SOURCE_DIR}/resource.qrc
-        ${CMAKE_CURRENT_SOURCE_DIR}/app.rc
     )
     if(WIN32)
         target_link_libraries(gt-configurator PRIVATE comctl32)
