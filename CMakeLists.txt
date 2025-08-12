@@ -34,7 +34,6 @@ find_package(Qt5 COMPONENTS Widgets SerialPort Network REQUIRED)
 find_package(AHPGT REQUIRED)
 find_package(DFU REQUIRED)
 find_package(Threads REQUIRED)
-find_package(ZLIB REQUIRED)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -42,7 +41,6 @@ set(CMAKE_AUTORCC ON)
 include_directories(${CMAKE_INCLUDE_PATH})
 include_directories(${AHP_GT_INCLUDE_DIR})
 include_directories(${DFU_INCLUDE_DIR})
-include_directories(${ZLIB_INCLUDE_DIRS})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/icon.ico ${CMAKE_CURRENT_BINARY_DIR}/icon.ico COPYONLY )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt1.json ${CMAKE_CURRENT_BINARY_DIR}/gt1.json COPYONLY )
@@ -64,7 +62,6 @@ if(ANDROID)
         ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.ui
     )
     else(ANDROID)
-    qt5_add_resources(RESOURCES resource.qrc)
     add_executable(gt-configurator ${DFU_SOURCES}
         ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
@@ -72,6 +69,7 @@ if(ANDROID)
         ${CMAKE_CURRENT_SOURCE_DIR}/threads.h
         ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.ui
         ${CMAKE_CURRENT_SOURCE_DIR}/resource.qrc
+        ${CMAKE_CURRENT_SOURCE_DIR}/app.rc
     )
     if(WIN32)
         target_link_libraries(gt-configurator PRIVATE comctl32)
@@ -82,7 +80,7 @@ if(ANDROID)
     endif(WIN32)
 endif(ANDROID)
 
-target_link_libraries(gt-configurator PRIVATE ${ZLIB_LIBRARIES} ${DFU_LIBRARIES} ${AHP_GT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} Qt5::Widgets Qt5::SerialPort Qt5::Network)
+target_link_libraries(gt-configurator PRIVATE ${DFU_LIBRARIES} ${AHP_GT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} Qt5::Widgets Qt5::SerialPort Qt5::Network)
 install(TARGETS gt-configurator RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install(FILES ahp-gt-configurator.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons)
 install(FILES ahp-gt-configurator.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
