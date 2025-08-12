@@ -42,6 +42,7 @@ include_directories(${CMAKE_INCLUDE_PATH})
 include_directories(${AHP_GT_INCLUDE_DIR})
 include_directories(${DFU_INCLUDE_DIR})
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/brew.sh.cmake ${CMAKE_CURRENT_BINARY_DIR}/brew.sh )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/icon.ico ${CMAKE_CURRENT_BINARY_DIR}/icon.ico COPYONLY )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt1.json ${CMAKE_CURRENT_BINARY_DIR}/gt1.json COPYONLY )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt2dec.json ${CMAKE_CURRENT_BINARY_DIR}/gt2dec.json COPYONLY )
