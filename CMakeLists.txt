@@ -30,7 +30,7 @@ set(AHP_GT_CONFIGURATOR_VERSION "${AHP_GT_CONFIGURATOR_VERSION_MAJOR}.${AHP_GT_C
 #endif()
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
 
-find_package(Qt5 COMPONENTS Widgets SerialPort Network REQUIRED)
+find_package(Qt5 COMPONENTS Core Widgets SerialPort Network REQUIRED)
 find_package(AHPGT REQUIRED)
 find_package(DFU REQUIRED)
 find_package(Threads REQUIRED)
