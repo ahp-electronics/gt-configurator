@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <limits>
 #include <QThread>
 #include <QSettings>
 #include <QMainWindow>
