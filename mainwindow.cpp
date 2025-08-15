@@ -367,7 +367,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->FW_List, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             [ = ](int value)
     {
-        QString url = "https://www.iliaplatone.com/firmware.php?product="+ui->FW_List->currentText();
+        QString url = "https://www.iliaplatone.com/firmware.php?download=yes&product="+ui->FW_List->currentText();
         if(DownloadFirmware(url, firmwareFilename, settings))
             ui->Write->setText("Flash");
         else {
