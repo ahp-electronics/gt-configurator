@@ -26,7 +26,8 @@ class MainWindow : public QMainWindow
         GT1 = 1,
         GT2 = 2,
         GT2_BRAKE = 3,
-        GT5 = 5
+        GT5 = 5,
+        GT5_BRAKE = 6,
     } GT_Version;
 
     public:
@@ -50,7 +51,7 @@ class MainWindow : public QMainWindow
         }
 
     private:
-        int GT { 0 };
+        int GT[NumAxes] { 0 };
         int version[NumAxes] { 0 };
         int axis_number { 0  };
         double phi {0.0};

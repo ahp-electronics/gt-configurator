@@ -418,24 +418,32 @@ MainWindow::MainWindow(QWidget *parent)
         {
             ahp_gt_select_device(0);
             int a = 0;
-            version[0] = 0;
-            for (a= 0; a < NumAxes && version[0] == 0; a++)
-                version[0] = ahp_gt_get_mc_version(a);
-            if (a == 1)
-                version[1] = ahp_gt_get_mc_version(a);
-            a--;
             axis_number = 0;
-            GT = 0;
-            if((version[0] & 0xf) == 1 && (version[1] & 0xf) == 1)
-                GT = GT1;
-            else if((version[0] & 0xf) == 0x2 && (version[1] & 0xf) == 0x3)
-                GT = GT2;
-            else if((version[0] & 0xf00) == 0x900 && (version[1] & 0xf00) == 0x900)
-                GT = GT2_BRAKE;
-            else if((version[0] & 0xf) == 0x5) {
-                GT = GT5;
-                axis_number = a;
-            } else return;
+            version[0] = 0;
+            for (a= 0; a < NumAxes && version[a] == 0; a++){
+                version[a] = ahp_gt_get_mc_version(a);
+                if((version[a] & 0xf) == 5) {
+                    GT[a] = GT5;
+                    axis_number = a;
+                } else if((version[a] & 0xf) == 4) {
+                    GT[a] = GT5_BRAKE;
+                    axis_number = a;
+                }
+            }
+            GT[0] = 0;
+            GT[1] = 0;
+            if((version[0] & 0xf) == 1 && (version[1] & 0xf) == 1){
+                    GT[0] = GT1;
+                    GT[1] = GT1;
+                }
+                else if((version[0] & 0xf) == 2 && (version[1] & 0xf) == 3){
+                    GT[0] = GT2;
+                    GT[1] = GT2;
+                } else if((version[0] & 0xf) == 6 && (version[1] & 0xf) == 7){
+                    GT[0] = GT2_BRAKE;
+                    GT[1] = GT2_BRAKE;
+                }
+
             ui->Axis->setCurrentIndex(axis_number);
             settings->setValue("LastPort", ui->ComPort->currentText());
             ui->Write->setText("Write");
@@ -627,7 +635,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Axis, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             [ = ](int value)
     {
-        switch (GT) {
+        switch (GT[value]) {
         case GT1:
         case GT2:
         case GT2_BRAKE:
@@ -637,6 +645,7 @@ MainWindow::MainWindow(QWidget *parent)
             }
             break;
         case GT5:
+        case GT5_BRAKE:
             if(isConnected) {
                 ahp_gt_copy_axis(axis_number, value);
                 ahp_gt_write_values(axis_number, nullptr, nullptr);
