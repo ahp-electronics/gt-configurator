@@ -738,7 +738,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>as/sec:</string>
+       <string>deg/sec:</string>
       </property>
      </widget>
      <widget class="QLabel" name="CurrentStepsLabel">

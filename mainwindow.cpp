@@ -429,6 +429,7 @@ MainWindow::MainWindow(QWidget *parent)
                     GT[a] = GT5_BRAKE;
                     axis_number = a;
                 }
+                ahp_gt_read_values(a);
             }
             GT[0] = 0;
             GT[1] = 0;
@@ -656,6 +657,7 @@ MainWindow::MainWindow(QWidget *parent)
             break;
         }
         axis_number = value;
+        ahp_gt_read_values(axis_number);
     });
     connect(ui->Speed, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
@@ -770,7 +772,7 @@ MainWindow::MainWindow(QWidget *parent)
         if(isConnected && finished)
         {
                 ui->CurrentSteps->setText(QString::number((int)currentSteps));
-                ui->Rate->setText("as/sec: " + QString::number(Speed));
+                ui->Rate->setText("deg/sec: " + QString::number(Speed/3600.0));
                 UpdateValues(axis_number);
         }
 
@@ -864,7 +866,7 @@ void MainWindow::UpdateValues(int axis)
     double Z = sqrt(fmax(0, pow(mV / mI, 2.0) - pow(R, 2.0)));
     double f = (2.0 * M_PI * Z / L);
     ui->PWMFrequency->setText("PWM Hz: " + QString::number(f));
-    ui->GotoFrequency->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(axis) / SIDEREAL_DAY));
+    ui->GotoFrequency->setText("Goto Hz: " + QString::number(totalsteps * ahp_gt_get_max_speed(axis) / M_PI / 2));
     ui->MotorSteps->setValue(ahp_gt_get_motor_steps(axis));
     ui->Motor->setValue(ahp_gt_get_motor_teeth(axis));
     ui->Worm->setValue(ahp_gt_get_worm_teeth(axis));
@@ -906,6 +908,4 @@ void MainWindow::UpdateValues(int axis)
     ui->HighBauds->setChecked((ahp_gt_get_mount_flags() & bauds_115200) != 0);
     ui->LimitIntensity->setChecked(ahp_gt_is_intensity_limited(axis));
     ui->Intensity->setValue(ahp_gt_get_intensity_limit(axis));
-    disconnectControls(true);
-    disconnectControls(false);
 }
