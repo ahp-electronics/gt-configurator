@@ -74,6 +74,9 @@ char *strrand(int len)
     return ret;
 }
 
+const int base_timing = 1500000;
+const int offset_timing = 1500000>>4;
+
 QStringList MainWindow::CheckFirmware(QString url, int timeout_ms)
 {
     QByteArray list;
@@ -160,7 +163,7 @@ void MainWindow::readIni(QString ini)
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency(axis_number)).toInt());
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
-    ui->HighBauds->setChecked(settings->value("HighBauds", false).toBool());
+    //ui->HighBauds->setChecked(settings->value("HighBauds", false).toBool());
     ui->LimitIntensity->setChecked(settings->value("LimitIntensity", false).toBool());
     ui->Intensity->setValue(settings->value("Intensity", 0).toInt());   int flags = ahp_gt_get_mount_flags();
 
@@ -171,7 +174,7 @@ void MainWindow::readIni(QString ini)
     flags &= ~isForkMount;
     flags &= ~bauds_115200;
     flags |= ((ui->MountStyle->currentIndex() == 1) ? isForkMount : 0);
-    flags |= (ui->HighBauds->isChecked() ? bauds_115200 : 0);
+    //flags |= (ui->HighBauds->isChecked() ? bauds_115200 : 0);
     flags |= halfCurrentRA;
     flags |= halfCurrentDec;
     ahp_gt_set_mount_flags((GTFlags)flags);
@@ -264,7 +267,8 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Address", ui->Address->value());
     settings->setValue("PWMFreq", ui->PWMFreq->value());
     settings->setValue("MountStyle", ui->MountStyle->currentIndex());
-    settings->setValue("HighBauds", ui->HighBauds->isChecked());
+    //settings->setValue("HighBauds", ui->HighBauds->isChecked());
+    settings->setValue("Timing", ui->Timing->value());
     settings->setValue("Notes", QString(ui->Notes->text().toUtf8().toBase64()));
     s->~QSettings();
     settings = oldsettings;
@@ -479,7 +483,8 @@ MainWindow::MainWindow(QWidget *parent)
         ui->ComPort->setEnabled(true);
         isConnected = false;
         finished = false;
-        ui->HighBauds->setChecked(false);
+        //ui->HighBauds->setChecked(false);
+        ui->Timing->setEnabled(true);
         ui->LoadFW->setEnabled(true);
         ui->Connect->setEnabled(true);
         ui->Disconnect->setEnabled(false);
@@ -601,7 +606,7 @@ MainWindow::MainWindow(QWidget *parent)
                 ahp_gt_delete_device(ahp_gt_get_current_device());
         }
         saveIni(ini);
-    });
+    });/*
     connect(ui->HighBauds, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
     {
         int flags = (int)ahp_gt_get_mount_flags();
@@ -610,7 +615,7 @@ MainWindow::MainWindow(QWidget *parent)
             flags |= bauds_115200;
         ahp_gt_set_mount_flags((GTFlags)flags);
         saveIni(ini);
-    });
+    });*/
     connect(ui->PWMFreq, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
     {
@@ -707,23 +712,6 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_set_intensity_limit(axis_number, value);
         saveIni(ini);
     });
-    connect(ui->Tune, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), this,
-            [ = ](bool checked)
-    {
-        stop_correction = !checked;
-        if(stop_correction) {
-            ui->Plus->setEnabled(true);
-            ui->Minus->setEnabled(true);
-            ui->Stop->setEnabled(true);
-            ui->Goto->setEnabled(true);
-        } else {
-            ui->Tune->setEnabled(false);
-            ui->Plus->setEnabled(false);
-            ui->Minus->setEnabled(false);
-            ui->Stop->setEnabled(false);
-            ui->Goto->setEnabled(false);
-        }
-    });
     connect(ui->Write, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked = false)
     {
@@ -762,6 +750,13 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ahp_gt_goto_absolute(axis_number, phi, (double)ui->Speed->value() * M_PI / SIDEREAL_NOON);
     });
+    connect(ui->Timing, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ](int value)
+    {
+        double offset = ((double)value/ui->Timing->maximum())*offset_timing;
+        ahp_gt_set_timing(axis_number, base_timing-offset);
+        ui->Timing_label->setText("Timing: "+QString::number(offset * 100.0 / base_timing)+"%");
+        saveIni(ini);
+    });
     connect(ProgressThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * parent)
     {
         ui->progress->setValue(fmax(ui->progress->minimum(), fmin(ui->progress->maximum(), percent)));
@@ -799,12 +794,12 @@ MainWindow::MainWindow(QWidget *parent)
                     lastSpeeds[s] = diffSteps;
                 Speed += lastSpeeds[s];
             }
-            Speed /= _n_speeds * diffTime;
+            Speed /= _n_speeds * diffTime;/*
             if(!stop_correction) {
                 ahp_gt_correct_tracking(axis_number, SIDEREAL_DAY * ahp_gt_get_wormsteps(axis_number) / ahp_gt_get_totalsteps(axis_number), &stop_correction);
                     if(ui->Tune->isChecked())
                         ui->Tune->click();
-            }
+            }*/
         }
         parent->unlock();
     });
@@ -905,7 +900,8 @@ void MainWindow::UpdateValues(int axis)
         index |= (((ahp_gt_get_mount_flags() & isForkMount) != 0) ? 1 : 0);
     }
     ui->MountStyle->setCurrentIndex(index);
-    ui->HighBauds->setChecked((ahp_gt_get_mount_flags() & bauds_115200) != 0);
+    //ui->HighBauds->setChecked((ahp_gt_get_mount_flags() & bauds_115200) != 0);
+    ui->Timing->setValue((base_timing-ahp_gt_get_timing(axis))*ui->Timing->maximum()/offset_timing);
     ui->LimitIntensity->setChecked(ahp_gt_is_intensity_limited(axis));
     ui->Intensity->setValue(ahp_gt_get_intensity_limit(axis));
 }
