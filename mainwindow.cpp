@@ -377,6 +377,7 @@ MainWindow::MainWindow(QWidget *parent)
         else {
             QFile f(firmwareFilename);
             QFile s("qrc:/data/"+ui->FW_List->currentText()+".json");
+            s.open(QIODevice::ReadOnly);
             QJsonDocument doc = QJsonDocument::fromJson(s.readAll());
             s.close();
             QJsonObject obj = doc.object();
