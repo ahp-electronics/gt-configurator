@@ -596,17 +596,6 @@ MainWindow::MainWindow(QWidget *parent)
                 break;
         }
         saveIni(ini);
-    });
-    connect(ui->Address, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            [ = ](int value)
-    {
-        if(isConnected) {
-            ahp_gt_copy_device(ahp_gt_get_current_device(), value);
-            ahp_gt_write_values(axis_number, nullptr, nullptr);
-            if(ahp_gt_get_current_device() > 0)
-                ahp_gt_delete_device(ahp_gt_get_current_device());
-        }
-        saveIni(ini);
     });/*
     connect(ui->HighBauds, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
     {
@@ -618,14 +607,14 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(ini);
     });*/
     connect(ui->PWMFreq, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-            [ = ](int value)
+    [ = ](int value)
     {
         ahp_gt_set_pwm_frequency(axis_number, value);
         ui->PWMFreq_label->setText("PWM: " + QString::number(366 + 366 * value) + " Hz");
         saveIni(ini);
     });
     connect(ui->MountStyle, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            [ = ](int index)
+    [ = ](int index)
     {
         int flags = (int)ahp_gt_get_mount_flags();
         if(index == 2) {
@@ -639,31 +628,64 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_set_mount_flags((GTFlags)(flags | (index == 1 ? isForkMount : 0)));
         saveIni(ini);
     });
+    connect(ui->Device, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    [ = ](int value)
+    {
+        if(isConnected) {
+            ahp_gt_select_device(value);
+        }
+        saveIni(ini);
+    });
+    connect(ui->setAddress, static_cast<void (QPushButton::*)()>(&QPushButton::click),
+    [ = ]()
+    {
+        if(isConnected) {
+            int currentAddress = ui->Address->value();
+            ahp_gt_copy_device(ahp_gt_get_current_device(), currentAddress);
+            ahp_gt_write_values(axis_number, nullptr, nullptr);
+            if(ahp_gt_get_current_device() > 0)
+                ahp_gt_delete_device(ahp_gt_get_current_device());
+        }
+        saveIni(ini);
+    });
+    connect(ui->setAxis, static_cast<void (QPushButton::*)()>(&QPushButton::click),
+            [ = ]()
+    {
+        if(isConnected) {
+            int currentAxis = ui->Axis->currentIndex();
+            switch (GT[currentAxis]) {
+            case GT5:
+            case GT5_BRAKE:
+                ahp_gt_copy_axis(axis_number, currentAxis);
+                ahp_gt_write_values(axis_number, nullptr, nullptr);
+                ahp_gt_delete_axis(axis_number);
+                break;
+            default:
+                break;
+            }
+            axis_number = currentAxis;
+            ahp_gt_read_values(axis_number);
+        }
+    });
     connect(ui->Axis, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             [ = ](int value)
     {
-        switch (GT[value]) {
-        case GT1:
-        case GT2:
-        case GT2_BRAKE:
-            if(value > 1) {
-                value = 1;
-                ui->Axis->setCurrentIndex(value);
+        if(isConnected) {
+            switch (GT[value]) {
+            case GT1:
+            case GT2:
+            case GT2_BRAKE:
+                if(value > 1) {
+                    value = 1;
+                }
+                break;
+            default:
+                break;
             }
-            break;
-        case GT5:
-        case GT5_BRAKE:
-            if(isConnected) {
-                ahp_gt_copy_axis(axis_number, value);
-                ahp_gt_write_values(axis_number, nullptr, nullptr);
-                ahp_gt_delete_axis(axis_number);
-            }
-            break;
-        default:
-            break;
+            ui->Axis->setCurrentIndex(value);
+            axis_number = value;
+            ahp_gt_read_values(axis_number);
         }
-        axis_number = value;
-        ahp_gt_read_values(axis_number);
     });
     connect(ui->Speed, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
