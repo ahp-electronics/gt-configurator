@@ -424,31 +424,34 @@ MainWindow::MainWindow(QWidget *parent)
             ahp_gt_select_device(0);
             int a = 0;
             axis_number = 0;
-            version[0] = 0;
-            for (a= 0; a < NumAxes && version[a] == 0; a++){
-                version[a] = ahp_gt_get_mc_version(a);
-                if((version[a] & 0xf) == 5) {
-                    GT[a] = GT5;
-                    axis_number = a;
-                } else if((version[a] & 0xf) == 4) {
-                    GT[a] = GT5_BRAKE;
-                    axis_number = a;
-                }
-                ahp_gt_read_values(a);
-            }
+            version[0] = ahp_gt_get_mc_version(0);
+            version[1] = ahp_gt_get_mc_version(1);
             GT[0] = 0;
             GT[1] = 0;
-            if((version[0] & 0xf) == 1 && (version[1] & 0xf) == 1){
-                    GT[0] = GT1;
-                    GT[1] = GT1;
+            if((version[0] & 0xf) == 1 && (version[1] & 0xf) == 1) {
+                GT[0] = GT1;
+                GT[1] = GT1;
+            }
+            else if((version[0] & 0xf) == 2 && (version[1] & 0xf) == 3){
+                GT[0] = GT2;
+                GT[1] = GT2;
+            } else if((version[0] & 0xf) == 6 && (version[1] & 0xf) == 7){
+                GT[0] = GT2_BRAKE;
+                GT[1] = GT2_BRAKE;
+            } else {
+                for (a= 0; a < NumAxes; a++){
+                    version[a] = ahp_gt_get_mc_version(a);
+                    if((version[a] & 0xf) == 5) {
+                        GT[a] = GT5;
+                        axis_number = a;
+                        break;
+                    } else if((version[a] & 0xf) == 4) {
+                        GT[a] = GT5_BRAKE;
+                        axis_number = a;
+                        break;
+                    }
                 }
-                else if((version[0] & 0xf) == 2 && (version[1] & 0xf) == 3){
-                    GT[0] = GT2;
-                    GT[1] = GT2;
-                } else if((version[0] & 0xf) == 6 && (version[1] & 0xf) == 7){
-                    GT[0] = GT2_BRAKE;
-                    GT[1] = GT2_BRAKE;
-                }
+            }
 
             ui->Axis->setCurrentIndex(axis_number);
             settings->setValue("LastPort", ui->ComPort->currentText());
@@ -633,38 +636,48 @@ MainWindow::MainWindow(QWidget *parent)
     {
         if(isConnected) {
             ahp_gt_select_device(value);
+            ahp_gt_read_values(axis_number);
         }
         saveIni(ini);
     });
-    connect(ui->setAddress, static_cast<void (QPushButton::*)()>(&QPushButton::click),
-    [ = ]()
+    connect(ui->setAddress, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+    [ = ](bool checked)
     {
         if(isConnected) {
             int currentAddress = ui->Address->value();
             ahp_gt_copy_device(ahp_gt_get_current_device(), currentAddress);
-            ahp_gt_write_values(axis_number, nullptr, nullptr);
+            WriteThread->start();
+            QTimer timer;
+            timer.setSingleShot(true);
+            QEventLoop loop;
+            connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+            connect(WriteThread, SIGNAL(finished()), &loop, SLOT(quit()));
+            timer.start(3000);
+            loop.exec();
             if(ahp_gt_get_current_device() > 0)
                 ahp_gt_delete_device(ahp_gt_get_current_device());
         }
         saveIni(ini);
     });
-    connect(ui->setAxis, static_cast<void (QPushButton::*)()>(&QPushButton::click),
-            [ = ]()
+    connect(ui->setAxis, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            [ = ](bool checked)
     {
         if(isConnected) {
             int currentAxis = ui->Axis->currentIndex();
-            switch (GT[currentAxis]) {
-            case GT5:
-            case GT5_BRAKE:
+            if (GT[axis_number] == GT5 || GT[axis_number] == GT5_BRAKE) {
                 ahp_gt_copy_axis(axis_number, currentAxis);
-                ahp_gt_write_values(axis_number, nullptr, nullptr);
+                WriteThread->start();
+                QTimer timer;
+                timer.setSingleShot(true);
+                QEventLoop loop;
+                connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+                connect(WriteThread, SIGNAL(finished()), &loop, SLOT(quit()));
+                timer.start(3000);
+                loop.exec();
                 ahp_gt_delete_axis(axis_number);
-                break;
-            default:
-                break;
+                axis_number = currentAxis;
+                ahp_gt_read_values(axis_number);
             }
-            axis_number = currentAxis;
-            ahp_gt_read_values(axis_number);
         }
     });
     connect(ui->Axis, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -678,13 +691,14 @@ MainWindow::MainWindow(QWidget *parent)
                 if(value > 1) {
                     value = 1;
                 }
+            case GT5:
+            case GT5_BRAKE:
+                ahp_gt_read_values(axis_number);
+                axis_number = value;
                 break;
             default:
                 break;
             }
-            ui->Axis->setCurrentIndex(value);
-            axis_number = value;
-            ahp_gt_read_values(axis_number);
         }
     });
     connect(ui->Speed, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
@@ -743,6 +757,13 @@ MainWindow::MainWindow(QWidget *parent)
         }
 
         WriteThread->start();
+        QTimer timer;
+        timer.setSingleShot(true);
+        QEventLoop loop;
+        connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+        connect(WriteThread, SIGNAL(finished()), &loop, SLOT(quit()));
+        timer.start(3000);
+        loop.exec();
     });
     connect(ui->Inductance, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
@@ -913,8 +934,6 @@ void MainWindow::UpdateValues(int axis)
     }
     ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency(axis));
     ui->PWMFreq_label->setText("PWM: " + QString::number(366 + 366 * ui->PWMFreq->value()) + " Hz");
-    if(ahp_gt_get_current_device() > 0)
-        ui->Address->setValue(ahp_gt_get_current_device());
     ui->MountType->setCurrentIndex(mounttypes.indexOf(ahp_gt_get_mount_type()));
     int index = 0;
     index |= (((ahp_gt_get_features(axis) & isAZEQ) != 0) ? 2 : 0);
