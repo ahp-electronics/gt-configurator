@@ -5,11 +5,15 @@
     </qresource>
     <qresource prefix="/data">
         <file>gt1.json</file>
+        <file>gt1_lock.json</file>
         <file>gt2ra.json</file>
         <file>gt2dec.json</file>
         <file>gt5.json</file>
         <file>gt2ra_brake.json</file>
         <file>gt2dec_brake.json</file>
         <file>gt5_brake.json</file>
+        <file>gt2ra_lock.json</file>
+        <file>gt2dec_lock.json</file>
+        <file>gt5_lock.json</file>
     </qresource>
 </RCC>
