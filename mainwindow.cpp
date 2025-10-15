@@ -613,6 +613,10 @@ MainWindow::MainWindow(QWidget *parent)
     [ = ](int value)
     {
         ahp_gt_set_pwm_frequency(axis_number, value);
+        if(GT[axis_number] == GT2 || GT[axis_number] == GT1) {
+            ahp_gt_set_pwm_frequency(0, value);
+            ahp_gt_set_pwm_frequency(1, value);
+        }
         ui->PWMFreq_label->setText("PWM: " + QString::number(366 + 366 * value) + " Hz");
         saveIni(ini);
     });
@@ -620,12 +624,20 @@ MainWindow::MainWindow(QWidget *parent)
     [ = ](int index)
     {
         int flags = (int)ahp_gt_get_mount_flags();
-        if(index == 2) {
-            ahp_gt_set_features(axis_number, (SkywatcherFeature)(ahp_gt_get_features(axis_number) | isAZEQ));
-            ahp_gt_set_features(axis_number, (SkywatcherFeature)(ahp_gt_get_features(axis_number) | isAZEQ));
+        if(GT[axis_number] == GT2 || GT[axis_number] == GT1) {
+            if(index == 2) {
+                ahp_gt_set_features(0, (SkywatcherFeature)(ahp_gt_get_features(0) | isAZEQ));
+                ahp_gt_set_features(1, (SkywatcherFeature)(ahp_gt_get_features(1) | isAZEQ));
+            } else {
+                ahp_gt_set_features(0, (SkywatcherFeature)(ahp_gt_get_features(0) & ~isAZEQ));
+                ahp_gt_set_features(1, (SkywatcherFeature)(ahp_gt_get_features(1) & ~isAZEQ));
+            }
         } else {
-            ahp_gt_set_features(axis_number, (SkywatcherFeature)(ahp_gt_get_features(axis_number) & ~isAZEQ));
-            ahp_gt_set_features(axis_number, (SkywatcherFeature)(ahp_gt_get_features(axis_number) & ~isAZEQ));
+            if(index == 2) {
+                ahp_gt_set_features(axis_number, (SkywatcherFeature)(ahp_gt_get_features(axis_number) | isAZEQ));
+            } else {
+                ahp_gt_set_features(axis_number, (SkywatcherFeature)(ahp_gt_get_features(axis_number) & ~isAZEQ));
+            }
         }
         flags &= ~isForkMount;
         ahp_gt_set_mount_flags((GTFlags)(flags | (index == 1 ? isForkMount : 0)));
