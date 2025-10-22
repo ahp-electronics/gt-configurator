@@ -431,23 +431,28 @@ MainWindow::MainWindow(QWidget *parent)
             if((version[0] & 0xf) == 1 && (version[1] & 0xf) == 1) {
                 GT[0] = GT1;
                 GT[1] = GT1;
+                setWindowTitle(getWindowTitle() + " " + "GT1 or GT1K5");
             }
             else if((version[0] & 0xf) == 2 && (version[1] & 0xf) == 3){
                 GT[0] = GT2;
                 GT[1] = GT2;
+                setWindowTitle(getWindowTitle() + " " + "GT2 or GT5K30");
             } else if((version[0] & 0xf) == 6 && (version[1] & 0xf) == 7){
                 GT[0] = GT2_BRAKE;
                 GT[1] = GT2_BRAKE;
+                setWindowTitle(getWindowTitle() + " " + "GT2 or GT5K30 with brakes");
             } else {
                 for (a= 0; a < NumAxes; a++){
                     version[a] = ahp_gt_get_mc_version(a);
                     if((version[a] & 0xf) == 5) {
                         GT[a] = GT5;
                         axis_number = a;
+                        setWindowTitle(getWindowTitle() + " " + "GT5");
                         break;
                     } else if((version[a] & 0xf) == 4) {
                         GT[a] = GT5_BRAKE;
                         axis_number = a;
+                        setWindowTitle(getWindowTitle() + " " + "GT5 with brakes");
                         break;
                     }
                 }
@@ -689,29 +694,15 @@ MainWindow::MainWindow(QWidget *parent)
                 ahp_gt_delete_axis(axis_number);
                 axis_number = currentAxis;
                 ahp_gt_read_values(axis_number);
-            }
+            } else
+                axis_number = currentAxis;
         }
     });
     connect(ui->Axis, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             [ = ](int value)
     {
-        if(isConnected) {
-            switch (GT[value]) {
-            case GT1:
-            case GT2:
-            case GT2_BRAKE:
-                if(value > 1) {
-                    value = 1;
-                }
-            case GT5:
-            case GT5_BRAKE:
-                ahp_gt_read_values(axis_number);
-                axis_number = value;
-                break;
-            default:
-                break;
-            }
-        }
+        axis_number = ui->Axis->currentIndex();
+        ahp_gt_read_values(axis_number);
     });
     connect(ui->Speed, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
             [ = ](int value)
@@ -923,8 +914,8 @@ void MainWindow::UpdateValues(int axis)
     ui->Worm->setValue(ahp_gt_get_worm_teeth(axis));
     ui->Crown->setValue(ahp_gt_get_crown_teeth(axis));
     ui->Acceleration->setValue(ui->Acceleration->maximum() - ahp_gt_get_acceleration_angle(axis) * 1800.0 / M_PI);
-    ui->MaxSpeed->setMaximum(ahp_gt_get_speed_limit(axis) * SIDEREAL_NOON / M_PI);
-    ui->Speed->setMaximum(ahp_gt_get_speed_limit(axis) * SIDEREAL_NOON / M_PI);
+    //ui->MaxSpeed->setMaximum(ahp_gt_get_speed_limit(axis) * SIDEREAL_NOON / M_PI);
+    //ui->Speed->setMaximum(ahp_gt_get_speed_limit(axis) * SIDEREAL_NOON / M_PI);
     ui->MaxSpeed->setValue(ahp_gt_get_max_speed(axis) * SIDEREAL_NOON / M_PI);
     ui->MaxSpeed_label->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(axis) * SIDEREAL_NOON / M_PI) + "x");
     ui->Coil->setCurrentIndex(ahp_gt_get_stepping_conf(axis));

@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <config.h>
 #include <limits>
 #include <QThread>
 #include <QSettings>
@@ -21,6 +22,7 @@ QT_END_NAMESPACE
 class MainWindow : public QMainWindow
 {
         Q_OBJECT
+
 
     enum {
         GT1 = 1,
@@ -49,6 +51,7 @@ class MainWindow : public QMainWindow
         {
             RAmutex.unlock();
         }
+        QString getWindowTitle() { return "GT Configurator - Version " GT_CONFIGURATOR_VERSION " Engine " + QString::number(ahp_gt_get_version(), 16); }
 
     private:
         int GT[NumAxes] { 0 };
@@ -90,5 +93,5 @@ class MainWindow : public QMainWindow
         static void WriteValues(MainWindow *wnd);
         QMutex RAmutex, DEmutex;
         QMutex mutex;
-};
+        };
 #endif // MAINWINDOW_H

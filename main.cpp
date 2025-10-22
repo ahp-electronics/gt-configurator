@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 #endif
     MainWindow w;
-    w.setWindowTitle("GT Configurator - Version " GT_CONFIGURATOR_VERSION " Engine " + QString::number(ahp_gt_get_version(), 16));
+    w.setWindowTitle(w.getWindowTitle());
     QFont font = w.font();
     font.setPixelSize(12);
     w.setFont(font);
