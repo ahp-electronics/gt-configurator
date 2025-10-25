@@ -914,8 +914,6 @@ void MainWindow::UpdateValues(int axis)
     ui->Worm->setValue(ahp_gt_get_worm_teeth(axis));
     ui->Crown->setValue(ahp_gt_get_crown_teeth(axis));
     ui->Acceleration->setValue(ui->Acceleration->maximum() - ahp_gt_get_acceleration_angle(axis) * 1800.0 / M_PI);
-    //ui->MaxSpeed->setMaximum(ahp_gt_get_speed_limit(axis) * SIDEREAL_NOON / M_PI);
-    //ui->Speed->setMaximum(ahp_gt_get_speed_limit(axis) * SIDEREAL_NOON / M_PI);
     ui->MaxSpeed->setValue(ahp_gt_get_max_speed(axis) * SIDEREAL_NOON / M_PI);
     ui->MaxSpeed_label->setText("Maximum speed: " + QString::number(ahp_gt_get_max_speed(axis) * SIDEREAL_NOON / M_PI) + "x");
     ui->Coil->setCurrentIndex(ahp_gt_get_stepping_conf(axis));
