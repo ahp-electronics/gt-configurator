@@ -19,6 +19,7 @@ SetupIconFile=icon.ico
 [Files]
 Source: "../bin/{#TargetName}64/*"; DestDir: "{app}"; Check: Is64BitInstallMode ; Flags: solidbreak recursesubdirs
 Source: "../bin/{#TargetName}32/*"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: solidbreak recursesubdirs
+Source: "../{#TargetName}/driver/CH341SER.EXE"; DestDir: {app}/driver; DestName: CH341SER.EXE; Flags: ignoreversion
 Source: "../{#TargetName}/driver/dpinst32.exe"; DestDir: {app}/driver; DestName: dpinst.exe; Check: not IsWin64; Flags: ignoreversion
 Source: "../{#TargetName}/driver/dpinst64.exe"; DestDir: {app}/driver; DestName: dpinst.exe; Check: IsWin64; Flags: ignoreversion
 Source: "../{#TargetName}/driver/ser2pl*"; DestDir: {app}/driver;
@@ -30,6 +31,7 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#TargetName}.exe"
 
 [Run]
 Filename: "{app}/driver/dpinst.exe"; Parameters: "/F /A /SW /PATH ""{app}/driver"""
+Filename: "{app}/driver/CH341SER.EXE"
 
 [Code]
 function VersionInstalled(const ProductID: string): String;
