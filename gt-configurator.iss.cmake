@@ -31,7 +31,6 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#TargetName}.exe"
 
 [Run]
 Filename: "{app}/driver/dpinst.exe"; Parameters: "/F /A /SW /PATH ""{app}/driver"""
-Filename: "{app}/driver/CH341SER.EXE"
 
 [Code]
 function VersionInstalled(const ProductID: string): String;
