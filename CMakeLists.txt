@@ -58,8 +58,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt-configurator.iss.cmake ${CMAKE_CUR
 if(ANDROID)
     add_library(gt-configurator SHARED ${DFU_SOURCES}
         ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp        ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/threads.h
         ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.ui
     )
@@ -67,7 +66,6 @@ if(ANDROID)
     add_executable(gt-configurator ${DFU_SOURCES}
         ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h
         ${CMAKE_CURRENT_SOURCE_DIR}/threads.h
         ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.ui
         ${CMAKE_CURRENT_SOURCE_DIR}/resource.qrc
