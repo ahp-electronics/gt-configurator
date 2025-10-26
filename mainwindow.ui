@@ -1477,7 +1477,17 @@
      </item>
      <item>
       <property name="text">
+       <string>gt1_lock</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>gt2dec</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>gt2dec_lock</string>
       </property>
      </item>
      <item>
@@ -1492,12 +1502,22 @@
      </item>
      <item>
       <property name="text">
+       <string>gt2ra_lock</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>gt2ra_brake</string>
       </property>
      </item>
      <item>
       <property name="text">
        <string>gt5</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>gt5_lock</string>
       </property>
      </item>
      <item>

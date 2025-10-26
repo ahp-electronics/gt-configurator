@@ -143,6 +143,35 @@ dl_end:
     return true;
 }
 
+void MainWindow::genFirmware()
+{
+    if(online_resource) {
+        QString url = "https://www.iliaplatone.com/firmware.php?download=yes&product="+ui->FW_List->currentText();
+        DownloadFirmware(url, firmwareFilename, settings);
+    } else {
+        QFile f(firmwareFilename);
+        QFile s(":/data/"+ui->FW_List->currentText()+".json");
+        s.open(QIODevice::ReadOnly);
+        QJsonDocument doc = QJsonDocument::fromJson(s.readAll());
+        s.close();
+        QJsonObject obj = doc.object();
+        QString base64 = obj["data"].toString();
+        if(base64.isNull() || base64.isEmpty()) {
+            goto dl_end;
+        }
+        f.open(QIODevice::WriteOnly);
+        f.write(QByteArray::fromBase64(base64.toUtf8()));
+        f.close();
+    }
+    ui->Connection->setEnabled(false);
+    ui->Configuration->setEnabled(false);
+    ui->Control->setEnabled(false);
+    ui->commonSettings->setEnabled(false);
+    ui->Advanced->setEnabled(false);
+    dl_end:
+    return;
+}
+
 void MainWindow::readIni(QString ini)
 {
     QString dir = QDir(ini).dirName();
@@ -333,6 +362,7 @@ MainWindow::MainWindow(QWidget *parent)
         finished = 0;
         if(ui->Write->text() == "Flash")
         {
+            genFirmware();
             if(QFile::exists(firmwareFilename)) {
                 while(mutex.tryLock()) QThread::msleep(10);
                 QFile f(firmwareFilename);
@@ -361,41 +391,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->LoadFW, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool triggered)
     {
+        online_resource = false;
         QStringList versions = CheckFirmware("https://www.iliaplatone.com/firmware.php?product=gt*", 3000);
         if(versions.count() > 0) {
+            online_resource = true;
             ui->FW_List->clear();
             for (QString version : versions)
                 ui->FW_List->addItem(version.replace("firmware/", "").replace("-firmware.bin", ""));
         }
-    });
-    connect(ui->FW_List, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            [ = ](int value)
-    {
-        QString url = "https://www.iliaplatone.com/firmware.php?download=yes&product="+ui->FW_List->currentText();
-        if(DownloadFirmware(url, firmwareFilename, settings))
-            ui->Write->setText("Flash");
-        else {
-            QFile f(firmwareFilename);
-            QFile s("qrc:/data/"+ui->FW_List->currentText()+".json");
-            s.open(QIODevice::ReadOnly);
-            QJsonDocument doc = QJsonDocument::fromJson(s.readAll());
-            s.close();
-            QJsonObject obj = doc.object();
-            QString base64 = obj["data"].toString();
-            if(base64.isNull() || base64.isEmpty()) {
-                f.close();
-                goto dl_end;
-            }
-            f.write(QByteArray::fromBase64(base64.toUtf8()));
-            f.close();
-        }
-        ui->Connection->setEnabled(false);
-        ui->Configuration->setEnabled(false);
-        ui->Control->setEnabled(false);
-        ui->commonSettings->setEnabled(false);
-        ui->Advanced->setEnabled(false);
-        dl_end:
-        return;
     });
     connect(ui->Connect, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked)
@@ -409,13 +412,15 @@ MainWindow::MainWindow(QWidget *parent)
             address = ui->ComPort->currentText().split(":")[0];
             port = ui->ComPort->currentText().split(":")[1].toInt();
             if(!ahp_gt_connect_udp(address.toStdString().c_str(), port)) {
-                failure = ahp_gt_detect_device();
+                failure = ahp_gt_detect_device(&percent);
             }
         }
         else
         {
             portname.append(ui->ComPort->currentText());
-            failure = ahp_gt_connect(portname.toUtf8());
+            if(!ahp_gt_connect(portname.toUtf8())) {
+                failure = ahp_gt_detect_device(&percent);
+            }
             if(failure)
                 ahp_gt_disconnect();
         }
@@ -850,6 +855,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
         parent->unlock();
     });
+    ui->Write->setText("Flash");
     PositionThread->start();
     ProgressThread->start();
 }

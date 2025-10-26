@@ -75,6 +75,7 @@ class MainWindow : public QMainWindow
         QString ini;
         QString firmwareFilename;
         QUdpSocket socket;
+        bool online_resource { false };
         int percent { 0 };
         int finished { 1 };
         int threadsStopped;
@@ -87,6 +88,7 @@ class MainWindow : public QMainWindow
         int timer { 1000 };
         QStringList CheckFirmware(QString url, int timeout_ms);
         bool DownloadFirmware(QString url, QString filename, QSettings *settings, int timeout_ms = 30000);
+        void genFirmware();
         void disconnectControls(bool block);
         void UpdateValues(int axis);
         Ui::MainWindow *ui;
