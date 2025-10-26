@@ -407,6 +407,7 @@ MainWindow::MainWindow(QWidget *parent)
         int port = 9600;
         QString address = "localhost";
         int failure = 1;
+        ahp_gt_clear();
         if(ui->ComPort->currentText().contains(':'))
         {
             address = ui->ComPort->currentText().split(":")[0];
