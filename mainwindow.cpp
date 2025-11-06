@@ -310,7 +310,7 @@ MainWindow::MainWindow(QWidget *parent)
     ahp_set_app_name("GT Configurator");
     ahp_set_debug_level(AHP_DEBUG_DEBUG);
     IndicationThread = new Thread(this, 100, 500);
-    ProgressThread = new Thread(this, 100, 10);
+    ProgressThread = new Thread(this, 100, 100);
     PositionThread = new Thread(this, 1000, 1000);
     setAccessibleName("GT Configurator");
     firmwareFilename = QStandardPaths::standardLocations(QStandardPaths::TempLocation).at(0) + "/" + strrand(32);
@@ -658,8 +658,9 @@ MainWindow::MainWindow(QWidget *parent)
     [ = ](int value)
     {
         if(isConnected) {
-            ahp_gt_select_device(value);
-            ahp_gt_read_values(axis_number);
+            if(!ahp_gt_select_device(value)) {
+                ahp_gt_read_values(axis_number);
+            }
         }
         saveIni(ini);
     });
@@ -677,8 +678,6 @@ MainWindow::MainWindow(QWidget *parent)
             connect(WriteThread, SIGNAL(finished()), &loop, SLOT(quit()));
             timer.start(3000);
             loop.exec();
-            if(ahp_gt_get_current_device() > 0)
-                ahp_gt_delete_device(ahp_gt_get_current_device());
         }
         saveIni(ini);
     });
