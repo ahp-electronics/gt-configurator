@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <config.h>
+#include <limits>
 #include <QThread>
 #include <QSettings>
 #include <QMainWindow>
@@ -40,6 +42,7 @@ class MainWindow : public QMainWindow
         {
             RAmutex.unlock();
         }
+        QString getWindowTitle() { return "GT Configurator - Version " GT_CONFIGURATOR_VERSION " Engine " + QString::number(ahp_gt_get_version(), 16); }
 
     private:
         double Latitude, Longitude, Elevation;
@@ -69,6 +72,7 @@ class MainWindow : public QMainWindow
         QString ini;
         QString firmwareFilename;
         QUdpSocket socket;
+        bool online_resource { false };
         int percent { 0 };
         int finished { 1 };
         int threadsStopped;
@@ -81,6 +85,7 @@ class MainWindow : public QMainWindow
         int timer { 1000 };
         QStringList CheckFirmware(QString url, int timeout_ms);
         bool DownloadFirmware(QString url, QString filename, QSettings *settings, int timeout_ms = 30000);
+        void genFirmware();
         void disconnectControls(bool block);
         void UpdateValues(int axis);
         Ui::MainWindow *ui;
@@ -88,5 +93,6 @@ class MainWindow : public QMainWindow
         bool isTracking[2] { false, false };
         static void WriteValues(MainWindow *wnd);
         QMutex RAmutex, DEmutex;
-};
+        QMutex mutex;
+        };
 #endif // MAINWINDOW_H

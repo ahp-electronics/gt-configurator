@@ -15,10 +15,12 @@
 #include <QSerialPortInfo>
 #include <QFileDialog>
 #include <QTimer>
+#include <QMutex>
 #include <errno.h>
 #include <libdfu.h>
 #include "./ui_mainwindow.h"
 static const double SIDEREAL_DAY = 86164.0916000;
+static const double SIDEREAL_NOON = (SIDEREAL_DAY / 2);
 static MountType mounttype[] =
 {
     isEQ6,
@@ -141,6 +143,35 @@ dl_end:
     return true;
 }
 
+void MainWindow::genFirmware()
+{
+    if(online_resource) {
+        QString url = "https://www.iliaplatone.com/firmware.php?download=yes&product="+ui->FW_List->currentText();
+        DownloadFirmware(url, firmwareFilename, settings);
+    } else {
+        QFile f(firmwareFilename);
+        QFile s(":/data/"+ui->FW_List->currentText()+".json");
+        s.open(QIODevice::ReadOnly);
+        QJsonDocument doc = QJsonDocument::fromJson(s.readAll());
+        s.close();
+        QJsonObject obj = doc.object();
+        QString base64 = obj["data"].toString();
+        if(base64.isNull() || base64.isEmpty()) {
+            goto dl_end;
+        }
+        f.open(QIODevice::WriteOnly);
+        f.write(QByteArray::fromBase64(base64.toUtf8()));
+        f.close();
+    }
+    ui->Connection->setEnabled(false);
+    ui->Control->setEnabled(false);
+    ui->commonSettings->setEnabled(false);
+    ui->AdvancedRA->setEnabled(false);
+    ui->AdvancedDec->setEnabled(false);
+    dl_end:
+    return;
+}
+
 void MainWindow::readIni(QString ini)
 {
     QString dir = QDir(ini).dirName();
@@ -171,7 +202,7 @@ void MainWindow::readIni(QString ini)
     flags &= ~isForkMount;
     flags &= ~bauds_115200;
     flags |= ((ui->MountStyle->currentIndex() == 1) ? isForkMount : 0);
-    flags |= (ui->HighBauds->isChecked() ? bauds_115200 : 0);
+    //flags |= (ui->HighBauds->isChecked() ? bauds_115200 : 0);
     flags |= halfCurrentRA;
     flags |= halfCurrentDec;
     ahp_gt_set_mount_flags((GTFlags)flags);
@@ -316,8 +347,8 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Resistance_0", ui->Resistance_0->value());
     settings->setValue("Current_0", ui->Current_0->value());
     settings->setValue("Voltage_0", ui->Voltage_0->value());
-    settings->setValue("TimingValue_0", ahp_gt_get_timing(0));
     settings->setValue("Mean_0", ui->Mean_0->value());
+    settings->setValue("Timing_0", ui->Timing_0->value());
 
     settings->setValue("Invert_1", ui->Invert_1->isChecked());
     settings->setValue("SteppingMode_1", ui->SteppingMode_1->currentIndex());
@@ -333,14 +364,14 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Resistance_1", ui->Resistance_1->value());
     settings->setValue("Current_1", ui->Current_1->value());
     settings->setValue("Voltage_1", ui->Voltage_1->value());
-    settings->setValue("TimingValue_1", ahp_gt_get_timing(1));
     settings->setValue("Mean_1", ui->Mean_1->value());
+    settings->setValue("Timing_1", ui->Timing_1->value());
 
     settings->setValue("MountType", ui->MountType->currentIndex());
     settings->setValue("Address", ui->Address->value());
     settings->setValue("PWMFreq", ui->PWMFreq->value());
     settings->setValue("MountStyle", ui->MountStyle->currentIndex());
-    settings->setValue("HighBauds", ui->HighBauds->isChecked());
+    //settings->setValue("HighBauds", ui->HighBauds->isChecked());
     settings->setValue("Notes", QString(ui->Notes->text().toUtf8().toBase64()));
 
     settings->setValue("Ra", Ra);
@@ -405,12 +436,13 @@ MainWindow::MainWindow(QWidget *parent)
         percent = 0;
         finished = 0;
         ui->WorkArea->setEnabled(false);
-        ui->Write->setEnabled(false);
         ui->Connection->setEnabled(false);
         finished = 0;
         if(ui->Write->text() == "Flash")
         {
+            genFirmware();
             if(QFile::exists(firmwareFilename)) {
+                while(mutex.tryLock()) QThread::msleep(10);
                 QFile f(firmwareFilename);
                 f.open(QIODevice::ReadOnly);
                 if(!dfu_flash(f.handle(), &percent, &finished))
@@ -418,6 +450,7 @@ MainWindow::MainWindow(QWidget *parent)
                     settings->setValue("firmware", f.readAll().toBase64());
                 }
                 f.close();
+                mutex.unlock();
             }
         }
         else
@@ -472,10 +505,10 @@ MainWindow::MainWindow(QWidget *parent)
                     f.close();
                 }
                 ui->Connection->setEnabled(false);
-                ui->Configuration->setEnabled(false);
                 ui->Control->setEnabled(false);
                 ui->commonSettings->setEnabled(false);
-                ui->Advanced->setEnabled(false);
+                ui->AdvancedRA->setEnabled(false);
+                ui->AdvancedDec->setEnabled(false);
             dl_end:
                 return;
             });
@@ -486,19 +519,20 @@ MainWindow::MainWindow(QWidget *parent)
         int port = 9600;
         QString address = "localhost";
         int failure = 1;
+        ahp_gt_clear();
         if(ui->ComPort->currentText().contains(':'))
         {
             address = ui->ComPort->currentText().split(":")[0];
             port = ui->ComPort->currentText().split(":")[1].toInt();
             if(!ahp_gt_connect_udp(address.toStdString().c_str(), port)) {
-                failure = ahp_gt_detect_device();
+                failure = ahp_gt_detect_device(&percent);
             }
         }
         else
         {
             portname.append(ui->ComPort->currentText());
             if(!ahp_gt_connect(portname.toUtf8())) {
-                failure = ahp_gt_detect_device();
+                failure = ahp_gt_detect_device(&percent);
             } else {
                 ahp_gt_disconnect();
             }
@@ -538,8 +572,8 @@ MainWindow::MainWindow(QWidget *parent)
             [ = ](bool checked)
     {
         IndicationThread->stop();
-        ui->Write->setText("Write");
-        ui->Write->setEnabled(false);
+        ui->Write->setText("Flash");
+        ui->Write->setEnabled(true);
         ui->ComPort->setEnabled(true);
         isConnected = false;
         finished = false;
@@ -848,7 +882,7 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_write_values(0, nullptr, nullptr);
         ahp_gt_write_values(1, nullptr, nullptr);
         saveIni(ini);
-    });
+    });/*
     connect(ui->HighBauds, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
     {
         int flags = (int)ahp_gt_get_mount_flags();
@@ -857,9 +891,9 @@ MainWindow::MainWindow(QWidget *parent)
             flags |= bauds_115200;
         ahp_gt_set_mount_flags((GTFlags)flags);
         saveIni(ini);
-    });
+    });*/
     connect(ui->PWMFreq, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-            [ = ](int value)
+    [ = ](int value)
     {
         ahp_gt_set_pwm_frequency(0, value);
         ahp_gt_set_pwm_frequency(1, value);
@@ -867,7 +901,7 @@ MainWindow::MainWindow(QWidget *parent)
         saveIni(ini);
     });
     connect(ui->MountStyle, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            [ = ](int index)
+    [ = ](int index)
     {
         int flags = (int)ahp_gt_get_mount_flags();
         if(index == 2) {
@@ -1104,6 +1138,13 @@ MainWindow::MainWindow(QWidget *parent)
         }
 
         WriteThread->start();
+        QTimer timer;
+        timer.setSingleShot(true);
+        QEventLoop loop;
+        connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+        connect(WriteThread, SIGNAL(finished()), &loop, SLOT(quit()));
+        timer.start(3000);
+        loop.exec();
     });
     connect(ui->Inductance_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)

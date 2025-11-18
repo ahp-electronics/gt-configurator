@@ -20,7 +20,7 @@
       <x>10</x>
       <y>80</y>
       <width>1081</width>
-      <height>451</height>
+      <height>461</height>
      </rect>
     </property>
     <property name="contextMenuPolicy">
@@ -125,7 +125,7 @@
        <number>1</number>
       </property>
       <property name="maximum">
-       <number>1000</number>
+       <number>2000</number>
       </property>
       <property name="value">
        <number>200</number>
@@ -599,7 +599,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>360</y>
+       <y>370</y>
        <width>471</width>
        <height>81</height>
       </rect>
@@ -756,8 +756,8 @@
      <widget class="QSpinBox" name="Address">
       <property name="geometry">
        <rect>
-        <x>200</x>
-        <y>50</y>
+        <x>190</x>
+        <y>53</y>
         <width>51</width>
         <height>21</height>
        </rect>
@@ -1134,7 +1134,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>as/sec:</string>
+       <string>deg/sec:</string>
       </property>
      </widget>
      <widget class="QLabel" name="CurrentStepsLabel_0">
@@ -1563,7 +1563,7 @@
        <x>10</x>
        <y>30</y>
        <width>231</width>
-       <height>331</height>
+       <height>341</height>
       </rect>
      </property>
      <property name="title">
@@ -1777,7 +1777,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>281</y>
+        <y>300</y>
         <width>211</width>
         <height>20</height>
        </rect>
@@ -1786,7 +1786,7 @@
        <number>1</number>
       </property>
       <property name="maximum">
-       <number>1000</number>
+       <number>2000</number>
       </property>
       <property name="value">
        <number>200</number>
@@ -1805,7 +1805,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>300</y>
+        <y>320</y>
         <width>101</width>
         <height>21</height>
        </rect>
@@ -1833,7 +1833,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>260</y>
+        <y>280</y>
         <width>201</width>
         <height>17</height>
        </rect>
@@ -1846,7 +1846,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>300</y>
+        <y>320</y>
         <width>111</width>
         <height>17</height>
        </rect>
@@ -1906,6 +1906,47 @@
        <string>Stepping mode</string>
       </property>
      </widget>
+     <widget class="QSlider" name="Timing_0">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>260</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>-1024</number>
+      </property>
+      <property name="maximum">
+       <number>1024</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::NoTicks</enum>
+      </property>
+      <property name="tickInterval">
+       <number>50</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="Timing_label_0">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>260</y>
+        <width>111</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Timing</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QGroupBox" name="DEC">
      <property name="enabled">
@@ -1916,7 +1957,7 @@
        <x>250</x>
        <y>30</y>
        <width>231</width>
-       <height>331</height>
+       <height>341</height>
       </rect>
      </property>
      <property name="title">
@@ -2126,88 +2167,6 @@
        <string>Motor teeth</string>
       </property>
      </widget>
-     <widget class="QSlider" name="MaxSpeed_1">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>281</y>
-        <width>211</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>1000</number>
-      </property>
-      <property name="value">
-       <number>200</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::NoTicks</enum>
-      </property>
-      <property name="tickInterval">
-       <number>50</number>
-      </property>
-     </widget>
-     <widget class="QSlider" name="Acceleration_1">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>300</y>
-        <width>101</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="maximum">
-       <number>100</number>
-      </property>
-      <property name="singleStep">
-       <number>1</number>
-      </property>
-      <property name="value">
-       <number>10</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::NoTicks</enum>
-      </property>
-      <property name="tickInterval">
-       <number>8</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="MaxSpeed_label_1">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>260</y>
-        <width>201</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Max speed</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="Acceleration_label_1">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>300</y>
-        <width>111</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Acceleration</string>
-      </property>
-     </widget>
      <widget class="QCheckBox" name="Invert_1">
       <property name="geometry">
        <rect>
@@ -2257,6 +2216,129 @@
       </property>
       <property name="text">
        <string>Stepping mode</string>
+      </property>
+     </widget>
+     <widget class="QSlider" name="MaxSpeed_1">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>300</y>
+        <width>211</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>2000</number>
+      </property>
+      <property name="value">
+       <number>200</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::NoTicks</enum>
+      </property>
+      <property name="tickInterval">
+       <number>50</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="Acceleration_label_1">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>320</y>
+        <width>111</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Acceleration</string>
+      </property>
+     </widget>
+     <widget class="QSlider" name="Timing_1">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>260</y>
+        <width>101</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>-1024</number>
+      </property>
+      <property name="maximum">
+       <number>1024</number>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::NoTicks</enum>
+      </property>
+      <property name="tickInterval">
+       <number>50</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="Timing_label_1">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>260</y>
+        <width>111</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Timing</string>
+      </property>
+     </widget>
+     <widget class="QSlider" name="Acceleration_1">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>320</y>
+        <width>101</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="value">
+       <number>10</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::NoTicks</enum>
+      </property>
+      <property name="tickInterval">
+       <number>8</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="MaxSpeed_label_1">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>280</y>
+        <width>201</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Max speed</string>
       </property>
      </widget>
     </widget>
@@ -2410,7 +2492,7 @@
     </property>
     <widget class="QPushButton" name="Write">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -2421,7 +2503,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Write</string>
+      <string>Flash</string>
      </property>
     </widget>
     <widget class="QProgressBar" name="progress">
@@ -2435,6 +2517,9 @@
      </property>
      <property name="value">
       <number>0</number>
+     </property>
+     <property name="textVisible">
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QPushButton" name="LoadFW">
