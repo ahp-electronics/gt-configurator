@@ -28,6 +28,8 @@
 
 #include <cmath>
 #include <QThread>
+#include <QTimer>
+#include <QEventLoop>
 #include <QDateTime>
 #include <QWidget>
 #include <QMutex>
@@ -89,6 +91,15 @@ class Thread : public QThread
         QString getName()
         {
             return Name;
+        }
+        void block(int msec) {
+            QTimer timer;
+            timer.setSingleShot(true);
+            QEventLoop loop;
+            connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+            connect(this, SIGNAL(finished()), &loop, SLOT(quit()));
+            timer.start(msec);
+            loop.exec();
         }
         QObject *getParent() { return parent; }
     private:

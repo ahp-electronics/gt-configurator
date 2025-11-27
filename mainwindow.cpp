@@ -168,7 +168,7 @@ void MainWindow::genFirmware()
     ui->commonSettings->setEnabled(false);
     ui->AdvancedRA->setEnabled(false);
     ui->AdvancedDec->setEnabled(false);
-    dl_end:
+dl_end:
     return;
 }
 
@@ -229,6 +229,7 @@ void MainWindow::readIni(QString ini)
     ui->Coil_0->setCurrentIndex(settings->value("Coil_0", ahp_gt_get_stepping_conf(0)).toInt());
     ui->SteppingMode_0->setCurrentIndex(settings->value("SteppingMode_0", ahp_gt_get_stepping_mode(0)).toInt());
     ui->Mean_0->setValue(settings->value("Mean_0", 1).toInt());
+    ui->Timing_0->setValue(settings->value("Timing_0", 0).toInt());
 
     ui->MotorSteps_1->setValue(settings->value("MotorSteps_1", ahp_gt_get_motor_steps(1)).toInt());
     ui->Motor_1->setValue(settings->value("Motor_1", ahp_gt_get_motor_teeth(1)).toInt());
@@ -246,8 +247,9 @@ void MainWindow::readIni(QString ini)
     ui->Coil_1->setCurrentIndex(settings->value("Coil_1", ahp_gt_get_stepping_conf(1)).toInt());
     ui->SteppingMode_1->setCurrentIndex(settings->value("SteppingMode_1", ahp_gt_get_stepping_mode(1)).toInt());
     ui->Mean_1->setValue(settings->value("Mean_1", 1).toInt());
+    ui->Timing_1->setValue(settings->value("Timing_1", 0).toInt());
 
-    ahp_gt_set_timing(0, settings->value("TimingValue_0", 1500000).toInt());
+    ahp_gt_set_timing(0, -settings->value("Timing_0", 0).toInt() * 1500000.0 / 10000.0 + 1500000.0);
     ahp_gt_set_motor_steps(0, ui->MotorSteps_0->value());
     ahp_gt_set_motor_teeth(0, ui->Motor_0->value());
     ahp_gt_set_worm_teeth(0, ui->Worm_0->value());
@@ -270,7 +272,7 @@ void MainWindow::readIni(QString ini)
             break;
     }
 
-    ahp_gt_set_timing(1, settings->value("TimingValue_1", 1500000).toInt());
+    ahp_gt_set_timing(1, -settings->value("Timing_1", 0).toInt() * 1500000.0 / 10000.0 + 1500000.0);
     ahp_gt_set_motor_steps(1, ui->MotorSteps_1->value());
     ahp_gt_set_motor_teeth(1, ui->Motor_1->value());
     ahp_gt_set_worm_teeth(1, ui->Worm_1->value());
@@ -440,6 +442,11 @@ MainWindow::MainWindow(QWidget *parent)
         finished = 0;
         if(ui->Write->text() == "Flash")
         {
+            if(!ahp_gt_is_detected()&&ahp_gt_is_connected()) {
+                ahp_gt_detect_device(&percent);
+                thread->unlock();
+                return;
+            }
             genFirmware();
             if(QFile::exists(firmwareFilename)) {
                 while(mutex.tryLock()) QThread::msleep(10);
@@ -515,6 +522,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Connect, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked)
     {
+        ui->Connect->setEnabled(false);
         QString portname;
         int port = 9600;
         QString address = "localhost";
@@ -525,19 +533,21 @@ MainWindow::MainWindow(QWidget *parent)
             address = ui->ComPort->currentText().split(":")[0];
             port = ui->ComPort->currentText().split(":")[1].toInt();
             if(!ahp_gt_connect_udp(address.toStdString().c_str(), port)) {
-                failure = ahp_gt_detect_device(&percent);
+                WriteThread->start();
+                WriteThread->block(60000);
             }
         }
         else
         {
             portname.append(ui->ComPort->currentText());
             if(!ahp_gt_connect(portname.toUtf8())) {
-                failure = ahp_gt_detect_device(&percent);
+                WriteThread->start();
+                WriteThread->block(60000);
             } else {
                 ahp_gt_disconnect();
             }
         }
-        if(!failure)
+        if(ahp_gt_is_detected())
         {
             settings->setValue("LastPort", ui->ComPort->currentText());
             ui->Write->setText("Write");
@@ -567,6 +577,7 @@ MainWindow::MainWindow(QWidget *parent)
             ui->ComPort->setEnabled(false);
             IndicationThread->start();
         }
+        ui->Connect->setEnabled(true);
     });
     connect(ui->Disconnect, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
             [ = ](bool checked)
@@ -875,6 +886,18 @@ MainWindow::MainWindow(QWidget *parent)
         }
         saveIni(ini);
     });
+    connect(ui->Timing_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
+    [ = ](int value)
+    {
+        ahp_gt_set_timing(0, -value * 1500000.0 / 10000.0 + 1500000.0);
+        saveIni(ini);
+    });
+    connect(ui->Timing_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
+    [ = ](int value)
+    {
+        ahp_gt_set_timing(1, -value * 1500000.0 / 10000.0 + 1500000.0);
+        saveIni(ini);
+    });
     connect(ui->Address, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
@@ -1138,13 +1161,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
 
         WriteThread->start();
-        QTimer timer;
-        timer.setSingleShot(true);
-        QEventLoop loop;
-        connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
-        connect(WriteThread, SIGNAL(finished()), &loop, SLOT(quit()));
-        timer.start(3000);
-        loop.exec();
+        WriteThread->block(60000);
     });
     connect(ui->Inductance_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
@@ -1549,6 +1566,7 @@ void MainWindow::UpdateValues(int axis)
         ui->Coil_0->setCurrentIndex(ahp_gt_get_stepping_conf(0));
         ui->SteppingMode_0->setCurrentIndex(ahp_gt_get_stepping_mode(0));
         ui->Invert_0->setChecked(ahp_gt_get_direction_invert(0));
+        ui->Timing_label_0->setText("Timing: " + QString::number(ui->Timing_0->value() * 100.0 / 1500000.0 / 100.0) + " %");
     }
     else if (axis == 1)
     {
@@ -1580,6 +1598,7 @@ void MainWindow::UpdateValues(int axis)
         ui->Coil_1->setCurrentIndex(ahp_gt_get_stepping_conf(1));
         ui->SteppingMode_1->setCurrentIndex(ahp_gt_get_stepping_mode(1));
         ui->Invert_1->setChecked(ahp_gt_get_direction_invert(1));
+        ui->Timing_label_1->setText("Timing: " + QString::number(ui->Timing_1->value() * 100.0 / 1500000.0 / 100.0) + " %");
     }
     switch(ahp_gt_get_feature(0))
     {
