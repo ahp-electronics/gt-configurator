@@ -189,6 +189,7 @@ void MainWindow::readIni(QString ini)
     QSettings *settings = new QSettings(ini, QSettings::Format::IniFormat);
     ui->Notes->setText(QByteArray::fromBase64(settings->value("Notes").toString().toUtf8()));
 
+    ui->Address->setValue(settings->value("Address", 0).toInt());
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency(0)).toInt());
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency(1)).toInt());
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
@@ -211,6 +212,7 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_features(1, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0)));
     ahp_gt_set_pwm_frequency(0, ui->PWMFreq->value());
     ahp_gt_set_pwm_frequency(1, ui->PWMFreq->value());
+    ahp_gt_select_device(ui->Address->value());
 
 
     ui->MotorSteps_0->setValue(settings->value("MotorSteps_0", ahp_gt_get_motor_steps(0)).toInt());
@@ -901,9 +903,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Address, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
     {
-        ahp_gt_copy_device(ahp_gt_get_current_device(), value);
-        ahp_gt_write_values(0, nullptr, nullptr);
-        ahp_gt_write_values(1, nullptr, nullptr);
+        if(value > 0) {
+            ahp_gt_copy_device(ahp_gt_get_current_device(), value-1);
+            ahp_gt_write_values(0, nullptr, nullptr);
+            ahp_gt_write_values(1, nullptr, nullptr);
+        }
+        ahp_gt_select_device(value);
         saveIni(ini);
     });/*
     connect(ui->HighBauds, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
@@ -1353,12 +1358,12 @@ MainWindow::MainWindow(QWidget *parent)
                 if(a == 0)
                 {
                     ui->CurrentSteps_0->setText(QString::number((int)currentSteps[a]));
-                    ui->Rate_0->setText("as/sec: " + QString::number(Speed[a]));
+                    ui->Rate_0->setText("deg/sec: " + QString::number(Speed[a]));
                 }
                 if(a == 1)
                 {
                     ui->CurrentSteps_1->setText(QString::number(currentSteps[a]));
-                    ui->Rate_1->setText("as/sec: " + QString::number(Speed[a]));
+                    ui->Rate_1->setText("deg/sec: " + QString::number(Speed[a]));
                 }
                 UpdateValues(a);
             }
@@ -1443,7 +1448,7 @@ MainWindow::MainWindow(QWidget *parent)
             lastPollTime[a] = status[a].timestamp;
             double diffSteps = currentSteps[a] - lastSteps[a];
             lastSteps[a] = currentSteps[a];
-            diffSteps *= 360.0 * 60.0 * 60.0 / ahp_gt_get_totalsteps(a);
+            diffSteps *= 360.0 / ahp_gt_get_totalsteps(a);
             Speed[a] = 0.0;
             int _n_speeds = 1;
             if(a == 0)
@@ -1629,6 +1634,7 @@ void MainWindow::UpdateValues(int axis)
             break;
     }
     ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency(0));
+    ui->PWMFreq->setValue(ahp_gt_get_pwm_frequency(1));
     ui->PWMFreq_label->setText("PWM: " + QString::number(366 + 366 * ui->PWMFreq->value()) + " Hz");
     ui->MountType->setCurrentIndex(mounttypes.indexOf(ahp_gt_get_mount_type()));
     int index = 0;
