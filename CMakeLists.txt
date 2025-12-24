@@ -50,7 +50,7 @@ file(GLOB JSONS ${CMAKE_CURRENT_SOURCE_DIR}/*.json)
 file(COPY ${JSONS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt-configurator-single-ui.iss.cmake ${CMAKE_CURRENT_BINARY_DIR}/gt-configurator.iss )
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt-configurator-single-ui.iss.cmake ${CMAKE_CURRENT_BINARY_DIR}/gt-configurator-single-ui.iss )
 
 if(ANDROID)
     add_library(gt-configurator SHARED ${DFU_SOURCES}
