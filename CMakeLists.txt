@@ -48,37 +48,36 @@ file(GLOB ICONS ${CMAKE_CURRENT_SOURCE_DIR}/*.ico)
 file(COPY ${ICONS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(GLOB JSONS ${CMAKE_CURRENT_SOURCE_DIR}/*.json)
 file(COPY ${JSONS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt-configurator.iss.cmake ${CMAKE_CURRENT_BINARY_DIR}/gt-configurator.iss )
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt-configurator-single-ui.iss.cmake ${CMAKE_CURRENT_BINARY_DIR}/gt-configurator.iss )
 
 if(ANDROID)
-    add_library(gt-configurator-single-ui SHARED ${DFU_SOURCES}
+    add_library(gt-configurator SHARED ${DFU_SOURCES}
         ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp        ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/threads.h
         ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.ui
     )
     else(ANDROID)
-    add_executable(gt-configurator-single-ui ${DFU_SOURCES}
+    add_executable(gt-configurator ${DFU_SOURCES}
         ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.h
         ${CMAKE_CURRENT_SOURCE_DIR}/threads.h
         ${CMAKE_CURRENT_SOURCE_DIR}/mainwindow.ui
         ${CMAKE_CURRENT_SOURCE_DIR}/resource.qrc
         ${CMAKE_CURRENT_SOURCE_DIR}/app.rc
     )
     if(WIN32)
-        target_link_libraries(gt-configurator-single-ui PRIVATE comctl32)
+        target_link_libraries(gt-configurator PRIVATE comctl32)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wl,--subsystem,windows")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--subsystem,windows")
         set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -Wl,--subsystem,windows")
-        set_target_properties(gt-configurator-single-ui PROPERTIES WIN32_EXECUTABLE TRUE)
+        set_target_properties(gt-configurator PROPERTIES WIN32_EXECUTABLE TRUE)
     endif(WIN32)
 endif(ANDROID)
 
-target_link_libraries(gt-configurator-single-ui PRIVATE ${DFU_LIBRARIES} ${AHP_GT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} Qt5::Widgets Qt5::SerialPort Qt5::Network)
-install(TARGETS gt-configurator-single-ui RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+target_link_libraries(gt-configurator PRIVATE ${DFU_LIBRARIES} ${AHP_GT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} Qt5::Widgets Qt5::SerialPort Qt5::Network)
+install(TARGETS gt-configurator RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install(FILES ahp-gt-configurator.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons)
 install(FILES ahp-gt-configurator.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
