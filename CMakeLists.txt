@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(AHP_GT_CONFIGURATOR_VERSION_MAJOR 1)
 set(AHP_GT_CONFIGURATOR_VERSION_MINOR 3)
-set(AHP_GT_CONFIGURATOR_VERSION_RELEASE 7)
+set(AHP_GT_CONFIGURATOR_VERSION_RELEASE 8)
 set(AHP_GT_CONFIGURATOR_VERSION "${AHP_GT_CONFIGURATOR_VERSION_MAJOR}.${AHP_GT_CONFIGURATOR_VERSION_MINOR}.${AHP_GT_CONFIGURATOR_VERSION_RELEASE}")
 
 # QtCreator supports the following variables for Android, which are identical to qmake Android variables.
@@ -45,14 +45,7 @@ include_directories(${DFU_INCLUDE_DIR})
 execute_process (COMMAND ./update_firmware.sh https://www.iliaplatone.com/firmware.php WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/brew.sh.cmake ${CMAKE_CURRENT_BINARY_DIR}/brew.sh )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/icon.ico ${CMAKE_CURRENT_BINARY_DIR}/icon.ico COPYONLY )
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt1.json ${CMAKE_CURRENT_BINARY_DIR}/gt1.json COPYONLY )
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt1_lock.json ${CMAKE_CURRENT_BINARY_DIR}/gt1_lock.json COPYONLY )
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt2dec.json ${CMAKE_CURRENT_BINARY_DIR}/gt2dec.json COPYONLY )
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt2ra.json ${CMAKE_CURRENT_BINARY_DIR}/gt2ra.json COPYONLY )
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt2dec_brake.json ${CMAKE_CURRENT_BINARY_DIR}/gt2dec_brake.json COPYONLY )
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt2ra_brake.json ${CMAKE_CURRENT_BINARY_DIR}/gt2ra_brake.json COPYONLY )
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt5.json ${CMAKE_CURRENT_BINARY_DIR}/gt5.json COPYONLY )
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt5_brake.json ${CMAKE_CURRENT_BINARY_DIR}/gt5_brake.json COPYONLY )
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt-configurator.iss.cmake ${CMAKE_CURRENT_BINARY_DIR}/gt-configurator.iss )
 

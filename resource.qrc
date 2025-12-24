@@ -1,6 +1,1 @@
-<RCC>
-    <qresource prefix="/icons">
-        <file>icon.ico</file>
-        <file>check.ico</file>
-    </qresource>
-    <qresource prefix="/data">
+
