@@ -1,4 +1,5 @@
-
+IDI_ICON1               ICON        DISCARDABLE            "icon.ico"
+IDI_ICON2               ICON        DISCARDABLE            "check.ico"
 IDI_DATA1               TEXT        DISCARDABLE            "gt1.json"
 IDI_DATA2               TEXT        DISCARDABLE            "gt1_lock.json"
 IDI_DATA3               TEXT        DISCARDABLE            "gt2dec_brake.json"

@@ -1,4 +1,9 @@
-
+<RCC>
+    <qresource prefix="/icons">
+        <file>icon.ico</file>
+        <file>check.ico</file>
+    </qresource>
+    <qresource prefix="/data">
 <file>gt1.json</file>
 <file>gt1_lock.json</file>
 <file>gt2dec_brake.json</file>
