@@ -333,6 +333,11 @@ MainWindow::MainWindow(QWidget *parent)
         finished = 0;
         if(ui->Write->text() == "Flash")
         {
+            if(!ahp_gt_is_detected()&&ahp_gt_is_connected()) {
+                ahp_gt_detect_device(&percent);
+                thread->unlock();
+                return;
+            }
             if(QFile::exists(firmwareFilename)) {
                 while(mutex.tryLock()) QThread::msleep(10);
                 QFile f(firmwareFilename);
@@ -409,15 +414,17 @@ MainWindow::MainWindow(QWidget *parent)
             address = ui->ComPort->currentText().split(":")[0];
             port = ui->ComPort->currentText().split(":")[1].toInt();
             if(!ahp_gt_connect_udp(address.toStdString().c_str(), port)) {
-                failure = ahp_gt_detect_device();
+                WriteThread->start();
+                WriteThread->block(60000);
             }
         }
         else
         {
             portname.append(ui->ComPort->currentText());
-            failure = ahp_gt_connect(portname.toUtf8());
-            if(failure)
-                ahp_gt_disconnect();
+            if(!ahp_gt_connect(portname.toStdString().c_str())) {
+                WriteThread->start();
+                WriteThread->block(60000);
+            }
         }
         if(!failure)
         {
