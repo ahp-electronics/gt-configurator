@@ -44,7 +44,10 @@ include_directories(${DFU_INCLUDE_DIR})
 
 execute_process (COMMAND ./update_firmware.sh https://www.iliaplatone.com/firmware.php WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/brew.sh.cmake ${CMAKE_CURRENT_BINARY_DIR}/brew.sh )
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/icon.ico ${CMAKE_CURRENT_BINARY_DIR}/icon.ico COPYONLY )
+file(GLOB ICONS ${CMAKE_CURRENT_SOURCE_DIR}/*.ico)
+file(COPY ${ICONS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(GLOB JSONS ${CMAKE_CURRENT_SOURCE_DIR}/*.json)
+file(COPY ${JSONS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gt-configurator.iss.cmake ${CMAKE_CURRENT_BINARY_DIR}/gt-configurator.iss )
