@@ -19,10 +19,11 @@ SetupIconFile=icon.ico
 [Files]
 Source: "../bin/{#TargetName}64/*"; DestDir: "{app}"; Check: Is64BitInstallMode ; Flags: solidbreak recursesubdirs
 Source: "../bin/{#TargetName}32/*"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: solidbreak recursesubdirs
-Source: "../{#TargetName}/driver/dpinst32.exe"; DestDir: {app}/driver; DestName: dpinst.exe; Check: not IsWin64; Flags: ignoreversion
-Source: "../{#TargetName}/driver/dpinst64.exe"; DestDir: {app}/driver; DestName: dpinst.exe; Check: IsWin64; Flags: ignoreversion
-Source: "../{#TargetName}/driver/ser2pl*"; DestDir: {app}/driver;
-Source: "../{#TargetName}/driver/ahpbootloader*"; DestDir: {app}/driver;
+Source: "../bin/{#TargetName}32/driver/dpinst32.exe"; DestDir: {app}/driver; DestName: dpinst.exe; Check: not IsWin64; Flags: ignoreversion
+Source: "../bin/{#TargetName}64/driver/dpinst64.exe"; DestDir: {app}/driver; DestName: dpinst.exe; Check: IsWin64; Flags: ignoreversion
+Source: "../bin/{#TargetName}64/driver/CH341SER*"; DestDir: {app}/driver; Flags: ignoreversion
+Source: "../bin/{#TargetName}64/driver/ser2pl*"; DestDir: {app}/driver; Flags: ignoreversion
+Source: "../bin/{#TargetName}64/driver/ahpbootloader*"; DestDir: {app}/driver; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#TargetName}.exe"
