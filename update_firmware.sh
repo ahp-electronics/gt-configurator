@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
 url=$1
 wget "${url}?product=gt*" -O - | jq .data | tr -d '"' | base64 -d | tr -s ',' '\n' | cut -d '/' -f 2 | cut -d '-' -f 1 | while read line; do curl --resolve "iliaplatone.com:443:192.71.211.119" "${url}?product=$line&download=on" -o $line.json; done
 i=1
