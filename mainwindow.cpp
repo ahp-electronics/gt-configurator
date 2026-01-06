@@ -1498,12 +1498,6 @@ MainWindow::~MainWindow()
     ProgressThread->stop();
     WriteThread->stop();
     ServerThread->stop();
-    RaThread->wait();
-    DecThread->wait();
-    IndicationThread->wait();
-    ProgressThread->wait();
-    WriteThread->wait();
-    ServerThread->wait();
     if(QFile(firmwareFilename).exists())
         unlink(firmwareFilename.toUtf8());
     threadsStopped = true;
