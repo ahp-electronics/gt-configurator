@@ -1,5 +1,5 @@
 #define MyAppName "GT Configurator"
-#define TargetName "gt-configurator-single-ui"
+#define TargetName "gt-configurator-single"
 
 [Setup]
 AppId={{9C18C97C-463A-42AD-B5D7-4154023BDE23}

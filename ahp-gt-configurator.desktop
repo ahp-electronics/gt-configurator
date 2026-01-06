@@ -1,10 +1,10 @@
 [Desktop Entry]
 Version=1.0
 Encoding=UTF-8
-Name=AHP GT Configurator
+Name=AHP GT Configurator (Single UI)
 GenericName=Configuration utility for the AHP GT mount controllers
 Comment=Configuration utility for the GT Controllers
-Exec=gt-configurator
+Exec=gt-configurator-single
 Icon=ahp-gt-configurator
 StartupNotify=true
 Terminal=false
