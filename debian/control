@@ -1,4 +1,4 @@
-Source: gt-configurator
+Source: gt-configurator-single
 Section: misc
 Priority: optional
 Maintainer: Ilia Platone <info@iliaplatone.com>
@@ -15,7 +15,7 @@ Standards-Version: 3.9.5
 Homepage: http://iliaplatone.com/gt1
 Vcs-Git: git://github.com/ahp-electronics/gt-configurator.git
 
-Package: gt-configurator
+Package: gt-configurator-single
 Section: misc
 Architecture: any
 Multi-Arch: same
