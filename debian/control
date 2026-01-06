@@ -2,10 +2,9 @@ Source: gt-configurator-single
 Section: misc
 Priority: optional
 Maintainer: Ilia Platone <info@iliaplatone.com>
-Build-Depends: debhelper (>= 8.1.3~),
+Build-Depends:
  cdbs,
  libusb-1.0-0-dev,
- qtcreator,
  libqt5charts5-dev,
  libqt5serialport5-dev,
  libahp-gt,
