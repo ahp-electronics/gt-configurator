@@ -715,13 +715,13 @@ MainWindow::MainWindow(QWidget *parent)
     {
         ahp_gt_stop_motion(axis_number, 0);
     });
-    connect(ui->LimitIntensity, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), this,
+    connect(ui->LimitTorque, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), this,
             [ = ](bool checked)
     {
         ahp_gt_limit_intensity(axis_number, checked);
         saveIni(ini);
     });
-    connect(ui->Intensity, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), this,
+    connect(ui->Torque, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), this,
             [ = ](int value)
     {
         ahp_gt_set_intensity_limit(axis_number, value);
