@@ -164,8 +164,8 @@ void MainWindow::readIni(QString ini)
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
     //ui->HighBauds->setChecked(settings->value("HighBauds", false).toBool());
-    ui->LimitIntensity->setChecked(settings->value("LimitIntensity", false).toBool());
-    ui->Intensity->setValue(settings->value("Intensity", 0).toInt());   int flags = ahp_gt_get_mount_flags();
+    ui->LimitTorque->setChecked(settings->value("LimitTorque", false).toBool());
+    ui->Torque->setValue(settings->value("Intensity", 0).toInt());   int flags = ahp_gt_get_mount_flags();
 
     int features = ahp_gt_get_features(axis_number);
     features &= ~(isAZEQ | hasHalfCurrentTracking);
@@ -261,8 +261,8 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("TimingValue", ahp_gt_get_timing(axis_number));
     settings->setValue("Mean", ui->Mean->value());
 
-    settings->setValue("LimitIntensity", ui->LimitIntensity->isChecked());
-    settings->setValue("Intensity", ui->Intensity->value());
+    settings->setValue("LimitTorque", ui->LimitTorque->isChecked());
+    settings->setValue("Torque", ui->Torque->value());
     settings->setValue("MountType", ui->MountType->currentIndex());
     settings->setValue("Device", ui->Device->value());
     settings->setValue("PWMFreq", ui->PWMFreq->value());
@@ -914,6 +914,6 @@ void MainWindow::UpdateValues(int axis)
     ui->MountStyle->setCurrentIndex(index);
     //ui->HighBauds->setChecked((ahp_gt_get_mount_flags() & bauds_115200) != 0);
     ui->Timing->setValue((base_timing-ahp_gt_get_timing(axis))*ui->Timing->maximum()/offset_timing);
-    ui->LimitIntensity->setChecked(ahp_gt_is_intensity_limited(axis));
-    ui->Intensity->setValue(ahp_gt_get_intensity_limit(axis));
+    ui->LimitTorque->setChecked(ahp_gt_is_intensity_limited(axis));
+    ui->Torque->setValue(ahp_gt_get_intensity_limit(axis));
 }
