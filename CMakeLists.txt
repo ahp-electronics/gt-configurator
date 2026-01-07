@@ -78,5 +78,5 @@ endif(ANDROID)
 
 target_link_libraries(gt-configurator-single PRIVATE ${DFU_LIBRARIES} ${AHP_GT_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} Qt5::Widgets Qt5::SerialPort Qt5::Network)
 install(TARGETS gt-configurator-single RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-install(FILES ahp-gt-configurator.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons)
-install(FILES ahp-gt-configurator.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
+install(FILES ahp-gt-configurator-single.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons)
+install(FILES ahp-gt-configurator-single.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
