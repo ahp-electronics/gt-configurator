@@ -57,6 +57,9 @@ class MainWindow : public QMainWindow
         int GT[NumAxes] { 0 };
         int version[NumAxes] { 0 };
         int axis_number { 0  };
+        int device_number { 0  };
+        int new_axis { 0  };
+        int new_device { 0  };
         double phi {0.0};
 
         bool axis_lospeed { false};
