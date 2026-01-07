@@ -10,6 +10,11 @@
     <height>657</height>
    </rect>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(30, 30, 30);
+font: 10pt &quot;FreeSans&quot;;
+color: rgb(255, 255, 255);</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGroupBox" name="WorkArea">
     <property name="enabled">
@@ -2603,7 +2608,7 @@
      <x>0</x>
      <y>0</y>
      <width>1100</width>
-     <height>23</height>
+     <height>18</height>
     </rect>
    </property>
   </widget>
