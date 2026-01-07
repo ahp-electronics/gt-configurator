@@ -3,6 +3,7 @@ Section: misc
 Priority: optional
 Maintainer: Ilia Platone <info@iliaplatone.com>
 Build-Depends:
+ cdbs,
  libusb-1.0-0-dev,
  libqt5charts5-dev,
  libqt5serialport5-dev,
