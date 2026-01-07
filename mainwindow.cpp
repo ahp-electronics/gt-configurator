@@ -360,6 +360,8 @@ MainWindow::MainWindow(QWidget *parent)
             device_number = new_device;
             ahp_gt_select_device(device_number);
             ahp_gt_read_values(axis_number);
+            percent = 0;
+            ahp_gt_detect_device(&percent);
             ui->Write->setEnabled(true);
             ui->WorkArea->setEnabled(true);
         }
@@ -432,7 +434,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
         if(ahp_gt_is_detected())
         {
-            ahp_gt_select_device(0);
             int a = 0;
             axis_number = 0;
             version[0] = ahp_gt_get_mc_version(0);
@@ -469,6 +470,7 @@ MainWindow::MainWindow(QWidget *parent)
                 }
             }
 
+            ui->Device->setValue(ahp_gt_get_current_device());
             ui->Axis->setCurrentIndex(axis_number);
             settings->setValue("LastPort", ui->ComPort->currentText());
             ui->Write->setText("Write");
