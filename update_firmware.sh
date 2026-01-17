@@ -1,6 +1,8 @@
 #!/bin/bash
+rm *.json
+
 url=$1
-wget "${url}?product=gt*" -O - | jq .data | tr -d '"' | base64 -d | tr -s ',' '\n' | cut -d '/' -f 2 | cut -d '-' -f 1 | while read line; do curl --resolve "iliaplatone.com:443:192.71.211.119" "${url}?product=$line&download=on" -o $line.json; done
+curl "${url}?product=gt*" | jq .data | tr -d '"' | base64 -d | tr -s ',' '\n' | cut -d '/' -f 2 | cut -d '-' -f 1 | while read line; do curl "${url}?product=$line&download=on" -o $line.json; done
 i=1
 echo "IDI_ICON1               ICON        DISCARDABLE            \"icon.ico\"" > app.rc
 
