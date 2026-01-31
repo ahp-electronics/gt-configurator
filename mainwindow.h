@@ -23,15 +23,6 @@ class MainWindow : public QMainWindow
 {
         Q_OBJECT
 
-
-    enum {
-        GT1 = 1,
-        GT2 = 2,
-        GT2_BRAKE = 3,
-        GT5 = 5,
-        GT5_BRAKE = 6,
-    } GT_Version;
-
     public:
         MainWindow(QWidget *parent = nullptr);
         ~MainWindow();

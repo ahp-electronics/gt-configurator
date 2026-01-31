@@ -264,7 +264,8 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("LimitTorque", ui->LimitTorque->isChecked());
     settings->setValue("Torque", ui->Torque->value());
     settings->setValue("MountType", ui->MountType->currentIndex());
-    settings->setValue("Device", ui->Device->value());
+    settings->setValue("Device", ui->SelectDevice->value());
+    settings->setValue("Device", ui->SetDevice->value());
     settings->setValue("PWMFreq", ui->PWMFreq->value());
     settings->setValue("MountStyle", ui->MountStyle->currentIndex());
     //settings->setValue("HighBauds", ui->HighBauds->isChecked());
@@ -301,7 +302,7 @@ MainWindow::MainWindow(QWidget *parent)
     stop_correction = true;
     settings = new QSettings(ini, QSettings::Format::IniFormat);
     isConnected = false;
-    this->setFixedSize(600, 660);
+    this->setFixedSize(600, 690);
     ui->setupUi(this);
     QString lastPort = settings->value("LastPort", "").toString();
     if(lastPort != "")
@@ -309,7 +310,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->ComPort->addItem("localhost:11880");
     ahp_gt_set_axes_limit(NumAxes);
     for(int a = 0; a < ahp_gt_get_axes_limit(); a++) {
-        ui->Axis->addItem(ahp_gt_get_axis_name(a));
+        ui->SetAxis->addItem(ahp_gt_get_axis_name(a));
+        ui->SelectAxis->addItem(ahp_gt_get_axis_name(a));
     }
     QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
     if(ports.length() > 0)
@@ -334,7 +336,24 @@ MainWindow::MainWindow(QWidget *parent)
         if(ui->Write->text() == "Flash")
         {
             if(!ahp_gt_is_detected()&&ahp_gt_is_connected()) {
+                ahp_gt_select_device(device_number);
                 ahp_gt_detect_device(&percent);
+                if(ahp_gt_is_detected())
+                {
+                    int a = 0;
+                    axis_number = 0;
+                    for (a= 0; a < NumAxes; a++) {
+                        if(ahp_gt_axis_is_detected(a)) {
+                            if(ahp_gt_get_axis_model(a) == GT5) {
+                                GT[a] = GT5;
+                                axis_number = a;
+                                setWindowTitle(getWindowTitle() + " " + "GT5");
+                                break;
+                            }
+                        }
+                    }
+                    ahp_gt_read_values(axis_number);
+                }
                 thread->unlock();
                 return;
             }
@@ -360,8 +379,6 @@ MainWindow::MainWindow(QWidget *parent)
             device_number = new_device;
             ahp_gt_select_device(device_number);
             ahp_gt_read_values(axis_number);
-            percent = 0;
-            ahp_gt_detect_device(&percent);
             ui->Write->setEnabled(true);
             ui->WorkArea->setEnabled(true);
         }
@@ -432,46 +449,11 @@ MainWindow::MainWindow(QWidget *parent)
                 WriteThread->block(60000);
             }
         }
-        if(ahp_gt_is_detected())
-        {
-            int a = 0;
-            axis_number = 0;
-            version[0] = ahp_gt_get_mc_version(0);
-            version[1] = ahp_gt_get_mc_version(1);
-            GT[0] = 0;
-            GT[1] = 0;
-            if((version[0] & 0xf) == 1 && (version[1] & 0xf) == 1) {
-                GT[0] = GT1;
-                GT[1] = GT1;
-                setWindowTitle(getWindowTitle() + " " + "GT1 or GT1K5");
-            }
-            else if((version[0] & 0xf) == 2 && (version[1] & 0xf) == 3){
-                GT[0] = GT2;
-                GT[1] = GT2;
-                setWindowTitle(getWindowTitle() + " " + "GT2 or GT5K30");
-            } else if((version[0] & 0xf) == 6 && (version[1] & 0xf) == 7){
-                GT[0] = GT2_BRAKE;
-                GT[1] = GT2_BRAKE;
-                setWindowTitle(getWindowTitle() + " " + "GT2 or GT5K30 with brakes");
-            } else {
-                for (a= 0; a < NumAxes; a++){
-                    version[a] = ahp_gt_get_mc_version(a);
-                    if((version[a] & 0xf) == 5) {
-                        GT[a] = GT5;
-                        axis_number = a;
-                        setWindowTitle(getWindowTitle() + " " + "GT5");
-                        break;
-                    } else if((version[a] & 0xf) == 4) {
-                        GT[a] = GT5_BRAKE;
-                        axis_number = a;
-                        setWindowTitle(getWindowTitle() + " " + "GT5 with brakes");
-                        break;
-                    }
-                }
-            }
-
-            ui->Device->setValue(ahp_gt_get_current_device());
-            ui->Axis->setCurrentIndex(axis_number);
+        if(ahp_gt_is_detected()) {
+            ui->SelectDevice->setValue(ahp_gt_get_current_device());
+            ui->SetDevice->setValue(ahp_gt_get_current_device());
+            ui->SelectAxis->setCurrentIndex(axis_number);
+            ui->SetAxis->setCurrentIndex(axis_number);
             settings->setValue("LastPort", ui->ComPort->currentText());
             ui->Write->setText("Write");
             ui->Write->setEnabled(true);
@@ -661,21 +643,37 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_set_mount_flags((GTFlags)(flags | (index == 1 ? isForkMount : 0)));
         saveIni(ini);
     });
-    connect(ui->Device, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui->SelectDevice, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
     [ = ](int value)
     {
         if(isConnected) {
-            new_device = ui->Device->value();
+            ahp_gt_select_device(value);
+        }
+        saveIni(ini);
+    });
+    connect(ui->SetDevice, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    [ = ](int value)
+    {
+        if(isConnected) {
+            new_device = ui->SetDevice->value();
             ahp_gt_copy_device(ahp_gt_get_current_device(), new_device);
         }
         saveIni(ini);
     });
-    connect(ui->Axis, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            [ = ](int value)
+    connect(ui->SelectAxis, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+    [ = ](int value)
     {
         if(isConnected) {
-            new_axis = ui->Axis->currentIndex();
-            if (GT[axis_number] == GT5 || GT[axis_number] == GT5_BRAKE) {
+            axis_number = value;
+        }
+        saveIni(ini);
+    });
+    connect(ui->SetAxis, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+    [ = ](int value)
+    {
+        if(isConnected) {
+            new_axis = ui->SetAxis->currentIndex();
+            if (GT[axis_number] == GT5) {
                 ahp_gt_copy_axis(axis_number, new_axis);
             }
         }
@@ -729,7 +727,7 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_set_intensity_limit(axis_number, value);
         saveIni(ini);
     });
-    connect(ui->Write, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+    connect(ui->Write, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked), this,
             [ = ](bool checked = false)
     {
         if(ui->Write->text() == "Write")
@@ -812,12 +810,7 @@ MainWindow::MainWindow(QWidget *parent)
                     lastSpeeds[s] = diffSteps;
                 Speed += lastSpeeds[s];
             }
-            Speed /= _n_speeds * diffTime;/*
-            if(!stop_correction) {
-                ahp_gt_correct_tracking(axis_number, SIDEREAL_DAY * ahp_gt_get_wormsteps(axis_number) / ahp_gt_get_totalsteps(axis_number), &stop_correction);
-                    if(ui->Tune->isChecked())
-                        ui->Tune->click();
-            }*/
+            Speed /= _n_speeds * diffTime;
         }
         parent->unlock();
     });
@@ -846,7 +839,10 @@ MainWindow::~MainWindow()
 void MainWindow::disconnectControls(bool block)
 {
     ui->MountType->blockSignals(block);
-    ui->Device->blockSignals(block);
+    ui->SelectAxis->blockSignals(block);
+    ui->SetAxis->blockSignals(block);
+    ui->SelectDevice->blockSignals(block);
+    ui->SetDevice->blockSignals(block);
     ui->MountStyle->blockSignals(block);
     ui->PWMFreq->blockSignals(block);
 
