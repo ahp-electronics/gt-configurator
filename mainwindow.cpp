@@ -189,8 +189,7 @@ void MainWindow::readIni(QString ini)
     ui->Worm->setValue(settings->value("Worm", ahp_gt_get_worm_teeth(axis_number)).toInt());
     ui->Crown->setValue(settings->value("Crown", ahp_gt_get_crown_teeth(axis_number)).toInt());
     ui->MaxSpeed->setValue(settings->value("MaxSpeed", ahp_gt_get_max_speed(axis_number) * SIDEREAL_NOON / M_PI).toInt());
-    ui->Acceleration->setValue(settings->value("Acceleration",
-                                 ui->Acceleration->maximum() - ahp_gt_get_acceleration_angle(axis_number) * 1800.0 / M_PI).toInt());
+    ui->Acceleration->setValue(settings->value("Acceleration", ui->Acceleration->maximum() - ahp_gt_get_acceleration_angle(axis_number) * 1800.0 / M_PI).toInt());
     ui->Invert->setChecked(settings->value("Invert", ahp_gt_get_direction_invert(axis_number) == 1).toBool());
     ui->Inductance->setValue(settings->value("Inductance", 10).toInt());
     ui->Resistance->setValue(settings->value("Resistance", 20000).toInt());
@@ -338,22 +337,19 @@ MainWindow::MainWindow(QWidget *parent)
             if(!ahp_gt_is_detected()&&ahp_gt_is_connected()) {
                 ahp_gt_select_device(device_number);
                 ahp_gt_detect_device(&percent);
-                if(ahp_gt_is_detected())
-                {
-                    int a = 0;
-                    axis_number = 0;
-                    for (a= 0; a < NumAxes; a++) {
-                        if(ahp_gt_axis_is_detected(a)) {
-                            if(ahp_gt_get_axis_model(a) == GT5) {
-                                GT[a] = GT5;
-                                axis_number = a;
-                                setWindowTitle(getWindowTitle() + " " + "GT5");
-                                break;
-                            }
+                int a = 0;
+                axis_number = 0;
+                for (a= 0; a < NumAxes; a++) {
+                    if(ahp_gt_axis_is_detected(a)) {
+                        if(ahp_gt_get_axis_model(a) == GT5) {
+                            GT[a] = GT5;
+                            axis_number = a;
+                            setWindowTitle(getWindowTitle() + " " + "GT5");
+                            break;
                         }
                     }
-                    ahp_gt_read_values(axis_number);
                 }
+                ahp_gt_read_values(axis_number);
                 thread->unlock();
                 return;
             }
@@ -368,19 +364,22 @@ MainWindow::MainWindow(QWidget *parent)
                 f.close();
                 mutex.unlock();
             }
-        }
-        else
-        {
-            ui->Write->setEnabled(false);
-            ahp_gt_move_axis(axis_number, new_axis);
-            ahp_gt_write_values(axis_number, &percent, &finished);
-            ahp_gt_reload(axis_number);
-            axis_number = new_axis;
-            device_number = new_device;
+        } else if(ui->Write->text() == "Scan") {
             ahp_gt_select_device(device_number);
-            ahp_gt_read_values(axis_number);
-            ui->Write->setEnabled(true);
-            ui->WorkArea->setEnabled(true);
+            ahp_gt_detect_device(&percent);
+        } else {
+            if(ahp_gt_is_detected()&&ahp_gt_is_connected()) {
+                ui->Write->setEnabled(false);
+                ahp_gt_move_axis(axis_number, new_axis);
+                ahp_gt_write_values(axis_number, &percent, &finished);
+                ahp_gt_reload(axis_number);
+                axis_number = new_axis;
+                device_number = new_device;
+                ahp_gt_select_device(device_number);
+                ahp_gt_read_values(axis_number);
+                ui->Write->setEnabled(true);
+                ui->WorkArea->setEnabled(true);
+            }
         }
         ui->Connection->setEnabled(true);
         percent = 0;
@@ -647,6 +646,7 @@ MainWindow::MainWindow(QWidget *parent)
     [ = ](int value)
     {
         if(isConnected) {
+            device_number = value;
             ahp_gt_select_device(value);
         }
         saveIni(ini);
@@ -664,7 +664,8 @@ MainWindow::MainWindow(QWidget *parent)
     [ = ](int value)
     {
         if(isConnected) {
-            axis_number = value;
+            if(ahp_gt_axis_is_detected(value))
+                axis_number = value;
         }
         saveIni(ini);
     });
@@ -673,9 +674,8 @@ MainWindow::MainWindow(QWidget *parent)
     {
         if(isConnected) {
             new_axis = ui->SetAxis->currentIndex();
-            if (GT[axis_number] == GT5) {
-                ahp_gt_copy_axis(axis_number, new_axis);
-            }
+            ahp_gt_copy_axis(axis_number, new_axis);
+            axis_number = new_axis;
         }
         saveIni(ini);
     });
@@ -814,7 +814,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
         parent->unlock();
     });
-    PositionThread->start();
+    //PositionThread->start();
     ProgressThread->start();
 }
 
@@ -860,6 +860,7 @@ void MainWindow::disconnectControls(bool block)
 
 void MainWindow::UpdateValues(int axis)
 {
+    ahp_gt_read_values(axis);
     double totalsteps = ahp_gt_get_totalsteps(axis) * ahp_gt_get_divider(axis) / ahp_gt_get_multiplier(axis);
     ui->Divider->setText(QString::number(ahp_gt_get_divider(axis)));
     ui->Multiplier->setText(QString::number(ahp_gt_get_multiplier(axis)));
