@@ -783,7 +783,7 @@ MainWindow::MainWindow(QWidget *parent)
         if(isConnected && finished)
         {
                 ui->CurrentSteps->setText(QString::number((int)currentSteps));
-                ui->Rate->setText("deg/sec: " + QString::number(Speed/3600.0));
+                ui->Rate->setText("deg/sec: " + QString::number(Speed));
                 UpdateValues(axis_number);
         }
 
@@ -798,8 +798,8 @@ MainWindow::MainWindow(QWidget *parent)
             lastPollTime = status.timestamp;
             double diffSteps = currentSteps - lastSteps;
             lastSteps = currentSteps;
-            diffSteps *= 360.0 * 60.0 * 60.0 / ahp_gt_get_totalsteps(axis_number);
-            Speed = 0.0;
+            diffSteps *= 360.0 / ahp_gt_get_totalsteps(axis_number) * 63 / ahp_gt_get_multiplier(axis_number);
+            double speed = 0.0;
             int _n_speeds = 1;
             _n_speeds = ui->Mean->value();
             for(int s = 0; s < _n_speeds; s++)
@@ -808,13 +808,14 @@ MainWindow::MainWindow(QWidget *parent)
                     lastSpeeds[s] = lastSpeeds[s + 1];
                 else
                     lastSpeeds[s] = diffSteps;
-                Speed += lastSpeeds[s];
+                speed += lastSpeeds[s];
             }
-            Speed /= _n_speeds * diffTime;
+            speed /= _n_speeds * diffTime;
+            Speed = speed;
         }
         parent->unlock();
     });
-    //PositionThread->start();
+    PositionThread->start();
     ProgressThread->start();
 }
 
