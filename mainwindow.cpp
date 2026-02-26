@@ -1391,11 +1391,10 @@ MainWindow::MainWindow(QWidget *parent)
             }
             double diffTime = (double)status[a].timestamp-lastPollTime[a];
             lastPollTime[a] = status[a].timestamp;
-            double speed;
             double diffSteps = currentSteps[a] - lastSteps[a];
             lastSteps[a] = currentSteps[a];
-            diffSteps *= 360.0 / ahp_gt_get_totalsteps(a);
-            speed = 0.0;
+            diffSteps *= 360.0 / ahp_gt_get_totalsteps(a) * 63 / ahp_gt_get_multiplier(a);
+            Speed[a] = 0.0;
             int _n_speeds = 1;
             if(a == 0)
                 _n_speeds = ui->Mean_0->value();
@@ -1407,10 +1406,9 @@ MainWindow::MainWindow(QWidget *parent)
                     lastSpeeds[a][s] = lastSpeeds[a][s + 1];
                 else
                     lastSpeeds[a][s] = diffSteps;
-                speed += lastSpeeds[a][s];
+                Speed[a] += lastSpeeds[a][s];
             }
-            speed /= _n_speeds * diffTime;
-            Speed[a] = speed;
+            Speed[a] /= _n_speeds * diffTime;
             if(!stop_correction[a]) {
                 bool oldtracking = oldTracking[a];
                 oldTracking[a] = false;
