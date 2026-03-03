@@ -203,7 +203,7 @@ void MainWindow::readIni(QString ini)
     flags &= ~isForkMount;
     flags &= ~bauds_115200;
     flags |= ((ui->MountStyle->currentIndex() == 1) ? isForkMount : 0);
-    //flags |= (ui->HighBauds->isChecked() ? bauds_115200 : 0);
+    flags |= (ui->HighBauds->isChecked() ? bauds_115200 : 0);
     flags |= halfCurrentRA;
     flags |= halfCurrentDec;
     ahp_gt_set_mount_flags((GTFlags)flags);
@@ -375,7 +375,7 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Address", ui->Address->value());
     settings->setValue("PWMFreq", ui->PWMFreq->value());
     settings->setValue("MountStyle", ui->MountStyle->currentIndex());
-    //settings->setValue("HighBauds", ui->HighBauds->isChecked());
+    settings->setValue("HighBauds", ui->HighBauds->isChecked());
     settings->setValue("Notes", QString(ui->Notes->text().toUtf8().toBase64()));
 
     settings->setValue("Ra", Ra);
@@ -910,7 +910,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
         ahp_gt_select_device(value);
         saveIni(ini);
-    });/*
+    });
     connect(ui->HighBauds, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
     {
         int flags = (int)ahp_gt_get_mount_flags();
@@ -919,7 +919,7 @@ MainWindow::MainWindow(QWidget *parent)
             flags |= bauds_115200;
         ahp_gt_set_mount_flags((GTFlags)flags);
         saveIni(ini);
-    });*/
+    });
     connect(ui->PWMFreq, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
     [ = ](int value)
     {
