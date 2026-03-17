@@ -163,7 +163,7 @@ void MainWindow::readIni(QString ini)
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency(axis_number)).toInt());
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
     ui->MountStyle->setCurrentIndex(settings->value("MountStyle", 0).toInt());
-    //ui->HighBauds->setChecked(settings->value("HighBauds", false).toBool());
+    ui->HighBauds->setChecked(settings->value("HighBauds", false).toBool());
     ui->LimitTorque->setChecked(settings->value("LimitTorque", false).toBool());
     ui->Torque->setValue(settings->value("Intensity", 0).toInt());   int flags = ahp_gt_get_mount_flags();
 
@@ -174,7 +174,7 @@ void MainWindow::readIni(QString ini)
     flags &= ~isForkMount;
     flags &= ~bauds_115200;
     flags |= ((ui->MountStyle->currentIndex() == 1) ? isForkMount : 0);
-    //flags |= (ui->HighBauds->isChecked() ? bauds_115200 : 0);
+    flags |= (ui->HighBauds->isChecked() ? bauds_115200 : 0);
     flags |= halfCurrentRA;
     flags |= halfCurrentDec;
     ahp_gt_set_mount_flags((GTFlags)flags);
@@ -267,7 +267,7 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Device", ui->SetDevice->value());
     settings->setValue("PWMFreq", ui->PWMFreq->value());
     settings->setValue("MountStyle", ui->MountStyle->currentIndex());
-    //settings->setValue("HighBauds", ui->HighBauds->isChecked());
+    settings->setValue("HighBauds", ui->HighBauds->isChecked());
     settings->setValue("Timing", ui->Timing->value());
     settings->setValue("Notes", QString(ui->Notes->text().toUtf8().toBase64()));
     s->~QSettings();
@@ -486,7 +486,7 @@ MainWindow::MainWindow(QWidget *parent)
         ui->ComPort->setEnabled(true);
         isConnected = false;
         finished = false;
-        //ui->HighBauds->setChecked(false);
+        ui->HighBauds->setChecked(false);
         ui->Timing->setEnabled(true);
         ui->LoadFW->setEnabled(true);
         ui->Connect->setEnabled(true);
@@ -598,7 +598,7 @@ MainWindow::MainWindow(QWidget *parent)
                 break;
         }
         saveIni(ini);
-    });/*
+    });
     connect(ui->HighBauds, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
     {
         int flags = (int)ahp_gt_get_mount_flags();
@@ -607,7 +607,7 @@ MainWindow::MainWindow(QWidget *parent)
             flags |= bauds_115200;
         ahp_gt_set_mount_flags((GTFlags)flags);
         saveIni(ini);
-    });*/
+    });
     connect(ui->PWMFreq, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
     [ = ](int value)
     {
@@ -675,7 +675,10 @@ MainWindow::MainWindow(QWidget *parent)
         if(isConnected) {
             new_axis = ui->SetAxis->currentIndex();
             ahp_gt_copy_axis(axis_number, new_axis);
-            axis_number = new_axis;
+            ui->Write->setText("Scan");
+            WriteThread->start();
+            WriteThread->block(60000);
+            ui->SelectAxis->setCurrentIndex(new_axis);
         }
         saveIni(ini);
     });
@@ -911,8 +914,10 @@ void MainWindow::UpdateValues(int axis)
     if(!index) {
         index |= (((ahp_gt_get_mount_flags() & isForkMount) != 0) ? 1 : 0);
     }
+    ui->SetAxis->setCurrentIndex(axis);
+    ui->SelectAxis->setCurrentIndex(axis);
     ui->MountStyle->setCurrentIndex(index);
-    //ui->HighBauds->setChecked((ahp_gt_get_mount_flags() & bauds_115200) != 0);
+    ui->HighBauds->setChecked((ahp_gt_get_mount_flags() & bauds_115200) != 0);
     ui->Timing->setValue((base_timing-ahp_gt_get_timing(axis))*ui->Timing->maximum()/offset_timing);
     ui->LimitTorque->setChecked(ahp_gt_is_intensity_limited(axis));
     ui->Torque->setValue(ahp_gt_get_intensity_limit(axis));
