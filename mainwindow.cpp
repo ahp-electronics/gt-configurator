@@ -189,7 +189,6 @@ void MainWindow::readIni(QString ini)
     QSettings *settings = new QSettings(ini, QSettings::Format::IniFormat);
     ui->Notes->setText(QByteArray::fromBase64(settings->value("Notes").toString().toUtf8()));
 
-    ui->Address->setValue(settings->value("Address", 0).toInt());
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency(0)).toInt());
     ui->PWMFreq->setValue(settings->value("PWMFreq", ahp_gt_get_pwm_frequency(1)).toInt());
     ui->MountType->setCurrentIndex(settings->value("MountType", 0).toInt());
@@ -212,7 +211,6 @@ void MainWindow::readIni(QString ini)
     ahp_gt_set_features(1, (SkywatcherFeature)(features | ((ui->MountStyle->currentIndex() == 2) ? isAZEQ : 0)));
     ahp_gt_set_pwm_frequency(0, ui->PWMFreq->value());
     ahp_gt_set_pwm_frequency(1, ui->PWMFreq->value());
-    ahp_gt_select_device(ui->Address->value());
 
 
     ui->MotorSteps_0->setValue(settings->value("MotorSteps_0", ahp_gt_get_motor_steps(0)).toInt());
@@ -372,7 +370,6 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Timing_1", ui->Timing_1->value());
 
     settings->setValue("MountType", ui->MountType->currentIndex());
-    settings->setValue("Address", ui->Address->value());
     settings->setValue("PWMFreq", ui->PWMFreq->value());
     settings->setValue("MountStyle", ui->MountStyle->currentIndex());
     settings->setValue("HighBauds", ui->HighBauds->isChecked());
@@ -446,6 +443,7 @@ MainWindow::MainWindow(QWidget *parent)
         if(ui->Write->text() == "Flash")
         {
             if(!ahp_gt_is_detected()&&ahp_gt_is_connected()) {
+                ahp_gt_select_device(device_number);
                 ahp_gt_detect_device(&percent);
                 thread->unlock();
                 return;
@@ -462,11 +460,16 @@ MainWindow::MainWindow(QWidget *parent)
                 f.close();
                 mutex.unlock();
             }
-        }
-        else
-        {
+        } else if(ui->Write->text() == "Scan") {
+            ahp_gt_select_device(device_number);
+            ahp_gt_detect_device(&percent);
+        } else {
             ahp_gt_write_values(0, &percent, &finished);
             ahp_gt_write_values(1, &percent, &finished);
+            ahp_gt_reload(0);
+            ahp_gt_reload(1);
+            device_number = new_device;
+            ahp_gt_select_device(device_number);
             ui->Write->setEnabled(true);
             ui->WorkArea->setEnabled(true);
         }
@@ -552,6 +555,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
         if(ahp_gt_is_detected())
         {
+            ui->SelectDevice->setValue(ahp_gt_get_current_device());
             settings->setValue("LastPort", ui->ComPort->currentText());
             ui->Write->setText("Write");
             ui->Write->setEnabled(true);
@@ -901,17 +905,24 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_set_timing(1, -value * 1500000.0 / 10000.0 + 1500000.0);
         saveIni(ini);
     });
-    connect(ui->Address, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui->SelectDevice, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
-    {
-        if(value > 0) {
-            ahp_gt_copy_device(ahp_gt_get_current_device(), value-1);
-            ahp_gt_write_values(0, nullptr, nullptr);
-            ahp_gt_write_values(1, nullptr, nullptr);
-        }
-        ahp_gt_select_device(value);
-        saveIni(ini);
-    });
+            {
+                if(isConnected) {
+                    device_number = value;
+                    ahp_gt_select_device(value);
+                }
+                saveIni(ini);
+            });
+    connect(ui->SetDevice, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            [ = ](int value)
+            {
+                if(isConnected) {
+                    new_device = ui->SetDevice->value();
+                    ahp_gt_copy_device(ahp_gt_get_current_device(), new_device);
+                }
+                saveIni(ini);
+            });
     connect(ui->HighBauds, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
     {
         int flags = (int)ahp_gt_get_mount_flags();
@@ -1506,7 +1517,8 @@ MainWindow::~MainWindow()
 void MainWindow::disconnectControls(bool block)
 {
     ui->MountType->blockSignals(block);
-    ui->Address->blockSignals(block);
+    ui->SetDevice->blockSignals(block);
+    ui->SelectDevice->blockSignals(block);
     ui->MountStyle->blockSignals(block);
     ui->PWMFreq->blockSignals(block);
 

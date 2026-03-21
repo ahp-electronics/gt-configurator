@@ -48,6 +48,8 @@ class MainWindow : public QMainWindow
         double Latitude, Longitude, Elevation;
         double Ra {0.0};
         double Dec {0.0};
+        int device_number { 0  };
+        int new_device { 0  };
 
         double* toDms(double d);
         QString toHMS(double hms);
