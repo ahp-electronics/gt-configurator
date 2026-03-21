@@ -434,6 +434,7 @@ MainWindow::MainWindow(QWidget *parent)
     else
         ui->ComPort->addItem("No serial ports available");
     ui->MountType->setCurrentIndex(0);
+    ahp_gt_set_axes_limit(2);
     WriteThread = new Thread(this);
     connect(WriteThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * thread) {
         saveIni(getDefaultIni());
