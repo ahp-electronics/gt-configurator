@@ -431,7 +431,6 @@ MainWindow::MainWindow(QWidget *parent)
     else
         ui->ComPort->addItem("No serial ports available");
     ui->MountType->setCurrentIndex(0);
-    ahp_gt_set_axes_limit(2);
     WriteThread = new Thread(this);
     connect(WriteThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * thread) {
         saveIni(getDefaultIni());
@@ -440,6 +439,7 @@ MainWindow::MainWindow(QWidget *parent)
         ui->WorkArea->setEnabled(false);
         ui->Connection->setEnabled(false);
         finished = 0;
+        ahp_gt_set_axes_limit(2);
         if(ui->Write->text() == "Flash")
         {
             if(!ahp_gt_is_detected()&&ahp_gt_is_connected()) {
