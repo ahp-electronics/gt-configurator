@@ -540,15 +540,16 @@ MainWindow::MainWindow(QWidget *parent)
             port = ui->ComPort->currentText().split(":")[1].toInt();
             if(!ahp_gt_connect_udp(address.toStdString().c_str(), port)) {
                 WriteThread->start();
-                WriteThread->block(60000);
+                WriteThread->block(6000);
             }
         }
         else
         {
             portname.append(ui->ComPort->currentText());
+            ahp_gt_set_high_rate(ui->WifiDongle->isChecked());
             if(!ahp_gt_connect(portname.toUtf8())) {
                 WriteThread->start();
-                WriteThread->block(60000);
+                WriteThread->block(6000);
             } else {
                 ahp_gt_disconnect();
             }
@@ -1178,7 +1179,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
 
         WriteThread->start();
-        WriteThread->block(60000);
+        WriteThread->block(6000);
     });
     connect(ui->Inductance_0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             [ = ](int value)
