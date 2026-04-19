@@ -481,7 +481,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ServerThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * thread) {
         ahp_gt_set_aligned(1);
         threadsStopped = false;
-        ahp_gt_start_synscan_server(11882, &threadsStopped);
+        ahp_gt_start_synta_server(11880, &threadsStopped);
         threadsStopped = true;
         thread->requestInterruption();
         thread->unlock();
