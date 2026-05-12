@@ -230,6 +230,8 @@ void MainWindow::readIni(QString ini)
     ui->SteppingMode_0->setCurrentIndex(settings->value("SteppingMode_0", ahp_gt_get_stepping_mode(0)).toInt());
     ui->Mean_0->setValue(settings->value("Mean_0", 1).toInt());
     ui->Timing_0->setValue(settings->value("Timing_0", 0).toInt());
+    ui->IntensityControl_0->setChecked(settings->value("IntensityControl_0", 0).toBool());
+    ui->IntensityLevel_0->setValue(settings->value("IntensityLevel_0", 0).toInt());
 
     ui->MotorSteps_1->setValue(settings->value("MotorSteps_1", ahp_gt_get_motor_steps(1)).toInt());
     ui->Motor_1->setValue(settings->value("Motor_1", ahp_gt_get_motor_teeth(1)).toInt());
@@ -248,6 +250,8 @@ void MainWindow::readIni(QString ini)
     ui->SteppingMode_1->setCurrentIndex(settings->value("SteppingMode_1", ahp_gt_get_stepping_mode(1)).toInt());
     ui->Mean_1->setValue(settings->value("Mean_1", 1).toInt());
     ui->Timing_1->setValue(settings->value("Timing_1", 0).toInt());
+    ui->IntensityControl_1->setChecked(settings->value("IntensityControl_1", 0).toBool());
+    ui->IntensityLevel_1->setValue(settings->value("IntensityLevel_1", 0).toInt());
 
     ahp_gt_set_timing(0, -settings->value("Timing_0", 0).toInt() * 1500000.0 / 10000.0 + 1500000.0);
     ahp_gt_set_motor_steps(0, ui->MotorSteps_0->value());
@@ -351,6 +355,8 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Voltage_0", ui->Voltage_0->value());
     settings->setValue("Mean_0", ui->Mean_0->value());
     settings->setValue("Timing_0", ui->Timing_0->value());
+    settings->setValue("IntensityControl_0", ui->IntensityControl_0->isChecked());
+    settings->setValue("IntensityLevel_0", ui->IntensityLevel_0->value());
 
     settings->setValue("Invert_1", ui->Invert_1->isChecked());
     settings->setValue("SteppingMode_1", ui->SteppingMode_1->currentIndex());
@@ -368,6 +374,8 @@ void MainWindow::saveIni(QString ini)
     settings->setValue("Voltage_1", ui->Voltage_1->value());
     settings->setValue("Mean_1", ui->Mean_1->value());
     settings->setValue("Timing_1", ui->Timing_1->value());
+    settings->setValue("IntensityControl_1", ui->IntensityControl_1->isChecked());
+    settings->setValue("IntensityLevel_1", ui->IntensityLevel_1->value());
 
     settings->setValue("MountType", ui->MountType->currentIndex());
     settings->setValue("PWMFreq", ui->PWMFreq->value());
@@ -393,7 +401,6 @@ MainWindow::MainWindow(QWidget *parent)
     ProgressThread = new Thread(this, 100, 10);
     RaThread = new Thread(this, 500, 1000);
     DecThread = new Thread(this, 1000, 1000);
-    ServerThread = new Thread(this);
     setAccessibleName("GT Configurator");
     firmwareFilename = QStandardPaths::standardLocations(QStandardPaths::TempLocation).at(0) + "/" + strrand(32);
     QString homedir = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation).at(0);
@@ -475,14 +482,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
         ui->Connection->setEnabled(true);
         percent = 0;
-        thread->requestInterruption();
-        thread->unlock();
-    });
-    connect(ServerThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), [ = ] (Thread * thread) {
-        ahp_gt_set_aligned(1);
-        threadsStopped = false;
-        ahp_gt_start_synta_server(11880, &threadsStopped);
-        threadsStopped = true;
         thread->requestInterruption();
         thread->unlock();
     });
@@ -597,7 +596,6 @@ MainWindow::MainWindow(QWidget *parent)
         isConnected = false;
         finished = false;
         ui->HighBauds->setChecked(false);
-        ui->Server->setChecked(false);
         ui->LoadFW->setEnabled(true);
         ui->Connect->setEnabled(true);
         ui->Disconnect->setEnabled(false);
@@ -894,36 +892,52 @@ MainWindow::MainWindow(QWidget *parent)
         }
         saveIni(ini);
     });
-    connect(ui->Timing_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-    [ = ](int value)
+    connect(ui->Timing_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ](int value)
     {
         ahp_gt_set_timing(0, -value * 1500000.0 / 10000.0 + 1500000.0);
         saveIni(ini);
     });
-    connect(ui->Timing_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-    [ = ](int value)
+    connect(ui->Timing_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ](int value)
     {
         ahp_gt_set_timing(1, -value * 1500000.0 / 10000.0 + 1500000.0);
         saveIni(ini);
     });
-    connect(ui->SelectDevice, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            [ = ](int value)
-            {
-                if(isConnected) {
-                    device_number = value;
-                    ahp_gt_select_device(value);
-                }
-                saveIni(ini);
-            });
-    connect(ui->SetDevice, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            [ = ](int value)
-            {
-                if(isConnected) {
-                    new_device = ui->SetDevice->value();
-                    ahp_gt_copy_device(ahp_gt_get_current_device(), new_device);
-                }
-                saveIni(ini);
-            });
+    connect(ui->IntensityControl_0, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ](bool checked)
+    {
+        ahp_gt_limit_intensity(0, checked);
+        saveIni(ini);
+    });
+    connect(ui->IntensityControl_1, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ](bool checked)
+    {
+        ahp_gt_limit_intensity(1, checked);
+        saveIni(ini);
+    });
+    connect(ui->IntensityLevel_0, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ](int value)
+    {
+        ahp_gt_set_intensity_limit(0, value);
+        saveIni(ini);
+    });
+    connect(ui->IntensityLevel_1, static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged), [ = ](int value)
+    {
+        ahp_gt_set_intensity_limit(1, value);
+        saveIni(ini);
+    });
+    connect(ui->SelectDevice, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+    {
+        if(isConnected) {
+            device_number = value;
+            ahp_gt_select_device(value);
+        }
+        saveIni(ini);
+    });
+    connect(ui->SetDevice, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [ = ](int value)
+    {
+        if(isConnected) {
+            new_device = ui->SetDevice->value();
+            ahp_gt_copy_device(ahp_gt_get_current_device(), new_device);
+        }
+        saveIni(ini);
+    });
     connect(ui->HighBauds, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
     {
         int flags = (int)ahp_gt_get_mount_flags();
@@ -1345,18 +1359,6 @@ MainWindow::MainWindow(QWidget *parent)
         ahp_gt_stop_motion(0, 0);
         ahp_gt_stop_motion(1, 0);
     });
-    connect(ui->Server, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked), [ = ] (bool checked)
-    {
-        oldTracking[0] = false;
-        oldTracking[1] = false;
-        if(checked) {
-            threadsStopped = false;
-            ServerThread->start();
-        }
-        if(!threadsStopped && !checked) {
-            threadsStopped = true;
-        }
-    });
     connect(ProgressThread, static_cast<void (Thread::*)(Thread *)>(&Thread::threadLoop), this, [ = ] (Thread * parent)
     {
         ui->progress->setValue(fmax(ui->progress->minimum(), fmin(ui->progress->maximum(), percent)));
@@ -1508,7 +1510,6 @@ MainWindow::~MainWindow()
     IndicationThread->stop();
     ProgressThread->stop();
     WriteThread->stop();
-    ServerThread->stop();
     if(QFile(firmwareFilename).exists())
         unlink(firmwareFilename.toUtf8());
     threadsStopped = true;

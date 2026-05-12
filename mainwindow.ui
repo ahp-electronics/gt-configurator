@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1100</width>
-    <height>657</height>
+    <height>633</height>
    </rect>
   </property>
   <property name="styleSheet">
@@ -25,7 +25,7 @@ color: rgb(255, 255, 255);</string>
       <x>10</x>
       <y>80</y>
       <width>1081</width>
-      <height>461</height>
+      <height>481</height>
      </rect>
     </property>
     <property name="contextMenuPolicy">
@@ -46,7 +46,7 @@ color: rgb(255, 255, 255);</string>
        <x>490</x>
        <y>30</y>
        <width>251</width>
-       <height>411</height>
+       <height>441</height>
       </rect>
      </property>
      <property name="title">
@@ -121,7 +121,7 @@ color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>90</x>
-        <y>370</y>
+        <y>400</y>
         <width>141</width>
         <height>16</height>
        </rect>
@@ -149,7 +149,7 @@ color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>370</y>
+        <y>400</y>
         <width>81</width>
         <height>16</height>
        </rect>
@@ -162,7 +162,7 @@ color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>390</y>
+        <y>420</y>
         <width>81</width>
         <height>16</height>
        </rect>
@@ -175,7 +175,7 @@ color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>90</x>
-        <y>390</y>
+        <y>420</y>
         <width>141</width>
         <height>16</height>
        </rect>
@@ -184,7 +184,7 @@ color: rgb(255, 255, 255);</string>
        <number>1</number>
       </property>
       <property name="maximum">
-       <number>1000</number>
+       <number>2000</number>
       </property>
       <property name="value">
        <number>200</number>
@@ -203,7 +203,7 @@ color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>350</y>
+        <y>370</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -216,7 +216,7 @@ color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>160</x>
-        <y>326</y>
+        <y>340</y>
         <width>61</width>
         <height>20</height>
        </rect>
@@ -292,8 +292,8 @@ color: rgb(255, 255, 255);</string>
      <widget class="QCheckBox" name="TuneRa">
       <property name="geometry">
        <rect>
-        <x>170</x>
-        <y>350</y>
+        <x>80</x>
+        <y>370</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -357,8 +357,8 @@ color: rgb(255, 255, 255);</string>
      <widget class="QCheckBox" name="TuneDec">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>350</y>
+        <x>160</x>
+        <y>370</y>
         <width>71</width>
         <height>16</height>
        </rect>
@@ -447,9 +447,9 @@ color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>90</x>
-        <y>326</y>
+        <y>339</y>
         <width>61</width>
-        <height>20</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="text">
@@ -604,7 +604,7 @@ color: rgb(255, 255, 255);</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>370</y>
+       <y>390</y>
        <width>471</width>
        <height>81</height>
       </rect>
@@ -699,9 +699,9 @@ color: rgb(255, 255, 255);</string>
       <property name="geometry">
        <rect>
         <x>270</x>
-        <y>46</y>
+        <y>45</y>
         <width>171</width>
-        <height>20</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="text">
@@ -713,7 +713,7 @@ color: rgb(255, 255, 255);</string>
        <rect>
         <x>270</x>
         <y>60</y>
-        <width>171</width>
+        <width>191</width>
         <height>16</height>
        </rect>
       </property>
@@ -725,6 +725,9 @@ color: rgb(255, 255, 255);</string>
       </property>
       <property name="singleStep">
        <number>1</number>
+      </property>
+      <property name="value">
+       <number>13</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -790,26 +793,13 @@ color: rgb(255, 255, 255);</string>
        <string>Set Device n°</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="Server">
-      <property name="geometry">
-       <rect>
-        <x>270</x>
-        <y>30</y>
-        <width>91</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Start server</string>
-      </property>
-     </widget>
      <widget class="QCheckBox" name="HighBauds">
       <property name="geometry">
        <rect>
-        <x>360</x>
-        <y>30</y>
+        <x>270</x>
+        <y>20</y>
         <width>111</width>
-        <height>20</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="text">
@@ -1600,7 +1590,7 @@ color: rgb(255, 255, 255);</string>
        <x>10</x>
        <y>30</y>
        <width>231</width>
-       <height>341</height>
+       <height>361</height>
       </rect>
      </property>
      <property name="title">
@@ -1844,7 +1834,7 @@ color: rgb(255, 255, 255);</string>
         <x>120</x>
         <y>320</y>
         <width>101</width>
-        <height>21</height>
+        <height>16</height>
        </rect>
       </property>
       <property name="maximum">
@@ -1984,6 +1974,47 @@ color: rgb(255, 255, 255);</string>
        <string>Timing</string>
       </property>
      </widget>
+     <widget class="QSlider" name="IntensityLevel_0">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>340</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="value">
+       <number>100</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::NoTicks</enum>
+      </property>
+      <property name="tickInterval">
+       <number>8</number>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="IntensityControl_0">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>340</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Intensity level</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QGroupBox" name="DEC">
      <property name="enabled">
@@ -1994,7 +2025,7 @@ color: rgb(255, 255, 255);</string>
        <x>250</x>
        <y>30</y>
        <width>231</width>
-       <height>341</height>
+       <height>361</height>
       </rect>
      </property>
      <property name="title">
@@ -2343,7 +2374,7 @@ color: rgb(255, 255, 255);</string>
         <x>120</x>
         <y>320</y>
         <width>101</width>
-        <height>21</height>
+        <height>16</height>
        </rect>
       </property>
       <property name="maximum">
@@ -2376,6 +2407,50 @@ color: rgb(255, 255, 255);</string>
       </property>
       <property name="text">
        <string>Max speed</string>
+      </property>
+     </widget>
+     <widget class="QSlider" name="IntensityLevel_1">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>340</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="singleStep">
+       <number>1</number>
+      </property>
+      <property name="value">
+       <number>100</number>
+      </property>
+      <property name="sliderPosition">
+       <number>100</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="tickPosition">
+       <enum>QSlider::NoTicks</enum>
+      </property>
+      <property name="tickInterval">
+       <number>8</number>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="IntensityControl_1">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>340</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Intensity level</string>
       </property>
      </widget>
     </widget>
@@ -2532,7 +2607,7 @@ color: rgb(255, 255, 255);</string>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>540</y>
+      <y>570</y>
       <width>1081</width>
       <height>61</height>
      </rect>
@@ -2657,7 +2732,6 @@ color: rgb(255, 255, 255);</string>
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen_FW">
    <property name="text">
     <string>Open FW...</string>
