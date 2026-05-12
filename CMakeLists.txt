@@ -42,7 +42,6 @@ include_directories(${CMAKE_INCLUDE_PATH})
 include_directories(${AHP_GT_INCLUDE_DIR})
 include_directories(${DFU_INCLUDE_DIR})
 
-execute_process (COMMAND ./update_firmware.sh https://www.iliaplatone.com/firmware.php WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/brew.sh.cmake ${CMAKE_CURRENT_BINARY_DIR}/brew.sh )
 file(GLOB ICONS ${CMAKE_CURRENT_SOURCE_DIR}/*.ico)
 file(COPY ${ICONS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
