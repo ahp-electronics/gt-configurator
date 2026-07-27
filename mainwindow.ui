@@ -404,10 +404,10 @@ color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="minimum">
-       <number>-1024</number>
+       <number>-100</number>
       </property>
       <property name="maximum">
-       <number>1024</number>
+       <number>100</number>
       </property>
       <property name="singleStep">
        <number>1</number>
@@ -439,47 +439,6 @@ color: rgb(255, 255, 255);</string>
       </property>
       <property name="text">
        <string>Timing: 0%</string>
-      </property>
-     </widget>
-     <widget class="QSlider" name="Torque">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>60</y>
-        <width>101</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="minimum">
-       <number>0</number>
-      </property>
-      <property name="maximum">
-       <number>1023</number>
-      </property>
-      <property name="singleStep">
-       <number>1</number>
-      </property>
-      <property name="value">
-       <number>1023</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="tickPosition">
-       <enum>QSlider::NoTicks</enum>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="LimitTorque">
-      <property name="geometry">
-       <rect>
-        <x>340</x>
-        <y>60</y>
-        <width>71</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Torque</string>
       </property>
      </widget>
      <widget class="QComboBox" name="SetAxis">
