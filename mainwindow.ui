@@ -2606,42 +2606,12 @@ color: rgb(255, 255, 255);</string>
      </item>
      <item>
       <property name="text">
-       <string>gt2ra_lock</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>gt2ra_brake</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
        <string>gt2dec</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>gt2dec_lock</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>gt2dec_brake</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
        <string>gt5</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>gt5_lock</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>gt5_brake</string>
       </property>
      </item>
     </widget>
